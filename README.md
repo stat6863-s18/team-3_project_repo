@@ -1,3 +1,3 @@
 # team-3_project_repo
 
-Team Nickname: In Process To Be Defined ()
+Team Nickname: Not Any More SASRCasm (the mystic pattern recognition pirates)
