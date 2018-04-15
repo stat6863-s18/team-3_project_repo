@@ -9,21 +9,37 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 
 
 * load external file that will generate final analytic file;
-%include '.\STAT6863-02_s18-team-0_project2_data_preparation';
+%include '.\STAT6863-02_s18-team-3_project2_data_preparation';
 
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: What are the top five schools that experienced the biggest increase
-in "Percent (%) Eligible Free (K-12)" between AY2014-15 and AY2015-16?
+Question: Amongst providers with complete results for both median time for door to
+diagnostic evaluation and comparison to national mortality rate, is there an association
+between higher values for door to door diagnostic evaluation and the mortality rate?
 
-Rationale: This should help identify schools to consider for new outreach based
-upon increasing child-poverty levels.
+Rationale: This should help identiy providers that have longer times for diagnostic
+evaluation with higher mortality rates. Intervention may be recommended to reduce
+the median door to door time.
 
-Note: This compares the column "Percent (%) Eligible Free (K-12)" from frpm1415
-to the column of the same name from frpm1516.
+Note: This compares the variable "door to diagnostic eval" in Timely_and_Effective to 
+"Mortality National Comparison" in Hospital_General.
+;
+
+*******************************************************************************;
+* Research Question Analysis Starting Point;
+*******************************************************************************;
+*
+Question: Amongst providers, is there an association between patients leaving before
+they are seen and scoring for effectiveness of care?
+
+Rationale: This would help inform whether wait time is a factor in the ratings for
+effectiveness of care
+
+Note: This compares the variable "left before being seen" in Timely_and_Effective to 
+"Effectiveness of Care National Comparison" in Hospital_General.
 ;
 
 
@@ -31,32 +47,12 @@ to the column of the same name from frpm1516.
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: Can "Percent (%) Eligible FRPM (K-12)" be used to predict the
-proportion of high school graduates earning a combined score of at least 1500
-on the SAT?
+Question: Amongst providers, is there an association between the median time to
+administration of pain meds and the scoring for readmission?
 
-Rationale: This would help inform whether child-poverty levels are associated
-with college-preparedness rates, providing a strong indicator for the types of
-schools most in need of college-preparation outreach.
+Rationale: This would help inform whether shorter times for administration of pain
+meds is a factor in the ratings for readmission
 
-Note: This compares the column "Percent (%) Eligible Free (K-12)" from frpm1415
-to the column PCTGE1500 from sat15.
-;
-
-
-*******************************************************************************;
-* Research Question Analysis Starting Point;
-*******************************************************************************;
-*
-Question: What are the top ten schools were the number of high school graduates
-taking the SAT exceeds the number of high school graduates completing UC/CSU
-entrance requirements?
-
-Rationale: This would help identify schools with significant gaps in
-preparation specific for California's two public university systems, suggesting
-where focused outreach on UC/CSU college-preparation might have the greatest
-impact.
-
-Note: This compares the column NUMTSTTAKR from sat15 to the column TOTAL from
-gradaf15.
+Note: This compares the variable "median time to pain med" in Timely_and_Effective to 
+"Readmission National Comparison" in Hospital_General.
 ;
