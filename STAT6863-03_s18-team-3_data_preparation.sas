@@ -5,8 +5,8 @@
 
 [Dataset 1 Name] Hospital Charge Data
 
-[Dataset Description] Inpatient Prospective Payment System (IPPS) Provider Summary for the Top 100 
-Diagnosis-Related Groups (DRG) - FY2011
+[Dataset Description] Inpatient Prospective Payment System (IPPS) Provider Summary 
+for the Top 100 Diagnosis-Related Groups (DRG) - FY2011
 
 [Experimental Unit Description] Medicare Provider
 
@@ -16,7 +16,8 @@ Diagnosis-Related Groups (DRG) - FY2011
 
 [Data Source] https://data.cms.gov/api/views/97k6-zzx3/rows.csv?accessType=DOWNLOAD&bom=true&format=true
 
-[Data Dictionary] https://data.cms.gov/Medicare-Inpatient/Inpatient-Prospective-Payment-System-IPPS-Provider/97k6-zzx3
+[Data Dictionary] https://data.cms.gov/Medicare-Inpatient/Inpatient-
+Prospective-Payment-System-IPPS-Provider/97k6-zzx3
 
 [Unique ID Schema] The column Provider_ID is a unique id.
 ;
