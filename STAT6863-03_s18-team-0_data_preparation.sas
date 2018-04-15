@@ -4,120 +4,120 @@
 *******************************************************************************;
 
 * 
-[Dataset 1 Name] frpm1415
+[Dataset 1 Name] Master_Inpatient_Claim_2010.csv
 
-[Dataset Description] Student Poverty Free or Reduced Price Meals (FRPM) Data,
-AY2014-15
+[Dataset Description] Impatient Medicare Data by Service Line, 2010
 
-[Experimental Unit Description] California public K-12 schools in AY2014-15
 
-[Number of Observations] 10,393      
+[Experimental Unit Description] Benefeciary Claim
 
-[Number of Features] 28
+[Number of Observations] 13,916      
 
-[Data Source] The file http://www.cde.ca.gov/ds/sd/sd/documents/frpm1415.xls
-was downloaded and edited to produce file frpm1415-edited.xls by deleting
-worksheet "Title Page", deleting row 1 from worksheet "FRPM School-Level Data",
-reformatting column headers in "FRPM School-Level Data" to remove characters
-disallowed in SAS variable names, and setting all cell values to "Text" format
+[Number of Features] 10
 
-[Data Dictionary] http://www.cde.ca.gov/ds/sd/sd/fsspfrpm.asp
+[Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
+/Downloadable-Public-Use-Files/SynPUFs/Downloads
+/DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
+was downloaded and edited to produce file by subsetting to get 2010 year 
 
-[Unique ID Schema] The columns "County Code", "District Code", and "School
-Code" form a composite key, which together are equivalent to the unique id
-column CDS_CODE in dataset gradaf15, and which together are also equivalent to
-the unique id column CDS in dataset sat15.
+[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master
+/data/Data_Dictionary_Medicare.doc
+
+[Unique ID Schema] The columns "Claim_ID", "Bene_ID" and "CLM_LN" form 
+a composite key
+
 ;
-%let inputDataset1DSN = frpm1415_raw;
+%let inputDataset1DSN = Ip2010line;
 %let inputDataset1URL =
-https://github.com/stat6250/team-0_project2/blob/master/data/frpm1415-edited.xls?raw=true
+https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatient_Claim_2010.csv?raw=true
 ;
-%let inputDataset1Type = XLS;
+%let inputDataset1Type = CSV;
+
+
 
 
 *
-[Dataset 2 Name] frpm1516
+[Dataset 2 Name] Inpatient_Claim_2_2010.csv
 
-[Dataset Description] Student Poverty Free or Reduced Price Meals (FRPM) Data,
-AY2015-16
+[Dataset Description] Impatient Medicare Data by claim, 2010
 
-[Experimental Unit Description] California public K-12 schools in AY2015-16
+[Experimental Unit Description] Beneficiary Claim
 
-[Number of Observations] 10,453     
+[Number of Observations] 13,916     
 
-[Number of Features] 28
+[Number of Features] 36
 
-[Data Source] The file http://www.cde.ca.gov/ds/sd/sd/documents/frpm1516.xls
-was downloaded and edited to produce file frpm1516-edited.xls by deleting
-worksheet "Title Page", deleting row 1 from worksheet "FRPM School-Level Data",
-reformatting column headers in "FRPM School-Level Data" to remove characters
-disallowed in SAS variable names, and setting all cell values to "Text" format
+[Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
+/Downloadable-Public-Use-Files/SynPUFs/Downloads
+/DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
+was downloaded and edited to produce the file by subsetting to get 2010 year 
 
-[Data Dictionary] http://www.cde.ca.gov/ds/sd/sd/fsspfrpm.asp
+[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
+data/Data_Dictionary_Medicare.doc
 
-[Unique ID Schema] The columns "County Code", "District Code", and "School
-Code" form a composite key, which together are equivalent to the unique id
-column CDS_CODE in dataset gradaf15, and which together are also equivalent to
-the unique id column CDS in dataset sat15.
+[Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key
+.
 ;
-%let inputDataset2DSN = frpm1516_raw;
+%let inputDataset2DSN = Ip2010claim;
 %let inputDataset2URL =
-https://github.com/stat6250/team-0_project2/blob/master/data/frpm1516-edited.xls?raw=true
+https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim_2_2010.csv?raw=true
 ;
-%let inputDataset2Type = XLS;
+%let inputDataset2Type = CSV;
 
 
 *
-[Dataset 3 Name] gradaf15
+[Dataset 3 Name] Master_Beneficiary_Summary_2010.csv
 
-[Dataset Description] Graduates Meeting UC/CSU Entrance Requirements, AY2014-15
+[Dataset Description] Master Beneficiary Medicare Summary, 2010
 
-[Experimental Unit Description] California public K-12 schools in AY2014-15
+[Experimental Unit Description] Beneficiary Claim
+[Number of Observations] 112,374
 
-[Number of Observations] 2,490
+[Number of Features] 32
 
-[Number of Features] 15
+[Data Source] https://www.cms.gov/Research-Statistics-Data-and-Systems
+/Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2010_Beneficiary_
+Summary_File_Sample_1.zip was downloaded and edited to produce the file by
+subsetting to get 2010 year 
 
-[Data Source] The file
-http://dq.cde.ca.gov/dataquest/dlfile/dlfile.aspx?cLevel=School&cYear=2014-15&cCat=UCGradEth&cPage=filesgradaf.asp
-was downloaded and edited to produce file gradaf15.xls by importing into Excel
-and setting all cell values to "Text" format
+[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
+data/Data_Dictionary_Medicare.doc
 
-[Data Dictionary] http://www.cde.ca.gov/ds/sd/sd/fsgradaf09.asp
-
-[Unique ID Schema] The column CDS_CODE is a unique id.
+[Unique ID Schema] The column BENE_ID is a unique id.
 ;
-%let inputDataset3DSN = gradaf15_raw;
+%let inputDataset3DSN = Mbsf_AB_2010;
 %let inputDataset3URL =
-https://github.com/stat6250/team-0_project2/blob/master/data/gradaf15.xls?raw=true
+https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Beneficiary_Summary_2010.csv?raw=true
 ;
-%let inputDataset3Type = XLS;
+%let inputDataset3Type = CSV;
 
 
 *
-[Dataset 4 Name] sat15
+[Dataset 4 Name] Outpatient_Claim_2_2010.csv
 
-[Dataset Description] SAT Test Results, AY2014-15
+[Dataset Description] Outpatient Medicare Data by Claim, 2010
 
-[Experimental Unit Description] California public K-12 schools in AY2014-15
+[Experimental Unit Description] Beneficiary Claim
 
-[Number of Observations] 2,331
+[Number of Observations] 175,005
 
-[Number of Features] 12
+[Number of Features] 31
 
-[Data Source]  The file http://www3.cde.ca.gov/researchfiles/satactap/sat15.xls
-was downloaded and edited to produce file sat15-edited.xls by opening in Excel
-and setting all cell values to "Text" format
+[Data Source]  The file https://www.cms.gov/Research-Statistics-Data-and-Systems
+/Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2008_to_2010_Outpatient_
+Claims_Sample_1.zip
+was downloaded and edited to produce file by subsetting to get 2010 year 
 
-[Data Dictionary] http://www.cde.ca.gov/ds/sp/ai/reclayoutsat.asp
+[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
+data/Data_Dictionary_Medicare.doc
 
-[Unique ID Schema] The column CDS is a unique id.
+[Unique ID Schema] "Claim_ID", "Bene_ID" form a composite key
 ;
-%let inputDataset4DSN = sat15_raw;
+%let inputDataset4DSN = Op2010claim;
 %let inputDataset4URL =
-https://github.com/stat6250/team-0_project2/blob/master/data/sat15-edited.xls?raw=true
+https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Claim_2_2010.csv?raw=true
 ;
-%let inputDataset4Type = XLS;
+%let inputDataset4Type = CSV;
 
 
 * load raw datasets over the wire, if they doesn't already exist;
