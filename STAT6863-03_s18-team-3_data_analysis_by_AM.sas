@@ -16,14 +16,15 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: Do Medicare patients with RA/OA have more inpatient claims than patints
-that not have RA/OA?
+Question: Do Medicare patients with RA/OA have more inpatient claims than 
+patients that not have RA/OA?
 
-Rationale: This should help identify trends in hospitalization for patients with
-certain chronic conditions.
+Rationale: This should help identify trends in hospitalization for patients 
+with certain chronic conditions.
 
-Note: This compares the variable "Chronic Condition: RA/OA" in Master_Beneficiary_Summary_2010.csv 
-to "Inpatient admission date" in Master_Inpatient_Claim_2010.csv.
+Note: This compares the variable "Chronic Condition: RA/OA" in 
+Master_Beneficiary_Summary_2010.csv to "Inpatient admission date" in 
+Master_Inpatient_Claim_2010.csv.
 ;
 
 *******************************************************************************;
@@ -33,11 +34,12 @@ to "Inpatient admission date" in Master_Inpatient_Claim_2010.csv.
 Question: What is the median inpatient claim amount for Medicare patients with 
 COPD versus patients that do not have COPD?
 
-Rationale: This should help identify differences in hospitalization costs for patients 
-with/without certain chronic conditions.
+Rationale: This should help identify differences in hospitalization costs for 
+patients with/without certain chronic conditions.
 
-Note: This compares the variable "Chronic Condition: COPD" in Master_Beneficiary_Summary_2010.csv 
-to "Claim Payment Amount" in Master_Inpatient_Claim_2010.csv.
+Note: This compares the variable "Chronic Condition: COPD" in 
+Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
+Master_Inpatient_Claim_2010.csv.
 ;
 
 *******************************************************************************;
@@ -47,9 +49,10 @@ to "Claim Payment Amount" in Master_Inpatient_Claim_2010.csv.
 Question: What is the median outpatient claim amount for Medicare patients with 
 COPD versus patients that do not have COPD?
 
-Rationale: This should help identify differences in hospitalization costs for patients 
-with/without certain chronic conditions.
+Rationale: This should help identify differences in outpatient costs for 
+patients with/without certain chronic conditions.
 
-Note: This compares the variable "Chronic Condition: COPD" in Master_Beneficiary_Summary_2010.csv 
-to "Claim Payment Amount" in Master_Outpatient_Claim_1_2010.csv.
+Note: This compares the variable "Chronic Condition: COPD" in 
+Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
+Master_Outpatient_Claim_1_2010.csv.
 ;
