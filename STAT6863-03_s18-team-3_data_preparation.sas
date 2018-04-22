@@ -276,3 +276,79 @@ proc sql;
 quit;
 title;
 
+/*For Azamat's Research Questions*/
+title "Inspect BENE_HI_CVRAGE_TOT_MONS in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(BENE_HI_CVRAGE_TOT_MONS) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect BENE_HMO_CVRAGE_TOT_MONS in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(BENE_HMO_CVRAGE_TOT_MONS) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
+proc sql;
+    select
+         min(UTIL_DAY) as min
+        ,max(UTIL_DAY) as max
+        ,mean(UTIL_DAY) as mean
+        ,median(UTIL_DAY) as median
+        ,nmiss(UTIL_DAY) as missing
+    from
+        Ip2010claim
+    ;
+quit;
+title;
+
+title "Inspect Outpatient Claims Start Date (FROM_DT) in Op2010claim";
+proc sql;
+    select
+         min(FROM_DT) as min
+        ,max(FROM_DT) as max
+        ,mean(FROM_DT) as mean
+        ,median(FROM_DT) as median
+        ,nmiss(FROM_DT) as missing
+    from
+        Op2010claim
+    ;
+quit;
+title;
+
+proc contents data=mbsf_ab_2010; run;
+*We have in this file information about Medicare beneficiaries who
+enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
+(BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
+program.
+
+PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF FILE;
+
+data enr.contenr_2010;
+    set src.mbsf_ab_2010;
+	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
+    /* IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE */
+    if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
+    contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
+    if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
+    else contenrl_hmo_2010='nohmo'; 
+	/* CLASSIFY BENEFICIARIES THAT PASSED AWAY IN 2010 */
+	if death_dt ne . then death_2010=1; else death_2010=0;
+run;
+title;
+
+title "VARIABLES USED TO GET CONTINUOUS ENROLLMENT";
+proc freq data=enr.contenr_2010; 
+    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
+run;
+title;
+
