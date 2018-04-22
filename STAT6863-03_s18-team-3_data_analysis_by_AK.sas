@@ -31,15 +31,18 @@ to the column of the BENE_ID and Claim_ID from Master_Beneficiary_Summary_2010.
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: Who was continiously enrolled in Medicare program in 2010?
+Question: What was the proportion of inpatient and outpatient benefeciaries
+and HMO benefeciaries continiously enrolled in Medicare program in 2010?
+What was the proportion of benefeciaries who passed away?
 
 Rationale: This helps to understand how many beneficiaries who were 
-at age over 65 as of January 2010 continiously enrolled in Medicare program and 
-further to do analysis by gender, race. It also gets information about
-proportion of Americans by age category 
+at age over 65 as of January 2010 continiously enrolled in Medicare program
+(Part A, Part B and Part C )and further to do analysis by gender, race.
+It also gets information about proportion of Americans by age category 
 
 Note: This compares the column "BENE_HI_CVRAGE_TOT_MONS" 
-"BENE_SMI_CVRAGE_TOT_MONS" and BENE_ID from Master_Beneficiary_Summary_2010.
+"BENE_SMI_CVRAGE_TOT_MONS" and BENE_HMO_CVRAGE_TOT_MONS and from
+Master_Beneficiary_Summary_2010.
 ;
 
 
