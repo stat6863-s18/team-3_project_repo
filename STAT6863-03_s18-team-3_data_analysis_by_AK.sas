@@ -42,7 +42,7 @@ It also gets information about proportion of Americans by age category
 
 Note: This compares the column "BENE_HI_CVRAGE_TOT_MONS" 
 "BENE_SMI_CVRAGE_TOT_MONS" and BENE_HMO_CVRAGE_TOT_MONS and from
-Master_Beneficiary_Summary_2010.
+Master_Beneficiary_Summary_2010 by creating contenr_2010 data set.
 ;
 
 
@@ -57,6 +57,7 @@ Rationale: This would help identify what kind of medical services were
 in high demand to see utilization of Medicare hospital services by state
 and county. 
 
-Note: This compares the column BENE_ID, and CLN_ID from Master_inpatient_
-claim file after merging with Inpatient_Claim_2 file by composite key.
+Note: This compares the column BENE_ID, Claim_ID and CLN_ID from 
+Master_inpatient_claim file after merging with Inpatient_Claim_2 file
+by composite key.
 ;
