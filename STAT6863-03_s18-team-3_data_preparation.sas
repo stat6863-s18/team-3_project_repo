@@ -162,3 +162,68 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
     %end;
 %mend;
 %loadDatasets
+
+* check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+    create table Ip2010line_dups as
+        select
+             CLM_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Ip2010line
+        group by
+             CLM_Id
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+* check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+    create table Ip2010claim_dups as
+        select
+             CLM_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Ip2010claim
+        group by
+             CLM_Id
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+* check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values*/
+    create table Mbsf_AB_2010_dups as
+        select
+             Bene_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Mbsf_AB_2010
+        group by
+             Bene_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Op2010claim_dups has no rows. No mitigation needed for ID values*/
+    create table Op2010claim_dups as
+        select
+             Clm_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Op2010claim
+        group by
+             CLM_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+
