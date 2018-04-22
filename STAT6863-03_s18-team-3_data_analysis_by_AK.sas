@@ -16,13 +16,15 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: What is the proportion of beneficiaries who was 
-enrolled in Medicare program by state and county?
+Question: What was the percentage of Medicare benefeciaries by sex and race
+What is the proportion of beneficiaries who was enrolled in Medicare program
+by state and county?
 
 Rationale: This should help identify utilization of Medicare services by state
 and by county.
 
-Note: This compares the column "County" and "State" from msabea.txt 
+Note: This compares SEX and Race column from prepared analytic dataset
+contenr_2010. It also compares the column "County" and "State" from msabea.txt 
 to the column of the BENE_ID and Claim_ID from Master_Beneficiary_Summary_2010.
 ;
 
