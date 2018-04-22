@@ -333,8 +333,8 @@ program.
 
 PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF FILE;
 
-data enr.contenr_2010;
-    set src.mbsf_ab_2010;
+data contenr_2010;
+    set mbsf_ab_2010;
 	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
     /* IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE */
     if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
@@ -347,7 +347,7 @@ run;
 title;
 
 title "VARIABLES USED TO GET CONTINUOUS ENROLLMENT";
-proc freq data=enr.contenr_2010; 
+proc freq data=contenr_2010; 
     tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
 run;
 title;
