@@ -227,3 +227,52 @@ proc sql;
     ;
 quit;
 
+/*For Amber’s Research Questions*/
+title "Inspect SP_RA_OA in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(SP_RA_OA) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect SP_COPD in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(SP_COPD) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect Inpatient Claim Payment Amount in Ip2010line";
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Ip2010line
+    ;
+quit;
+title;
+
+title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Op2010claim
+    ;
+quit;
+title;
+
