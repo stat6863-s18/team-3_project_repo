@@ -352,3 +352,119 @@ proc freq data=contenr_2010;
 run;
 title;
 
+
+*Azamat's Preparation and Merging Data Sets;
+
+/* SORT INPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
+proc sort data=src.ip2010line out=ip2010line; 
+	by bene_id clm_id clm_ln; 
+run;
+
+/* TRANSFORM INPATIENT CLAIM LINE FILE */;
+data ip2010line_wide(drop=i clm_ln hcpcs_cd);
+	format  hcpcs_cd1-hcpcs_cd45 $5.;
+	set ip2010line;
+	by bene_id clm_id clm_ln;
+	retain 	hcpcs_cd1-hcpcs_cd45;
+
+	array	xhcpcs_cd(45) hcpcs_cd1-hcpcs_cd45;
+
+	if first.clm_id then do;
+		do i=1 to 45;
+			xhcpcs_cd(clm_ln)='';
+		end;
+	end;
+
+	xhcpcs_cd(clm_ln)=hcpcs_cd;
+ 
+	if last.clm_id then output;
+run;
+
+/* SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE */
+proc sort data=src.ip2010claim out=ip2010claim; 
+	by bene_id clm_id; 
+run; 
+
+proc sort data=ip2010line_wide;
+    by bene_id clm_id;
+run; 
+
+proc print data=ip2010line_wide(obs=2); 
+	var bene_id clm_id hcpcs_cd1 hcpcs_cd2 hcpcs_cd3; 
+run;
+
+proc print data=ip2010claim(obs=10); 
+	var bene_id clm_id from_dt thru_dt; 
+run;
+
+*combine ip2010claim and ip2010line_wide horizontally using a data-step match-merge;
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+
+
+/* MERGE INPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
+data ip_2010_v1;
+    retain
+        bene_id
+        clm_id
+        from_dt
+        thru_dt
+        hcpcs_cd1
+    ;
+    keep
+        bene_id
+        clm_id
+        from_dt
+        thru_dt
+        hcpcs_cd1
+    ;
+    merge
+        ip2010claim
+        ip2010line_wide
+    ;
+    by bene_id clm_id;
+
+run;
+proc sort data=ip_2010_v1;
+    by bene_id clm_id;
+run;
+
+* combine ip2010 and ip2010line_wide horizontally using proc sql;
+* note: After running the proc sql step below several times and averaging
+  the fullstimer output in the system log, they tend to take about 0.03
+  seconds of "real time" to execute and about 35 MB of memory on the computer
+  they were tested on. Consequently, the proc sql step appears to take roughly
+  the same amount of time to execute as the combined data step and proc sort
+  steps above, but to use 5MB more memory;
+* note to learners: Based upon these results, the proc sql step is preferable
+  if memory performance isn't critical. This is because less code is required,
+  so it's faster to write and verify correct output has been obtained;
+
+proc sql;
+    create table ip2010_v2 as
+        select
+             coalesce(A.bene_id,B.bene_id,) as Bene_ID
+            ,coalesce(A.clm_id,B.clm_id) as Clm_ID
+            ,B.hcpcs_cd1 as hcpcs_cd1
+            ,A.from_dt as from_dt
+            ,A.thru_dt as thru_dt
+        from
+            ip2010claim as A
+            full join
+            ip2010line_wide as B
+            on A.bene_id=B.bene_id and A.clm_id=B.clm_id
+        order by
+            bene_id, clm_id
+    ;
+quit;
+
+* verify that ip2010_v1 and ip2010_v2 are identical;
+proc compare
+        base=ip2010_v1
+        compare=ip2010_v2
+        novalues
+    ;
+run;
