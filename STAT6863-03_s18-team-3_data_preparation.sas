@@ -355,15 +355,15 @@ title;
 
 *Azamat's Preparation and Merging Data Sets;
 
-/* SORT INPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
-proc sort data=src.ip2010line out=ip2010line; 
+/* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
+proc sort data=op2010line out=op2010line; 
 	by bene_id clm_id clm_ln; 
 run;
 
-/* TRANSFORM INPATIENT CLAIM LINE FILE */;
-data ip2010line_wide(drop=i clm_ln hcpcs_cd);
-	format  hcpcs_cd1-hcpcs_cd45 $5.;
-	set ip2010line;
+/* TRANSFORM OUTPATIENT CLAIM LINE FILE */;
+data op2010line_wide(drop=i clm_ln hcpcs_cd);
+	format	hcpcs_cd1-hcpcs_cd45 $5.;
+	set op2010line;
 	by bene_id clm_id clm_ln;
 	retain 	hcpcs_cd1-hcpcs_cd45;
 
@@ -376,28 +376,28 @@ data ip2010line_wide(drop=i clm_ln hcpcs_cd);
 	end;
 
 	xhcpcs_cd(clm_ln)=hcpcs_cd;
- 
+
 	if last.clm_id then output;
 run;
 
 /* SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE */
-proc sort data=src.ip2010claim out=ip2010claim; 
+proc sort data=op2010claim out=op2010claim; 
 	by bene_id clm_id; 
 run; 
 
-proc sort data=ip2010line_wide;
+proc sort data=op2010line_wide;
     by bene_id clm_id;
 run; 
 
-proc print data=ip2010line_wide(obs=2); 
+proc print data=op2010line_wide(obs=2); 
 	var bene_id clm_id hcpcs_cd1 hcpcs_cd2 hcpcs_cd3; 
 run;
 
-proc print data=ip2010claim(obs=10); 
+proc print data=op2010claim(obs=10); 
 	var bene_id clm_id from_dt thru_dt; 
 run;
 
-*combine ip2010claim and ip2010line_wide horizontally using a data-step match-merge;
+*combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.03 seconds of combined "real time" to execute and a maximum of
@@ -405,14 +405,15 @@ run;
   proc sort step) on the computer they were tested on;
 
 
-/* MERGE INPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
-data ip_2010_v1;
+/* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
+data op_2010_v1;
     retain
         bene_id
         clm_id
         from_dt
         thru_dt
         hcpcs_cd1
+		hcpcs_cd3
     ;
     keep
         bene_id
@@ -420,19 +421,20 @@ data ip_2010_v1;
         from_dt
         thru_dt
         hcpcs_cd1
+		hcpcs_cd3
     ;
     merge
-        ip2010claim
-        ip2010line_wide
+        op2010claim
+        op2010line_wide
     ;
     by bene_id clm_id;
 
 run;
-proc sort data=ip_2010_v1;
+proc sort data=op_2010_v1;
     by bene_id clm_id;
 run;
 
-* combine ip2010 and ip2010line_wide horizontally using proc sql;
+* combine out2010 and out2010line_wide horizontally using proc sql;
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.03
   seconds of "real time" to execute and about 35 MB of memory on the computer
@@ -444,27 +446,28 @@ run;
   so it's faster to write and verify correct output has been obtained;
 
 proc sql;
-    create table ip2010_v2 as
+    create table op2010_v2 as
         select
-             coalesce(A.bene_id,B.bene_id,) as Bene_ID
-            ,coalesce(A.clm_id,B.clm_id) as Clm_ID
-            ,B.hcpcs_cd1 as hcpcs_cd1
+             coalesce(A.bene_id,B.bene_id) as Bene_Code
+            ,coalesce(A.clm_id,B.clm_id) as Claim_Code
+            ,B.hcpcs_cd1 as Revenue_Center_1
+            ,B.hcpcs_cd3 as Revenue_Center_2
             ,A.from_dt as from_dt
             ,A.thru_dt as thru_dt
         from
-            ip2010claim as A
+            op2010claim as A
             full join
-            ip2010line_wide as B
+            op2010line_wide as B
             on A.bene_id=B.bene_id and A.clm_id=B.clm_id
         order by
-            bene_id, clm_id
+            a.bene_id, a.clm_id
     ;
 quit;
 
 * verify that ip2010_v1 and ip2010_v2 are identical;
 proc compare
-        base=ip2010_v1
-        compare=ip2010_v2
+        base=op2010_v1
+        compare=op2010_v2
         novalues
     ;
 run;
