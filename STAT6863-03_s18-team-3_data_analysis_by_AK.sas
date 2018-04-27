@@ -70,6 +70,8 @@ column are not identical. However, these rows are saved in separate file
 if they are required for furher investigation.
 Values of Admtg_dgns_cd equal to zero should be 
 excluded from this analysis, since they are potentialy missing values.
+In addition values of hcpcs_cd1 and hcpcs_cd3 equal to missing
+should be excluded from analysis.
 ;
 
 proc sql outobs=10;
