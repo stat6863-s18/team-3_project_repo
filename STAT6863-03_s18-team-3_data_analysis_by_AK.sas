@@ -74,13 +74,17 @@ excluded from this analysis, since they are potentialy missing values.
 
 proc sql outobs=10;
     select
-         Bene_ID
-        ,Clm_ID
-        ,input(ADMTG_DGNS_CD, best15.) as Admit_Code
+         bene_id
+        ,clm_id
+        ,input(admtg_dgns_cd, best15.) as Admit_Code
+		,Revenue_Center_1
+		,Revenue_Center_2
     from
         op2010_v2
     where
         calculated Admit_Code > 0
+		and Revenue_Center_1 is missing
+		and Revenue_Center_2 is missing
     order by
         bene_id, clm_id
     ;
