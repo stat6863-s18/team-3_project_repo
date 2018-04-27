@@ -95,9 +95,9 @@ quit;
 
 data op_2010 op_nomatch;
     merge op2010claim(in=a) op2010line_wide(in=b);
-	   by bene_id clm_id;
-	   if a and b then output op_2010;
-       else output op_nomatch;
+	by bene_id clm_id;
+	if a and b then output op_2010;
+    else output op_nomatch;
 run;
 
 
