@@ -406,7 +406,7 @@ run;
 
 
 /* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
-data op_2010_v1;
+data op2010_v1;
     retain
         bene_id
         clm_id
@@ -414,6 +414,7 @@ data op_2010_v1;
         thru_dt
         hcpcs_cd1
 		hcpcs_cd3
+		admtg_dgns_cd
     ;
     keep
         bene_id
@@ -422,6 +423,7 @@ data op_2010_v1;
         thru_dt
         hcpcs_cd1
 		hcpcs_cd3
+		admtg_dgns_cd
     ;
     merge
         op2010claim
@@ -430,7 +432,7 @@ data op_2010_v1;
     by bene_id clm_id;
 
 run;
-proc sort data=op_2010_v1;
+proc sort data=op2010_v1;
     by bene_id clm_id;
 run;
 
@@ -448,19 +450,20 @@ run;
 proc sql;
     create table op2010_v2 as
         select
-             coalesce(A.bene_id,B.bene_id) as Bene_Code
-            ,coalesce(A.clm_id,B.clm_id) as Claim_Code
+             coalesce(A.bene_id,B.bene_id) as bene_id
+            ,coalesce(A.clm_id,B.clm_id) as clm_id
             ,B.hcpcs_cd1 as Revenue_Center_1
             ,B.hcpcs_cd3 as Revenue_Center_2
             ,A.from_dt as from_dt
             ,A.thru_dt as thru_dt
+			,A.admtg_dgns_cd
         from
             op2010claim as A
             full join
             op2010line_wide as B
             on A.bene_id=B.bene_id and A.clm_id=B.clm_id
         order by
-            a.bene_id, a.clm_id
+            bene_id, clm_id
     ;
 quit;
 
