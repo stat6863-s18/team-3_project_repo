@@ -63,4 +63,3 @@ Note: This compares the column BENE_ID, Claim_ID and CLN_ID from
 Master_inpatient_claim file after merging with Inpatient_Claim_2 file
 by composite key.
 ;
-
