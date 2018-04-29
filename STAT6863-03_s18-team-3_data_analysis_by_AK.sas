@@ -71,33 +71,7 @@ if they are required for furher investigation.
 Values of Admtg_dgns_cd equal to zero should be 
 excluded from this analysis, since they are potentialy missing values.
 In addition values of hcpcs_cd1 and hcpcs_cd3 equal to missing
-should be excluded from analysis.;
-
-proc sql outobs=10;
-    select
-         bene_id
-        ,clm_id
-        ,input(admtg_dgns_cd, best15.) as Admit_Code
-		,Revenue_Center_1
-		,Revenue_Center_2
-    from
-        op2010_v2
-    where
-        calculated Admit_Code > 0
-		and Revenue_Center_1 is missing
-		and Revenue_Center_2 is missing
-    order by
-        bene_id, clm_id
-    ;
-quit;
-
-
-data op_2010 op_nomatch;
-    merge op2010claim(in=a) op2010line_wide(in=b);
-	by bene_id clm_id;
-	if a and b then output op_2010;
-    else output op_nomatch;
-run;
-
+should be excluded from analysis.
+;
 
 
