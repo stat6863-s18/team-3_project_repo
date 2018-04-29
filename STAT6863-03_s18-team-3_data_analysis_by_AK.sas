@@ -71,8 +71,7 @@ if they are required for furher investigation.
 Values of Admtg_dgns_cd equal to zero should be 
 excluded from this analysis, since they are potentialy missing values.
 In addition values of hcpcs_cd1 and hcpcs_cd3 equal to missing
-should be excluded from analysis.
-;
+should be excluded from analysis.;
 
 proc sql outobs=10;
     select
@@ -99,5 +98,6 @@ data op_2010 op_nomatch;
 	if a and b then output op_2010;
     else output op_nomatch;
 run;
+
 
 

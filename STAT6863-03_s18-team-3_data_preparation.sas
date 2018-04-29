@@ -352,7 +352,6 @@ proc freq data=contenr_2010;
 run;
 title;
 
-
 *Azamat's Preparation and Merging Data Sets;
 
 /* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
@@ -474,3 +473,4 @@ proc compare
         novalues
     ;
 run;
+title;
