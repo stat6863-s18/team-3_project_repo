@@ -63,3 +63,16 @@ Master_Outpatient_Claim_1_2010.csv.
 
 Limitiations: No apparent limitations at this time.
 ;
+
+proc sql outobs=10;
+    select
+        BENE_ID
+        RA_OA_Status
+        CLM_ID
+	InP_PMT_AMT
+    from
+        Mbsf_AB_2010_and_Ip2010line_v2
+    order by
+        BENE_ID
+    ;
+quit;
