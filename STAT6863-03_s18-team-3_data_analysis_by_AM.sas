@@ -25,6 +25,9 @@ with certain chronic conditions.
 Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Inpatient admission date" in 
 Master_Inpatient_Claim_2010.csv.
+
+Limitations: No apparent limitations although care should be taken during merge
+since there are possible cases of multiple or zero admissions per beneficiary. 
 ;
 
 *******************************************************************************;
@@ -40,6 +43,8 @@ patients with/without certain chronic conditions.
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Inpatient_Claim_2010.csv.
+
+Limitiations: No apparent limitations at this time.
 ;
 
 *******************************************************************************;
@@ -55,4 +60,19 @@ patients with/without certain chronic conditions.
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Outpatient_Claim_1_2010.csv.
+
+Limitiations: No apparent limitations at this time.
 ;
+
+proc sql outobs=10;
+    select
+        BENE_ID
+        RA_OA_Status
+        CLM_ID
+	InP_PMT_AMT
+    from
+        Mbsf_AB_2010_and_Ip2010line_v2
+    order by
+        BENE_ID
+    ;
+quit;

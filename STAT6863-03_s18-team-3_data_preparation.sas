@@ -119,6 +119,8 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
 ;
 %let inputDataset4Type = CSV;
 
+* set global system options;
+options fullstimer;
 
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
@@ -162,3 +164,382 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
     %end;
 %mend;
 %loadDatasets
+
+* check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+    create table Ip2010line_dups as
+        select
+             CLM_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Ip2010line
+        group by
+             CLM_Id
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+* check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+    create table Ip2010claim_dups as
+        select
+             CLM_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Ip2010claim
+        group by
+             CLM_Id
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+* check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values*/
+    create table Mbsf_AB_2010_dups as
+        select
+             Bene_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Mbsf_AB_2010
+        group by
+             Bene_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+proc sql;
+    /* check for duplicate unique id values; after executing this query, we
+       see that Op2010claim_dups has no rows. No mitigation needed for ID values*/
+    create table Op2010claim_dups as
+        select
+             Clm_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Op2010claim
+        group by
+             CLM_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+
+/*For Amber’s Research Questions*/
+title "Inspect SP_RA_OA in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(SP_RA_OA) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect SP_COPD in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(SP_COPD) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect Inpatient Claim Payment Amount in Ip2010line";
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Ip2010line
+    ;
+quit;
+title;
+
+title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Op2010claim
+    ;
+quit;
+title;
+
+/*For Azamat's Research Questions*/
+title "Inspect BENE_HI_CVRAGE_TOT_MONS in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(BENE_HI_CVRAGE_TOT_MONS) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect BENE_HMO_CVRAGE_TOT_MONS in Mbsf_AB_2010";
+proc sql;
+    select
+        nmiss(BENE_HMO_CVRAGE_TOT_MONS) as missing
+    from
+        Mbsf_AB_2010
+    ;
+quit;
+title;
+
+title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
+proc sql;
+    select
+         min(UTIL_DAY) as min
+        ,max(UTIL_DAY) as max
+        ,mean(UTIL_DAY) as mean
+        ,median(UTIL_DAY) as median
+        ,nmiss(UTIL_DAY) as missing
+    from
+        Ip2010claim
+    ;
+quit;
+title;
+
+title "Inspect Outpatient Claims Start Date (FROM_DT) in Op2010claim";
+proc sql;
+    select
+         min(FROM_DT) as min
+        ,max(FROM_DT) as max
+        ,mean(FROM_DT) as mean
+        ,median(FROM_DT) as median
+        ,nmiss(FROM_DT) as missing
+    from
+        Op2010claim
+    ;
+quit;
+title;
+
+proc contents data=mbsf_ab_2010; run;
+*We have in this file information about Medicare beneficiaries who
+enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
+(BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
+program.
+
+PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
+
+data contenr_2010;
+    set mbsf_ab_2010;
+	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
+    /* IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE */
+    if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
+    contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
+    if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
+    else contenrl_hmo_2010='nohmo'; 
+	/* CLASSIFY BENEFICIARIES THAT PASSED AWAY IN 2010 */
+	if death_dt ne . then death_2010=1; else death_2010=0;
+run;
+title;
+
+title "VARIABLES USED TO GET CONTINUOUS ENROLLMENT";
+proc freq data=contenr_2010; 
+    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
+run;
+title;
+
+
+*Azamat's Preparation and Merging Data Sets;
+
+/* SORT INPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
+proc sort data=src.ip2010line out=ip2010line; 
+	by bene_id clm_id clm_ln; 
+run;
+
+/* TRANSFORM INPATIENT CLAIM LINE FILE */;
+data ip2010line_wide(drop=i clm_ln hcpcs_cd);
+	format  hcpcs_cd1-hcpcs_cd45 $5.;
+	set ip2010line;
+	by bene_id clm_id clm_ln;
+	retain 	hcpcs_cd1-hcpcs_cd45;
+
+	array	xhcpcs_cd(45) hcpcs_cd1-hcpcs_cd45;
+
+	if first.clm_id then do;
+		do i=1 to 45;
+			xhcpcs_cd(clm_ln)='';
+		end;
+	end;
+
+	xhcpcs_cd(clm_ln)=hcpcs_cd;
+ 
+	if last.clm_id then output;
+run;
+
+/* SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE */
+proc sort data=src.ip2010claim out=ip2010claim; 
+	by bene_id clm_id; 
+run; 
+
+proc sort data=ip2010line_wide;
+    by bene_id clm_id;
+run; 
+
+proc print data=ip2010line_wide(obs=2); 
+	var bene_id clm_id hcpcs_cd1 hcpcs_cd2 hcpcs_cd3; 
+run;
+
+proc print data=ip2010claim(obs=10); 
+	var bene_id clm_id from_dt thru_dt; 
+run;
+
+*combine ip2010claim and ip2010line_wide horizontally using a data-step match-merge;
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+
+
+/* MERGE INPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
+data ip_2010_v1;
+    retain
+        bene_id
+        clm_id
+        from_dt
+        thru_dt
+        hcpcs_cd1
+    ;
+    keep
+        bene_id
+        clm_id
+        from_dt
+        thru_dt
+        hcpcs_cd1
+    ;
+    merge
+        ip2010claim
+        ip2010line_wide
+    ;
+    by bene_id clm_id;
+
+run;
+proc sort data=ip_2010_v1;
+    by bene_id clm_id;
+run;
+
+* combine ip2010 and ip2010line_wide horizontally using proc sql;
+* note: After running the proc sql step below several times and averaging
+  the fullstimer output in the system log, they tend to take about 0.03
+  seconds of "real time" to execute and about 35 MB of memory on the computer
+  they were tested on. Consequently, the proc sql step appears to take roughly
+  the same amount of time to execute as the combined data step and proc sort
+  steps above, but to use 5MB more memory;
+* note to learners: Based upon these results, the proc sql step is preferable
+  if memory performance isn't critical. This is because less code is required,
+  so it's faster to write and verify correct output has been obtained;
+
+proc sql;
+    create table ip2010_v2 as
+        select
+             coalesce(A.bene_id,B.bene_id,) as Bene_ID
+            ,coalesce(A.clm_id,B.clm_id) as Clm_ID
+            ,B.hcpcs_cd1 as hcpcs_cd1
+            ,A.from_dt as from_dt
+            ,A.thru_dt as thru_dt
+        from
+            ip2010claim as A
+            full join
+            ip2010line_wide as B
+            on A.bene_id=B.bene_id and A.clm_id=B.clm_id
+        order by
+            bene_id, clm_id
+    ;
+quit;
+
+* verify that ip2010_v1 and ip2010_v2 are identical;
+proc compare
+        base=ip2010_v1
+        compare=ip2010_v2
+        novalues
+    ;
+run;
+
+/*For Amber's Research Questions*/
+
+* combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
+match-merge;
+* note: After running the data step and proc sort step below several times
+and averaging the fullstimer output in the system log, they tend to take
+about X.xx seconds of combined "real time" to execute and a maximum of about 
+X.x MB of memory on the computer they were tested on;
+
+data Mbsf_AB_2010_and_Ip2010line_v1;
+    retain
+        BENE_ID
+        SP_RA_OA
+        SP_COPD
+        CLM_ID
+        PMT_AMT
+    ;
+    keep
+        BENE_ID
+        SP_RA_OA
+        SP_COPD
+        CLM_ID
+        PMT_AMT
+    ;
+    merge
+        Mbsf_AB_2010
+        Ip2010line 
+    ;
+    by BENE_ID;
+run;
+
+proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
+    by BENE_ID;
+run;
+
+* combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
+* note: After running the proc sql step below several times and averaging the 
+fullstimer output in the system log, they tend to take about X.xx seconds of 
+"real time" to execute and about X.x MB of memory on the computer they were 
+tested on. Consequently, the proc sql step appears to take roughly the same 
+amount of time to execute as the combined data step and proc sort steps above, 
+but to use roughly five times as much memory;
+
+proc sql;
+
+    create table Mbsf_AB_2010_and_Ip2010line_v2 as
+        select
+             coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
+            ,input(A.SP_RA_OA) as RA_OA_Status
+            ,input(A.SP_COPD) as COPD_Status
+            ,input(B.CLM_ID) as CLM_ID
+		,input(B.PMT_AMT) as InP_PMT_AMT
+        from
+            Mbsf_AB_2010 as A
+            full join
+            Ip2010line as B
+            on A.BENE_ID=B.BENE_ID
+        order by
+            BENE_ID
+    ;
+quit;
+
+* verify that Mbsf_AB_2010_and_Ip2010line_v1 and Mbsf_AB_2010_and_Ip2010line_v2
+are identical;
+
+proc compare
+        base= Mbsf_AB_2010_and_Ip2010line_v1        
+        compare= Mbsf_AB_2010_and_Ip2010line_v2
+        novalues
+    ;
+run;
+
