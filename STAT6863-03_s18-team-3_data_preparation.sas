@@ -119,8 +119,6 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
 ;
 %let inputDataset4Type = CSV;
 
-* set global system options;
-options fullstimer;
 
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
@@ -357,15 +355,15 @@ title;
 
 *Azamat's Preparation and Merging Data Sets;
 
-/* SORT INPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
-proc sort data=src.ip2010line out=ip2010line; 
+/* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
+proc sort data=op2010line out=op2010line; 
 	by bene_id clm_id clm_ln; 
 run;
 
-/* TRANSFORM INPATIENT CLAIM LINE FILE */;
-data ip2010line_wide(drop=i clm_ln hcpcs_cd);
-	format  hcpcs_cd1-hcpcs_cd45 $5.;
-	set ip2010line;
+/* TRANSFORM OUTPATIENT CLAIM LINE FILE */;
+data op2010line_wide(drop=i clm_ln hcpcs_cd);
+	format	hcpcs_cd1-hcpcs_cd45 $5.;
+	set op2010line;
 	by bene_id clm_id clm_ln;
 	retain 	hcpcs_cd1-hcpcs_cd45;
 
@@ -378,28 +376,28 @@ data ip2010line_wide(drop=i clm_ln hcpcs_cd);
 	end;
 
 	xhcpcs_cd(clm_ln)=hcpcs_cd;
- 
+
 	if last.clm_id then output;
 run;
 
 /* SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE */
-proc sort data=src.ip2010claim out=ip2010claim; 
+proc sort data=op2010claim out=op2010claim; 
 	by bene_id clm_id; 
 run; 
 
-proc sort data=ip2010line_wide;
+proc sort data=op2010line_wide;
     by bene_id clm_id;
 run; 
 
-proc print data=ip2010line_wide(obs=2); 
+proc print data=op2010line_wide(obs=2); 
 	var bene_id clm_id hcpcs_cd1 hcpcs_cd2 hcpcs_cd3; 
 run;
 
-proc print data=ip2010claim(obs=10); 
+proc print data=op2010claim(obs=10); 
 	var bene_id clm_id from_dt thru_dt; 
 run;
 
-*combine ip2010claim and ip2010line_wide horizontally using a data-step match-merge;
+*combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.03 seconds of combined "real time" to execute and a maximum of
@@ -407,14 +405,16 @@ run;
   proc sort step) on the computer they were tested on;
 
 
-/* MERGE INPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
-data ip_2010_v1;
+/* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
+data op2010_v1;
     retain
         bene_id
         clm_id
         from_dt
         thru_dt
         hcpcs_cd1
+		hcpcs_cd3
+		admtg_dgns_cd
     ;
     keep
         bene_id
@@ -422,19 +422,21 @@ data ip_2010_v1;
         from_dt
         thru_dt
         hcpcs_cd1
+		hcpcs_cd3
+		admtg_dgns_cd
     ;
     merge
-        ip2010claim
-        ip2010line_wide
+        op2010claim
+        op2010line_wide
     ;
     by bene_id clm_id;
 
 run;
-proc sort data=ip_2010_v1;
+proc sort data=op2010_v1;
     by bene_id clm_id;
 run;
 
-* combine ip2010 and ip2010line_wide horizontally using proc sql;
+* combine out2010 and out2010line_wide horizontally using proc sql;
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.03
   seconds of "real time" to execute and about 35 MB of memory on the computer
@@ -446,17 +448,19 @@ run;
   so it's faster to write and verify correct output has been obtained;
 
 proc sql;
-    create table ip2010_v2 as
+    create table op2010_v2 as
         select
-             coalesce(A.bene_id,B.bene_id,) as Bene_ID
-            ,coalesce(A.clm_id,B.clm_id) as Clm_ID
-            ,B.hcpcs_cd1 as hcpcs_cd1
+             coalesce(A.bene_id,B.bene_id) as bene_id
+            ,coalesce(A.clm_id,B.clm_id) as clm_id
+            ,B.hcpcs_cd1 as Revenue_Center_1
+            ,B.hcpcs_cd3 as Revenue_Center_2
             ,A.from_dt as from_dt
             ,A.thru_dt as thru_dt
+			,A.admtg_dgns_cd
         from
-            ip2010claim as A
+            op2010claim as A
             full join
-            ip2010line_wide as B
+            op2010line_wide as B
             on A.bene_id=B.bene_id and A.clm_id=B.clm_id
         order by
             bene_id, clm_id
@@ -465,81 +469,8 @@ quit;
 
 * verify that ip2010_v1 and ip2010_v2 are identical;
 proc compare
-        base=ip2010_v1
-        compare=ip2010_v2
+        base=op2010_v1
+        compare=op2010_v2
         novalues
     ;
 run;
-
-/*For Amber's Research Questions*/
-
-* combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
-match-merge;
-* note: After running the data step and proc sort step below several times
-and averaging the fullstimer output in the system log, they tend to take
-about X.xx seconds of combined "real time" to execute and a maximum of about 
-X.x MB of memory on the computer they were tested on;
-
-data Mbsf_AB_2010_and_Ip2010line_v1;
-    retain
-        BENE_ID
-        SP_RA_OA
-        SP_COPD
-        CLM_ID
-        PMT_AMT
-    ;
-    keep
-        BENE_ID
-        SP_RA_OA
-        SP_COPD
-        CLM_ID
-        PMT_AMT
-    ;
-    merge
-        Mbsf_AB_2010
-        Ip2010line 
-    ;
-    by BENE_ID;
-run;
-
-proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
-    by BENE_ID;
-run;
-
-* combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
-* note: After running the proc sql step below several times and averaging the 
-fullstimer output in the system log, they tend to take about X.xx seconds of 
-"real time" to execute and about X.x MB of memory on the computer they were 
-tested on. Consequently, the proc sql step appears to take roughly the same 
-amount of time to execute as the combined data step and proc sort steps above, 
-but to use roughly five times as much memory;
-
-proc sql;
-
-    create table Mbsf_AB_2010_and_Ip2010line_v2 as
-        select
-             coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
-            ,input(A.SP_RA_OA) as RA_OA_Status
-            ,input(A.SP_COPD) as COPD_Status
-            ,input(B.CLM_ID) as CLM_ID
-		,input(B.PMT_AMT) as InP_PMT_AMT
-        from
-            Mbsf_AB_2010 as A
-            full join
-            Ip2010line as B
-            on A.BENE_ID=B.BENE_ID
-        order by
-            BENE_ID
-    ;
-quit;
-
-* verify that Mbsf_AB_2010_and_Ip2010line_v1 and Mbsf_AB_2010_and_Ip2010line_v2
-are identical;
-
-proc compare
-        base= Mbsf_AB_2010_and_Ip2010line_v1        
-        compare= Mbsf_AB_2010_and_Ip2010line_v2
-        novalues
-    ;
-run;
-
