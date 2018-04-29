@@ -119,6 +119,8 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
 ;
 %let inputDataset4Type = CSV;
 
+* set global system options;
+options fullstimer;
 
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
@@ -471,23 +473,21 @@ run;
 
 /*For Amber's Research Questions*/
 
-* combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step match-merge;
+* combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
+match-merge;
 * note: After running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about X.xx seconds of combined "real time" to execute and a maximum of
-  about X.x MB of memory on the computer they were tested on;
+and averaging the fullstimer output in the system log, they tend to take
+about X.xx seconds of combined "real time" to execute and a maximum of about 
+X.x MB of memory on the computer they were tested on;
 
 data Mbsf_AB_2010_and_Ip2010line_v1;
-
     retain
-
         BENE_ID
         SP_RA_OA
         SP_COPD
         CLM_ID
         PMT_AMT
     ;
-
     keep
         BENE_ID
         SP_RA_OA
@@ -495,14 +495,11 @@ data Mbsf_AB_2010_and_Ip2010line_v1;
         CLM_ID
         PMT_AMT
     ;
-
     merge
         Mbsf_AB_2010
         Ip2010line 
     ;
-
     by BENE_ID;
-
 run;
 
 proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
@@ -510,9 +507,12 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
-* note: After running the proc sql step below several times and averaging
-  the fullstimer output in the system log, they tend to take about X.xx
-seconds of "real time" to execute and about X.x MB of memory on the computer they were tested on. Consequently, the proc sql step appears to take roughly the same amount of time to execute as the combined data step and proc sort steps above, but to use roughly five times as much memory;
+* note: After running the proc sql step below several times and averaging the 
+fullstimer output in the system log, they tend to take about X.xx seconds of 
+"real time" to execute and about X.x MB of memory on the computer they were 
+tested on. Consequently, the proc sql step appears to take roughly the same 
+amount of time to execute as the combined data step and proc sort steps above, 
+but to use roughly five times as much memory;
 
 proc sql;
 
@@ -524,7 +524,7 @@ proc sql;
             ,input(B.CLM_ID) as CLM_ID
 		,input(B.PMT_AMT) as InP_PMT_AMT
         from
-            Mbsf_AB_2010  as A
+            Mbsf_AB_2010 as A
             full join
             Ip2010line as B
             on A.BENE_ID=B.BENE_ID
@@ -533,7 +533,8 @@ proc sql;
     ;
 quit;
 
-* verify that Mbsf_AB_2010_and_Ip2010line_v1 and Mbsf_AB_2010_and_Ip2010line_v2 are identical;
+* verify that Mbsf_AB_2010_and_Ip2010line_v1 and Mbsf_AB_2010_and_Ip2010line_v2
+are identical;
 
 proc compare
         base= Mbsf_AB_2010_and_Ip2010line_v1        
