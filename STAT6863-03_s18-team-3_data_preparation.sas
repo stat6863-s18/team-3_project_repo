@@ -324,32 +324,3 @@ proc sql;
     ;
 quit;
 title;
-
-proc contents data=mbsf_ab_2010; run;
-*We have in this file information about Medicare beneficiaries who
-enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
-(BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
-program.
-
-PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
-
-data contenr_2010;
-    set mbsf_ab_2010;
-	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
-    /* IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE */
-    if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
-    contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
-    if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
-    else contenrl_hmo_2010='nohmo'; 
-	/* CLASSIFY BENEFICIARIES THAT PASSED AWAY IN 2010 */
-	if death_dt ne . then death_2010=1; else death_2010=0;
-run;
-title;
-
-title "VARIABLES USED TO GET CONTINUOUS ENROLLMENT";
-proc freq data=contenr_2010; 
-    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
-run;
-title;
-
-
