@@ -227,20 +227,49 @@ proc sql;
     ;
 quit;
 
-title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
-/* check for distribution of Part A benefeciaries to ensure sufficient info to
-answer research questions*/
-proc sql;
-    select
-         min(bene_hi_cvrage_tot_mons) as min
-        ,max(bene_hi_cvrage_tot_mons) as max
-        ,mean(bene_hi_cvrage_tot_mons) as mean
-        ,nmiss(bene_hi_cvrage_tot_mons) as missing
-    from
-        mbsf_ab_2010
-    ;
-quit;
-title;
+* inspect columns of interest in cleaned versions of data sets
+/*
+    title "Inspect Inpatient Claim Payment Amount in Ip2010line";
+	proc sql;
+    	    select
+         	min(PMT_AMT) as min
+        	,max(PMT_AMT) as max
+        	,mean(PMT_AMT) as mean
+        	,median(PMT_AMT) as median
+        	,nmiss(PMT_AMT) as missing
+    	    from
+        	Ip2010line
+    	    ;
+	quit;
+	title;
+
+    title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+	proc sql;
+    	    select
+         	min(PMT_AMT) as min
+        	,max(PMT_AMT) as max
+        	,mean(PMT_AMT) as mean
+        	,median(PMT_AMT) as median
+        	,nmiss(PMT_AMT) as missing
+    	    from
+        	Op2010claim
+    	    ;
+	quit;
+	title;
+
+     title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
+	proc sql;
+    	    select
+         	min(bene_hi_cvrage_tot_mons) as min
+        	,max(bene_hi_cvrage_tot_mons) as max
+        	,mean(bene_hi_cvrage_tot_mons) as mean
+        	,nmiss(bene_hi_cvrage_tot_mons) as missing
+    	    from
+            	mbsf_ab_2010
+    	    ;
+	quit;
+	title;
+*/
 
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
@@ -381,7 +410,12 @@ title;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
-
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+  
 data Mbsf_AB_2010_and_Ip2010line_v1;
     retain
         BENE_ID
@@ -409,6 +443,12 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+  
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
         select
@@ -443,6 +483,7 @@ run;
   about 0.11 seconds of combined "real time" to execute and a maximum of
   about 24 MB of memory (984 KB for the data step vs. 24000 KB for the
   proc sort step) on the computer they were tested on;
+
 data ip2010claim_and_op2010claim_v1;
     retain
         Bene_ID
