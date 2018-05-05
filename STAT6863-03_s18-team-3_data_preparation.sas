@@ -225,38 +225,6 @@ proc sql;
     ;
 quit;
 
-title "Inspect Inpatient Claim Payment Amount in Ip2010line";
-/* check for distribution of IP Claim Payments to ensure sufficient info to
-answer research questions*/
-proc sql;
-    select
-         min(PMT_AMT) as min
-        ,max(PMT_AMT) as max
-        ,mean(PMT_AMT) as mean
-        ,median(PMT_AMT) as median
-        ,nmiss(PMT_AMT) as missing
-    from
-        Ip2010line
-    ;
-quit;
-title;
-
-title "Inspect Outpatient Claim Payment Amount in Op2010claim";
-/* check for distribution of OP Claim Payments to ensure sufficient info to
-answer research questions*/
-proc sql;
-    select
-         min(PMT_AMT) as min
-        ,max(PMT_AMT) as max
-        ,mean(PMT_AMT) as mean
-        ,median(PMT_AMT) as median
-        ,nmiss(PMT_AMT) as missing
-    from
-        Op2010claim
-    ;
-quit;
-title;
-
 title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
 /* check for distribution of Part A benefeciaries to ensure sufficient info to
 answer research questions*/
@@ -414,14 +382,8 @@ proc compare
 run;
 title;
 
-/*For Amber's Research Questions*/
-
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
-* note: After running the data step and proc sort step below several times
-and averaging the fullstimer output in the system log, they tend to take
-about X.xx seconds of combined "real time" to execute and a maximum of about 
-X.x MB of memory on the computer they were tested on;
 
 data Mbsf_AB_2010_and_Ip2010line_v1;
     retain
@@ -450,22 +412,14 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
-* note: After running the proc sql step below several times and averaging the 
-fullstimer output in the system log, they tend to take about X.xx seconds of 
-"real time" to execute and about X.x MB of memory on the computer they were 
-tested on. Consequently, the proc sql step appears to take roughly the same 
-amount of time to execute as the combined data step and proc sort steps above, 
-but to use roughly five times as much memory;
-
 proc sql;
-
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
         select
              coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
             ,input(A.SP_RA_OA) as RA_OA_Status
             ,input(A.SP_COPD) as COPD_Status
             ,input(B.CLM_ID) as CLM_ID
-		,input(B.PMT_AMT) as InP_PMT_AMT
+	    ,input(B.PMT_AMT) as InP_PMT_AMT
         from
             Mbsf_AB_2010 as A
             full join
@@ -556,12 +510,7 @@ run;
   they were tested on. Consequently, the proc sql step appears to take more
   time to execute as the combined data step and proc sort steps
   above, but to use the same amount of memory;
-* note to learners: Based upon these results, the proc sql step is preferable
-  if memory performance isn't critical. This is because less code is required,
-  so it's faster to write and verify correct output has been obtained. In
-  addition, because proc sql doesn't create a PDV with the length of each
-  column determined by the column's first appearance, less care is needed for
-  issues like columns lengths being different in the input datasets;
+
 proc sql;
     create table ip2010claim_and_op2010claim_v2 as
         (
