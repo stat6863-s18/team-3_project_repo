@@ -163,8 +163,8 @@ options fullstimer;
 
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+/* check for duplicate unique id values; after executing this query, we
+see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -177,10 +177,11 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+    see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -193,6 +194,7 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
@@ -266,8 +268,6 @@ data contenr_2010_fnl;
     set contenr_2010;
 	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
 run;
-
-*Azamat's Preparation and Merging Data Sets;
 
 /* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
 proc sort data=op2010line out=op2010line; 
@@ -349,9 +349,6 @@ run;
   they were tested on. Consequently, the proc sql step appears to take roughly
   the same amount of time to execute as the combined data step and proc sort
   steps above, but to use 5MB more memory;
-* note to learners: Based upon these results, the proc sql step is preferable
-  if memory performance isn't critical. This is because less code is required,
-  so it's faster to write and verify correct output has been obtained;
 
 proc sql;
     create table op2010_v2 as
