@@ -225,20 +225,49 @@ proc sql;
     ;
 quit;
 
-title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
-/* check for distribution of Part A benefeciaries to ensure sufficient info to
-answer research questions*/
-proc sql;
-    select
-         min(bene_hi_cvrage_tot_mons) as min
-        ,max(bene_hi_cvrage_tot_mons) as max
-        ,mean(bene_hi_cvrage_tot_mons) as mean
-        ,nmiss(bene_hi_cvrage_tot_mons) as missing
-    from
-        mbsf_ab_2010
-    ;
-quit;
-title;
+* inspect columns of interest in cleaned versions of data sets
+/*
+    title "Inspect Inpatient Claim Payment Amount in Ip2010line";
+	proc sql;
+    	    select
+         	min(PMT_AMT) as min
+        	,max(PMT_AMT) as max
+        	,mean(PMT_AMT) as mean
+        	,median(PMT_AMT) as median
+        	,nmiss(PMT_AMT) as missing
+    	    from
+        	Ip2010line
+    	    ;
+	quit;
+	title;
+
+    title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+	proc sql;
+    	    select
+         	min(PMT_AMT) as min
+        	,max(PMT_AMT) as max
+        	,mean(PMT_AMT) as mean
+        	,median(PMT_AMT) as median
+        	,nmiss(PMT_AMT) as missing
+    	    from
+        	Op2010claim
+    	    ;
+	quit;
+	title;
+
+     title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
+	proc sql;
+    	    select
+         	min(bene_hi_cvrage_tot_mons) as min
+        	,max(bene_hi_cvrage_tot_mons) as max
+        	,mean(bene_hi_cvrage_tot_mons) as mean
+        	,nmiss(bene_hi_cvrage_tot_mons) as missing
+    	    from
+            	mbsf_ab_2010
+    	    ;
+	quit;
+	title;
+*/
 
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
@@ -266,8 +295,6 @@ data contenr_2010_fnl;
     set contenr_2010;
 	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
 run;
-
-*Azamat's Preparation and Merging Data Sets;
 
 /* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
 proc sort data=op2010line out=op2010line; 
@@ -349,9 +376,6 @@ run;
   they were tested on. Consequently, the proc sql step appears to take roughly
   the same amount of time to execute as the combined data step and proc sort
   steps above, but to use 5MB more memory;
-* note to learners: Based upon these results, the proc sql step is preferable
-  if memory performance isn't critical. This is because less code is required,
-  so it's faster to write and verify correct output has been obtained;
 
 proc sql;
     create table op2010_v2 as
@@ -446,6 +470,7 @@ run;
   about 0.11 seconds of combined "real time" to execute and a maximum of
   about 24 MB of memory (984 KB for the data step vs. 24000 KB for the
   proc sort step) on the computer they were tested on;
+
 data ip2010claim_and_op2010claim_v1;
     retain
         Bene_ID
