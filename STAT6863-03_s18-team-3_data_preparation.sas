@@ -293,7 +293,7 @@ run;
 title;
 
 *CREATE A 2010 ENROLLMENT FILE OF ONLY CONTINUOUSLY ENROLLED BENEFICIARIES
-by combining ALIVE BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE*/;
+BY COMBINING ALIVE BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE*/;
 data contenr_2010_fnl;
     set contenr_2010;
 	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
@@ -519,11 +519,11 @@ data ip2010claim_and_op2010claim_v1;
 
     ;
     set
-        src.ip2010claim(
+        ip2010claim(
             in = ip2010claim_row
             
         )
-        src.op2010claim(
+        op2010claim(
             
         )
     ;
