@@ -633,7 +633,7 @@ AND MERGE WITH MSABEA FILE */
 proc sort data=contenr_2010_fnl; by ssa; run;
 
 data contenr_2010_fnl;
-	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
+	merge contenr_2010_fnl(in=a) msabea_ssa(in=b);
 	by ssa;
 	if a;
 run;
