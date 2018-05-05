@@ -8,7 +8,6 @@
 
 [Dataset Description] Impatient Medicare Data by Service Line, 2010
 
-
 [Experimental Unit Description] Benefeciary Claim
 
 [Number of Observations] 13,916      
@@ -33,9 +32,6 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatien
 ;
 %let inputDataset1Type = CSV;
 
-
-
-
 *
 [Dataset 2 Name] Inpatient_Claim_2_2010.csv
 
@@ -55,8 +51,8 @@ was downloaded and edited to produce the file by subsetting to get 2010 year
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
 
-[Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key
-.
+[Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
+
 ;
 %let inputDataset2DSN = Ip2010claim;
 %let inputDataset2URL =
