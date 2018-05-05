@@ -115,6 +115,8 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
 ;
 %let inputDataset4Type = CSV;
 
+* set global system options;
+options fullstimer;
 
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
@@ -255,56 +257,21 @@ proc sql;
 quit;
 title;
 
-/*For Azamat's Research Questions*/
-title "Inspect BENE_HI_CVRAGE_TOT_MONS in Mbsf_AB_2010";
-proc sql;
-    select
-        nmiss(BENE_HI_CVRAGE_TOT_MONS) as missing
-    from
-        Mbsf_AB_2010
-    ;
-quit;
-title;
-
-title "Inspect BENE_HMO_CVRAGE_TOT_MONS in Mbsf_AB_2010";
-proc sql;
-    select
-        nmiss(BENE_HMO_CVRAGE_TOT_MONS) as missing
-    from
-        Mbsf_AB_2010
-    ;
-quit;
-title;
-
 title "Inspect Inpatient Claim Claim Utilization Day Count (UTIL_DAY) in Ip2010claim";
+/* check for distribution of Part A benefeciaries to ensure sufficient info to
+answer research questions*/
 proc sql;
     select
-         min(UTIL_DAY) as min
-        ,max(UTIL_DAY) as max
-        ,mean(UTIL_DAY) as mean
-        ,median(UTIL_DAY) as median
-        ,nmiss(UTIL_DAY) as missing
+         min(bene_hi_cvrage_tot_mons) as min
+        ,max(bene_hi_cvrage_tot_mons) as max
+        ,mean(bene_hi_cvrage_tot_mons) as mean
+        ,nmiss(bene_hi_cvrage_tot_mons) as missing
     from
-        Ip2010claim
+        mbsf_ab_2010
     ;
 quit;
 title;
 
-title "Inspect Outpatient Claims Start Date (FROM_DT) in Op2010claim";
-proc sql;
-    select
-         min(FROM_DT) as min
-        ,max(FROM_DT) as max
-        ,mean(FROM_DT) as mean
-        ,median(FROM_DT) as median
-        ,nmiss(FROM_DT) as missing
-    from
-        Op2010claim
-    ;
-quit;
-title;
-
-proc contents data=mbsf_ab_2010; run;
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
 (BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
@@ -325,11 +292,12 @@ data contenr_2010;
 run;
 title;
 
-title "VARIABLES USED TO GET CONTINUOUS ENROLLMENT";
-proc freq data=contenr_2010; 
-    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
+*CREATE A 2010 ENROLLMENT FILE OF ONLY CONTINUOUSLY ENROLLED BENEFICIARIES
+BY COMBINING ALIVE BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE*/;
+data contenr_2010_fnl;
+    set contenr_2010;
+	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
 run;
-title;
 
 *Azamat's Preparation and Merging Data Sets;
 
@@ -366,14 +334,6 @@ run;
 proc sort data=op2010line_wide;
     by bene_id clm_id;
 run; 
-
-proc print data=op2010line_wide(obs=2); 
-	var bene_id clm_id hcpcs_cd1 hcpcs_cd2 hcpcs_cd3; 
-run;
-
-proc print data=op2010claim(obs=10); 
-	var bene_id clm_id from_dt thru_dt; 
-run;
 
 *combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
 * note: After running the data step and proc sort step below several times
@@ -526,3 +486,159 @@ proc compare
     ;
 run;
 
+* combine ip2010claim and op2010claim vertically using a data-step interweave,
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.11 seconds of combined "real time" to execute and a maximum of
+  about 24 MB of memory (984 KB for the data step vs. 24000 KB for the
+  proc sort step) on the computer they were tested on;
+data ip2010claim_and_op2010claim_v1;
+    retain
+        Bene_ID
+        Claim_ID
+        Admtg_dgns_CD
+        From_DT
+        Thru_DT
+        Provider
+    ;
+    keep
+        Bene_ID
+        Clm_ID
+        Admtg_dgns_CD
+        From_DT
+        Thru_DT
+        Provider
+    ;
+    length    
+        Bene_ID $16.
+        Clm_ID  $15.
+        Admtg_dgns_CD  $5.
+		From_DT   4.
+		Thru_DT   4.
+		Provider  $6.
+
+    ;
+    set
+        ip2010claim(
+            in = ip2010claim_row
+            
+        )
+        op2010claim(
+            
+        )
+    ;
+    by
+        Bene_ID
+        Clm_ID
+    ;
+
+    if
+        ip2010claim_row=1
+    then
+        do;
+            Type = "IP-2010";
+           
+        end;
+    else
+        do;
+            Type = "OP-2010";
+            
+        end;
+run;
+proc sort data=ip2010claim_and_op2010claim_v1;
+    by Bene_ID Clm_ID;
+run;
+
+* combine ip2010claim and op2010claim vertically using proc sql;
+* note: After running the proc sql step below several times and averaging
+  the fullstimer output in the system log, they tend to take about 0.21
+  seconds of "real time" to execute and about 25 MB of memory on the computer
+  they were tested on. Consequently, the proc sql step appears to take more
+  time to execute as the combined data step and proc sort steps
+  above, but to use the same amount of memory;
+* note to learners: Based upon these results, the proc sql step is preferable
+  if memory performance isn't critical. This is because less code is required,
+  so it's faster to write and verify correct output has been obtained. In
+  addition, because proc sql doesn't create a PDV with the length of each
+  column determined by the column's first appearance, less care is needed for
+  issues like columns lengths being different in the input datasets;
+proc sql;
+    create table ip2010claim_and_op2010claim_v2 as
+        (
+            select
+                 a.Bene_ID
+                 ,a.Clm_ID
+                 ,a.Admtg_dgns_CD
+                 ,a.From_DT
+                 ,a.Thru_DT
+                 ,a.Provider
+            from
+                Ip2010claim as a
+        )
+		outer union corr
+        (
+            select
+                 b.Bene_ID
+                 ,b.Clm_ID
+                 ,b.Admtg_dgns_CD
+                 ,b.From_DT
+                 ,b.Thru_DT
+                 ,b.Provider
+            from
+                Op2010claim as b
+        )
+		order by
+             Bene_ID
+            ,Clm_ID
+	;
+quit;
+
+* verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
+  identical;
+proc compare
+        base=ip2010claim_and_op2010claim_v1
+        compare=ip2010claim_and_op2010claim_v2
+        novalues
+    ;
+run;
+
+*PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
+CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
+PROGRAM IN 2010
+
+/* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
+
+data msabea_ssa;
+filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03_State_County_Code.TXT";
+	infile msabea missover; 
+	input 
+		county $  1-25
+		state  $ 26-27
+		ssa    $ 30-34; 
+run; 
+
+/* SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD */
+proc sort data=msabea_ssa nodupkey; 
+	by ssa; 
+run;
+
+/* CREATE SSA VARIABLE ON ENROLLMENT DATA*/
+data contenr_2010_fnl;
+	set contenr_2010_fnl;
+	ssa=state_cd||cnty_cd;
+run;
+
+/* SORT CONTINUOUS ENROLLMENT DATA CONTENR_2010_FNL
+AND MERGE WITH MSABEA FILE */
+proc sort data=contenr_2010_fnl; by ssa; run;
+
+data contenr_2010_fnl;
+	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
+	by ssa;
+	if a;
+run;
+
+/* CREATE FINAL ENROLLMENT FILE WITH STATE AND COUNTY CODE*/
+proc sort data=contenr_2010_fnl; 
+	by bene_id; 
+run;
