@@ -408,7 +408,12 @@ title;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
-
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+  
 data Mbsf_AB_2010_and_Ip2010line_v1;
     retain
         BENE_ID
@@ -436,6 +441,12 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
+* note: After running the data step and proc sort step below several times
+  and averaging the fullstimer output in the system log, they tend to take
+  about 0.03 seconds of combined "real time" to execute and a maximum of
+  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
+  proc sort step) on the computer they were tested on;
+  
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
         select
