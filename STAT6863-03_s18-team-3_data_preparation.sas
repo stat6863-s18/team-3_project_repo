@@ -163,8 +163,8 @@ options fullstimer;
 
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+/* check for duplicate unique id values; after executing this query, we
+see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -177,10 +177,11 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+    see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -193,6 +194,7 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
@@ -299,8 +301,6 @@ data contenr_2010_fnl;
 	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
 run;
 
-*Azamat's Preparation and Merging Data Sets;
-
 /* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
 proc sort data=op2010line out=op2010line; 
 	by bene_id clm_id clm_ln; 
@@ -381,9 +381,6 @@ run;
   they were tested on. Consequently, the proc sql step appears to take roughly
   the same amount of time to execute as the combined data step and proc sort
   steps above, but to use 5MB more memory;
-* note to learners: Based upon these results, the proc sql step is preferable
-  if memory performance isn't critical. This is because less code is required,
-  so it's faster to write and verify correct output has been obtained;
 
 proc sql;
     create table op2010_v2 as
@@ -415,7 +412,6 @@ run;
 title;
 
 /*For Amber's Research Questions*/
-
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
 * note: After running the data step and proc sort step below several times
@@ -484,161 +480,4 @@ proc compare
         compare= Mbsf_AB_2010_and_Ip2010line_v2
         novalues
     ;
-run;
-
-* combine ip2010claim and op2010claim vertically using a data-step interweave,
-* note: After running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about 0.11 seconds of combined "real time" to execute and a maximum of
-  about 24 MB of memory (984 KB for the data step vs. 24000 KB for the
-  proc sort step) on the computer they were tested on;
-data ip2010claim_and_op2010claim_v1;
-    retain
-        Bene_ID
-        Claim_ID
-        Admtg_dgns_CD
-        From_DT
-        Thru_DT
-        Provider
-    ;
-    keep
-        Bene_ID
-        Clm_ID
-        Admtg_dgns_CD
-        From_DT
-        Thru_DT
-        Provider
-    ;
-    length    
-        Bene_ID $16.
-        Clm_ID  $15.
-        Admtg_dgns_CD  $5.
-		From_DT   4.
-		Thru_DT   4.
-		Provider  $6.
-
-    ;
-    set
-        ip2010claim(
-            in = ip2010claim_row
-            
-        )
-        op2010claim(
-            
-        )
-    ;
-    by
-        Bene_ID
-        Clm_ID
-    ;
-
-    if
-        ip2010claim_row=1
-    then
-        do;
-            Type = "IP-2010";
-           
-        end;
-    else
-        do;
-            Type = "OP-2010";
-            
-        end;
-run;
-proc sort data=ip2010claim_and_op2010claim_v1;
-    by Bene_ID Clm_ID;
-run;
-
-* combine ip2010claim and op2010claim vertically using proc sql;
-* note: After running the proc sql step below several times and averaging
-  the fullstimer output in the system log, they tend to take about 0.21
-  seconds of "real time" to execute and about 25 MB of memory on the computer
-  they were tested on. Consequently, the proc sql step appears to take more
-  time to execute as the combined data step and proc sort steps
-  above, but to use the same amount of memory;
-* note to learners: Based upon these results, the proc sql step is preferable
-  if memory performance isn't critical. This is because less code is required,
-  so it's faster to write and verify correct output has been obtained. In
-  addition, because proc sql doesn't create a PDV with the length of each
-  column determined by the column's first appearance, less care is needed for
-  issues like columns lengths being different in the input datasets;
-proc sql;
-    create table ip2010claim_and_op2010claim_v2 as
-        (
-            select
-                 a.Bene_ID
-                 ,a.Clm_ID
-                 ,a.Admtg_dgns_CD
-                 ,a.From_DT
-                 ,a.Thru_DT
-                 ,a.Provider
-            from
-                Ip2010claim as a
-        )
-		outer union corr
-        (
-            select
-                 b.Bene_ID
-                 ,b.Clm_ID
-                 ,b.Admtg_dgns_CD
-                 ,b.From_DT
-                 ,b.Thru_DT
-                 ,b.Provider
-            from
-                Op2010claim as b
-        )
-		order by
-             Bene_ID
-            ,Clm_ID
-	;
-quit;
-
-* verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
-  identical;
-proc compare
-        base=ip2010claim_and_op2010claim_v1
-        compare=ip2010claim_and_op2010claim_v2
-        novalues
-    ;
-run;
-
-*PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
-CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
-PROGRAM IN 2010
-
-/* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
-
-data msabea_ssa;
-filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03_State_County_Code.TXT";
-	infile msabea missover; 
-	input 
-		county $  1-25
-		state  $ 26-27
-		ssa    $ 30-34; 
-run; 
-
-/* SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD */
-proc sort data=msabea_ssa nodupkey; 
-	by ssa; 
-run;
-
-/* CREATE SSA VARIABLE ON ENROLLMENT DATA*/
-data contenr_2010_fnl;
-	set contenr_2010_fnl;
-	ssa=state_cd||cnty_cd;
-run;
-
-/* SORT CONTINUOUS ENROLLMENT DATA CONTENR_2010_FNL
-AND MERGE WITH MSABEA FILE */
-proc sort data=contenr_2010_fnl; by ssa; run;
-
-data contenr_2010_fnl;
-	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
-	by ssa;
-	if a;
-run;
-
-/* CREATE FINAL ENROLLMENT FILE WITH STATE AND COUNTY CODE*/
-proc sort data=contenr_2010_fnl; 
-	by bene_id; 
 run;
