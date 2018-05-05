@@ -17,7 +17,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 *
 Question: Do Medicare patients with RA/OA have more inpatient claims than 
-patients that not have RA/OA?
+patients that not have RA/OA? Is there a statistically significant difference?
 
 Rationale: This should help identify trends in hospitalization for patients 
 with certain chronic conditions.
@@ -25,44 +25,6 @@ with certain chronic conditions.
 Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Inpatient admission date" in 
 Master_Inpatient_Claim_2010.csv.
-
-Limitations: No apparent limitations although care should be taken during merge
-since there are possible cases of multiple or zero admissions per beneficiary. 
-;
-
-*******************************************************************************;
-* Research Question Analysis Starting Point;
-*******************************************************************************;
-*
-Question: What is the median inpatient claim amount for Medicare patients with 
-COPD versus patients that do not have COPD?
-
-Rationale: This should help identify differences in hospitalization costs for 
-patients with/without certain chronic conditions.
-
-Note: This compares the variable "Chronic Condition: COPD" in 
-Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
-Master_Inpatient_Claim_2010.csv.
-
-Limitiations: No apparent limitations at this time.
-;
-
-*******************************************************************************;
-* Research Question Analysis Starting Point;
-*******************************************************************************;
-*
-Question: What is the median outpatient claim amount for Medicare patients with 
-COPD versus patients that do not have COPD?
-
-Rationale: This should help identify differences in outpatient costs for 
-patients with/without certain chronic conditions.
-
-Note: This compares the variable "Chronic Condition: COPD" in 
-Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
-Master_Outpatient_Claim_1_2010.csv.
-
-Limitiations: No apparent limitations at this time.
-;
 
 proc sql outobs=10;
     select
@@ -72,6 +34,64 @@ proc sql outobs=10;
 	InP_PMT_AMT
     from
         Mbsf_AB_2010_and_Ip2010line_v2
+    order by
+        BENE_ID
+    ;
+quit;
+
+*******************************************************************************;
+* Research Question Analysis Starting Point;
+*******************************************************************************;
+*
+Question: What is the median inpatient claim amount for Medicare patients with 
+COPD versus patients that do not have COPD? Is there a statistically significant
+difference?
+
+Rationale: This should help identify differences in hospitalization costs for 
+patients with/without certain chronic conditions.
+
+Note: This compares the variable "Chronic Condition: COPD" in 
+Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
+Master_Inpatient_Claim_2010.csv.
+;
+
+proc sql outobs=10;
+    select
+        BENE_ID
+        COPD_Status
+        CLM_ID
+	InP_PMT_AMT
+    from
+        Mbsf_AB_2010_and_Ip2010line_v2
+    order by
+        BENE_ID
+    ;
+quit;
+
+*******************************************************************************;
+* Research Question Analysis Starting Point;
+*******************************************************************************;
+*
+Question: What is the median outpatient claim amount for Medicare patients with 
+COPD versus patients that do not have COPD? Is the difference statistically
+significant?
+
+Rationale: This should help identify differences in outpatient costs for 
+patients with/without certain chronic conditions.
+
+Note: This compares the variable "Chronic Condition: COPD" in 
+Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
+Master_Outpatient_Claim_1_2010.csv.
+;
+
+proc sql outobs=10;
+    select
+        BENE_ID
+        COPD_Status
+        CLM_ID
+	OP_PMT_AMT
+    from
+        Mbsf_AB_2010_and_Op2010line_v2
     order by
         BENE_ID
     ;
