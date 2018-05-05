@@ -601,3 +601,44 @@ proc compare
         novalues
     ;
 run;
+
+*PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
+CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
+PROGRAM IN 2010
+
+/* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
+
+data msabea_ssa;
+filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03_State_County_Code.TXT";
+	infile msabea missover; 
+	input 
+		county $  1-25
+		state  $ 26-27
+		ssa    $ 30-34; 
+run; 
+
+/* SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD */
+proc sort data=msabea_ssa nodupkey; 
+	by ssa; 
+run;
+
+/* CREATE SSA VARIABLE ON ENROLLMENT DATA*/
+data contenr_2010_fnl;
+	set contenr_2010_fnl;
+	ssa=state_cd||cnty_cd;
+run;
+
+/* SORT CONTINUOUS ENROLLMENT DATA CONTENR_2010_FNL
+AND MERGE WITH MSABEA FILE */
+proc sort data=contenr_2010_fnl; by ssa; run;
+
+data contenr_2010_fnl;
+	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
+	by ssa;
+	if a;
+run;
+
+/* CREATE FINAL ENROLLMENT FILE WITH STATE AND COUNTY CODE*/
+proc sort data=contenr_2010_fnl; 
+	by bene_id; 
+run;
