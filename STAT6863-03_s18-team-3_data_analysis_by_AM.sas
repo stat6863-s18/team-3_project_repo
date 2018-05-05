@@ -89,3 +89,37 @@ proc sql outobs=10;
         BENE_ID
     ;
 quit;
+
+/*Data Exploration*/
+
+title "Inspect Inpatient Claim Payment Amount in Ip2010line";
+/* check for distribution of IP Claim Payments to ensure sufficient info to
+answer research questions*/
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Ip2010line
+    ;
+quit;
+title;
+
+title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+/* check for distribution of OP Claim Payments to ensure sufficient info to
+answer research questions*/
+proc sql;
+    select
+         min(PMT_AMT) as min
+        ,max(PMT_AMT) as max
+        ,mean(PMT_AMT) as mean
+        ,median(PMT_AMT) as median
+        ,nmiss(PMT_AMT) as missing
+    from
+        Op2010claim
+    ;
+quit;
+title;
