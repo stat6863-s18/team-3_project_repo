@@ -445,7 +445,7 @@ run;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.13 seconds of combined "real time" to execute and a maximum of
-  about 14.6 MB of memory on the computer they were tested on;
+  about 40.6 MB of memory on the computer they were tested on;
   
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
