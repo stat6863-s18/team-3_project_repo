@@ -410,9 +410,8 @@ title;
 match-merge;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
-  about 0.03 seconds of combined "real time" to execute and a maximum of
-  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
-  proc sort step) on the computer they were tested on;
+  about 0.18 seconds of combined "real time" to execute and a maximum of
+  about 26.5 MB of memory on the computer they were tested on;
   
 data Mbsf_AB_2010_and_Ip2010line_v1;
     retain
@@ -443,18 +442,17 @@ run;
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
-  about 0.03 seconds of combined "real time" to execute and a maximum of
-  about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
-  proc sort step) on the computer they were tested on;
+  about 0.13 seconds of combined "real time" to execute and a maximum of
+  about 14.6 MB of memory on the computer they were tested on;
   
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
         select
              coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
-            ,input(A.SP_RA_OA) as RA_OA_Status
-            ,input(A.SP_COPD) as COPD_Status
-            ,input(B.CLM_ID) as CLM_ID
-	    ,input(B.PMT_AMT) as InP_PMT_AMT
+             A.SP_RA_OA as RA_OA_Status
+             A.SP_COPD as COPD_Status
+             B.CLM_ID as CLM_ID
+	     B.PMT_AMT as InP_PMT_AMT
         from
             Mbsf_AB_2010 as A
             full join
@@ -474,6 +472,8 @@ proc compare
         novalues
     ;
 run;
+
+
 
 * combine ip2010claim and op2010claim vertically using a data-step interweave,
 * note: After running the data step and proc sort step below several times
