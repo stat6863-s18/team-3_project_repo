@@ -5,26 +5,18 @@
 
 * 
 [Dataset 1 Name] Master_Inpatient_Claim_2010.csv
-
 [Dataset Description] Impatient Medicare Data by Service Line, 2010
-
 [Experimental Unit Description] Benefeciary Claim
-
 [Number of Observations] 13,916      
-
 [Number of Features] 10
-
 [Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads
 /DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
 was downloaded and edited to produce file by subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master
 /data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" and "CLM_LN" form 
 a composite key
-
 ;
 %let inputDataset1DSN = Ip2010line;
 %let inputDataset1URL =
@@ -34,25 +26,17 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatien
 
 *
 [Dataset 2 Name] Inpatient_Claim_2_2010.csv
-
 [Dataset Description] Impatient Medicare Data by claim, 2010
-
 [Experimental Unit Description] Beneficiary Claim
-
 [Number of Observations] 13,916     
-
 [Number of Features] 36
-
 [Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads
 /DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
 was downloaded and edited to produce the file by subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
-
 ;
 %let inputDataset2DSN = Ip2010claim;
 %let inputDataset2URL =
@@ -63,22 +47,16 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim
 
 *
 [Dataset 3 Name] Master_Beneficiary_Summary_2010.csv
-
 [Dataset Description] Master Beneficiary Medicare Summary, 2010
-
 [Experimental Unit Description] Beneficiary Claim
 [Number of Observations] 112,374
-
 [Number of Features] 32
-
 [Data Source] https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2010_Beneficiary_
 Summary_File_Sample_1.zip was downloaded and edited to produce the file by
 subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] The column BENE_ID is a unique id.
 ;
 %let inputDataset3DSN = Mbsf_AB_2010;
@@ -90,23 +68,16 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Benefici
 
 *
 [Dataset 4 Name] Outpatient_Claim_2_2010.csv
-
 [Dataset Description] Outpatient Medicare Data by Claim, 2010
-
 [Experimental Unit Description] Beneficiary Claim
-
 [Number of Observations] 175,005
-
 [Number of Features] 31
-
 [Data Source]  The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2008_to_2010_Outpatient_
 Claims_Sample_1.zip
 was downloaded and edited to produce file by subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] "Claim_ID", "Bene_ID" form a composite key
 ;
 %let inputDataset4DSN = Op2010claim;
@@ -163,8 +134,8 @@ options fullstimer;
 
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+/* check for duplicate unique id values; after executing this query, we
+see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -177,10 +148,11 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+    see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -193,6 +165,7 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
@@ -268,12 +241,10 @@ quit;
 	quit;
 	title;
 */
-
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
 (BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
 program.
-
 PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
 
 data contenr_2010;
@@ -443,7 +414,7 @@ run;
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.13 seconds of combined "real time" to execute and a maximum of
-  about 14.6 MB of memory on the computer they were tested on;
+  about 40.6 MB of memory on the computer they were tested on;
   
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
@@ -590,7 +561,6 @@ run;
 *PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
 CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
 PROGRAM IN 2010
-
 /* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
 
 data msabea_ssa;
@@ -618,7 +588,7 @@ AND MERGE WITH MSABEA FILE */
 proc sort data=contenr_2010_fnl; by ssa; run;
 
 data contenr_2010_fnl;
-	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
+	merge contenr_2010_fnl(in=a) msabea_ssa(in=b);
 	by ssa;
 	if a;
 run;
@@ -627,3 +597,4 @@ run;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
+title;
