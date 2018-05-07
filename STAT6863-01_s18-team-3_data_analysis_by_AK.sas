@@ -17,20 +17,11 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 *
 Question: What was the percentage of Medicare benefeciaries by sex and race?
-What is the proportion of benefeciaries who are still alive in 2010?
-
+What is the race with most of benefeciaries enrolled in 2010?
 Rationale: This should help identify benefeciaries of Medicare services by Sex
-and by Race in 2010 to explore the composition of our population.
-
-Note: This compares SEX, Race columns from prepared analytic datasets
-contenr_2010fnl and DEATH_2010 column from contenr_2010 data set. 
-
-
-*FREQUENCY OF CONTINUOUS ENROLLMENT ALIVE BENEFECIARIES (PART A, B AND HMO); 
-proc freq data=contenr_2010; 
-    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010; 
-run;
-
+and by Race in 2010 to explore the composition of our population. 
+Note: This compares "Sex", "Race" columns from prepared analytic datasets
+contenr_2010fnl. 
 *INVESTIGATION OF SEX AND RACE IN THE 2010 DATA BY CREATING FORMATS */;
 proc format; 
     value $sex_cats_fmt
@@ -61,6 +52,7 @@ proc freq data=contenr_2010_fnl;
     tables race / missing;
 	format race $race_cats_fmt.; 
 run;
+title;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -68,15 +60,12 @@ run;
 *
 Question: What is the proportion of benefeciaries who was enrolled in Medicare
 program by age categories? 
-
 Rationale: This should help identify benefeciaries of Medicare services by age
-group from 65 to over 95 years old. It shows the top age category in Medicare 
-program 
-
+group from 65 to over 95 years old. It shows the top age group in Medicare 
+program. It also gets information about proportion of Americans by age category.
 Note: It calculates column Study_Age that contains age as of 01.01.2010. 
 It also uses variable Age_cats to group benefeciaries by value of Study Age
 column 
-
 /* CALCULATING VARIABLE AGE_CATS THAT GROUPS STUDY_AGE INTO AGE CATEGORIES */;
 proc format; 
     value age_cats_fmt
@@ -109,44 +98,89 @@ proc freq data=contenr_2010_fnl;
     tables study_age * age_cats / list missing;
     format age_cats age_cats_fmt.; 
 run;
+title;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: What is the proportion of beneficiaries who was enrolled in Medicare
-program by state and county? 
+Question: What is the proportion of benefeciaries who are still alive in 2010?
+What was the proportion of benefeciaries who passed away?
+What was the proportion of inpatient and outpatient benefeciaries
+and HMO benefeciaries continiously enrolled in Medicare program in 2010?
+What is the proportion of beneficiaries who was enrolled in Medicare
+program by state and county?
+Rationale: It should identify benefeciarie as of January 2010 who continiously enrolled
+in Medicare program (Part A, Part B and Part C ). This should also help identify 
+the proportion of benefeciaries of Medicare services by state and by counties
+Note: It compares Column "contenrl_ab_2010" (Part A and B) and "contenrl_hmo" 
+(HMO) and death_2010 columns from contenr_2010 dataset. It also compares the column
+"County" and "State" from contenr_2010_fnl analytical
+file.
+*FREQUENCY OF CONTINUOUS ENROLLMENT ALIVE BENEFECIARIES (PART A, B AND HMO); 
 
-Rationale: This should help identify benefeciaries of Medicare services by age
-categories. It also identify the benefeciaries by state and by county.
+proc sql;
+    * print frequency of each Part A and B in contenr_2010;
+    select
+         contenrl_ab_2010 
+        ,count(*) as AB_2010
+	from contenr_2010
+        
+    group by
+        contenrl_ab_2010
+    ;
+quit;
 
+proc sql;
+    * print frequency of HMO in contenr_2010;
+    select
+         contenrl_hmo_2010 
+        ,count(*) as AB_2010
+	from contenr_2010
+        
+    group by
+        contenrl_hmo_2010
+    ;
+quit;
 
+proc sql;
+    * print frequency of Death and Alive in contenr_2010;
+    select
+         death_2010 
+        ,count(*) as AB_2010
+	from contenr_2010
+        
+    group by
+        death_2010
+    ;
+quit;
 
+*Checking the same result by PROC FREQ;
+proc freq data=contenr_2010; 
+    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010; 
+run;
 
-
-
-
-
-
+title "FREQUENCY OF BENEFICIARIES BY STATE AND COUNTY IN 2010 DATA";
+proc freq data=contenr_2010_fnl; 
+    tables state county /missing;
+	; 
+run;
+title;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: What is the proportion of beneficiaries who was enrolled in Medicare program
-by state and county? What is top 5 medical services for inpatient beneficiaries who 
+Question: What is top 5 medical services for inpatient beneficiaries who 
 were enrolled in Medicare program in 2010?
-
 Rationale: This would help identify what kind of medical services were
 in high demand to see utilization of Medicare hospital services by state
-and county. This should help identify benefeciaries of Medicare services by state
-and by county.
-
+and county.
 Note: This compares the column BENE_ID, Claim_ID and CLN_ID from 
 Master_inpatient_claim file after merging with Inpatient_Claim_2 file
-by composite key. It also compares the column "County" and "State" from msabea.txt 
-to the column of the BENE_ID and Claim_ID from Master_Beneficiary_Summary_2010.
-
+by composite key. It also compares the column "County" and "State" from 
+contenr_2010fnl to the column of the BENE_ID and Claim_ID from 
+Master_Beneficiary_Summary_2010.
 Limitations: Comparing procedure during merge process shows a couple of
 columns from op2010claim and op2010line_wide data sets that might be 
 excluded from initial analysis, since bene_id and claim_id rows for these 
@@ -175,30 +209,10 @@ proc sql outobs=10;
     ;
 quit;
 
-
 data op_2010 op_nomatch;
     merge op2010claim(in=a) op2010line_wide(in=b);
 	by bene_id clm_id;
 	if a and b then output op_2010;
     else output op_nomatch;
 run;
-
-
-*******************************************************************************;
-* Research Question Analysis Starting Point;
-*******************************************************************************;
-*
-Question: What was the proportion of inpatient and outpatient benefeciaries
-and HMO benefeciaries continiously enrolled in Medicare program in 2010?
-What was the proportion of benefeciaries who passed away?
-
-Rationale: This helps to understand how many beneficiaries who were 
-at age over 65 as of January 2010 continiously enrolled in Medicare program
-(Part A, Part B and Part C )and further to do analysis by gender, race.
-It also gets information about proportion of Americans by age category 
-
-Note: This compares the column "BENE_HI_CVRAGE_TOT_MONS" 
-"BENE_SMI_CVRAGE_TOT_MONS" and BENE_HMO_CVRAGE_TOT_MONS and from
-Master_Beneficiary_Summary_2010 by creating contenr_2010 data set.
-;
 
