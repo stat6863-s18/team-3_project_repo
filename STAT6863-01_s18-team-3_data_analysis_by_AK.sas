@@ -121,6 +121,7 @@ title;
 *******************************************************************************;
 *
 Question: What is the proportion of benefeciaries who are still alive in 2010?
+
 What was the proportion of benefeciaries who passed away? What was the proportion
 of inpatient and outpatient benefeciaries and HMO benefeciaries continiously 
 enrolled in Medicare program in 2010? What is the proportion of beneficiaries who
@@ -221,6 +222,12 @@ However, these rows are saved in separate file if they are required for furher
 investigation. Values of Admtg_dgns_cd equal to zero should be excluded from this
 analysis, since they are potentialy missing values. In addition values of hcpcs_cd1
 and hcpcs_cd3 equal to missing should be excluded from analysis;
+
+Note: This compares the column BENE_ID, Claim_ID and CLN_ID from 
+Master_inpatient_claim file after merging with Inpatient_Claim_2 file
+by composite key. It also compares the column "County" and "State" from 
+contenr_2010fnl to the column of the BENE_ID and Claim_ID from 
+Master_Beneficiary_Summary_2010.
 
 proc sql outobs=10;
     select
