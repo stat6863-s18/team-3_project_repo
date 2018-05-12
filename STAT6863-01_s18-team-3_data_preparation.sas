@@ -67,6 +67,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim
 [Dataset Description] Master Beneficiary Medicare Summary, 2010
 
 [Experimental Unit Description] Beneficiary Claim
+
 [Number of Observations] 112,374
 
 [Number of Features] 32
@@ -162,9 +163,11 @@ options fullstimer;
 %loadDatasets
 
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -177,10 +180,13 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -193,7 +199,9 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values*/
@@ -209,6 +217,9 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
+* check Op2010claim for bad unique id values, where the column Clm_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Op2010claim_dups has no rows. No mitigation needed for ID values*/
@@ -225,8 +236,8 @@ proc sql;
     ;
 quit;
 
-* inspect columns of interest in cleaned versions of data sets
-/*
+* inspect columns of interest in cleaned versions of data sets;
+
     title "Inspect Inpatient Claim Payment Amount in Ip2010line";
 	proc sql;
     	    select
@@ -267,7 +278,6 @@ quit;
     	    ;
 	quit;
 	title;
-*/
 
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
@@ -331,12 +341,12 @@ proc sort data=op2010line_wide;
 run; 
 
 *combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.03 seconds of combined "real time" to execute and a maximum of
   about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
   proc sort step) on the computer they were tested on;
-
 
 /* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
 data op2010_v1;
@@ -370,6 +380,7 @@ proc sort data=op2010_v1;
 run;
 
 * combine out2010 and out2010line_wide horizontally using proc sql;
+
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.03
   seconds of "real time" to execute and about 35 MB of memory on the computer
@@ -398,6 +409,7 @@ proc sql;
 quit;
 
 * verify that ip2010_v1 and ip2010_v2 are identical;
+
 proc compare
         base=op2010_v1
         compare=op2010_v2
@@ -408,6 +420,7 @@ title;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.18 seconds of combined "real time" to execute and a maximum of
@@ -440,6 +453,7 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.13 seconds of combined "real time" to execute and a maximum of
@@ -473,9 +487,8 @@ proc compare
     ;
 run;
 
+* combine ip2010claim and op2010claim vertically using a data-step interweave;
 
-
-* combine ip2010claim and op2010claim vertically using a data-step interweave,
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.11 seconds of combined "real time" to execute and a maximum of
@@ -540,6 +553,7 @@ proc sort data=ip2010claim_and_op2010claim_v1;
 run;
 
 * combine ip2010claim and op2010claim vertically using proc sql;
+
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.21
   seconds of "real time" to execute and about 25 MB of memory on the computer
@@ -580,6 +594,7 @@ quit;
 
 * verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
   identical;
+
 proc compare
         base=ip2010claim_and_op2010claim_v1
         compare=ip2010claim_and_op2010claim_v2
@@ -627,3 +642,5 @@ run;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
+
+title;
