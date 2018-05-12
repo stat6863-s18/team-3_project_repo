@@ -10,21 +10,20 @@
 
 [Experimental Unit Description] Benefeciary Claim
 
-[Number of Observations] 13,916      
+[Number of Observations] 13,916
 
 [Number of Features] 10
 
 [Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads
 /DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
-was downloaded and edited to produce file by subsetting to get 2010 year 
+was downloaded and edited to produce file by subsetting to get 2010 year
 
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master
 /data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" and "CLM_LN" form 
 a composite key
-
 ;
 %let inputDataset1DSN = Ip2010line;
 %let inputDataset1URL =
@@ -39,7 +38,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatien
 
 [Experimental Unit Description] Beneficiary Claim
 
-[Number of Observations] 13,916     
+[Number of Observations] 13,916
 
 [Number of Features] 36
 
@@ -52,7 +51,6 @@ was downloaded and edited to produce the file by subsetting to get 2010 year
 data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
-
 ;
 %let inputDataset2DSN = Ip2010claim;
 %let inputDataset2URL =
@@ -67,6 +65,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim
 [Dataset Description] Master Beneficiary Medicare Summary, 2010
 
 [Experimental Unit Description] Beneficiary Claim
+
 [Number of Observations] 112,374
 
 [Number of Features] 32
@@ -102,7 +101,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Benefici
 [Data Source]  The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2008_to_2010_Outpatient_
 Claims_Sample_1.zip
-was downloaded and edited to produce file by subsetting to get 2010 year 
+was downloaded and edited to produce file by subsetting to get 2010 year
 
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
@@ -270,12 +269,10 @@ quit;
 	quit;
 	title;
 */
-
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
 (BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
 program.
-
 PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
 
 data contenr_2010;
@@ -592,7 +589,6 @@ run;
 *PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
 CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
 PROGRAM IN 2010
-
 /* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
 
 data msabea_ssa;
@@ -629,6 +625,4 @@ run;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
-
-
-
+title;
