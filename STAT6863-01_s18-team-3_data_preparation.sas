@@ -10,20 +10,21 @@
 
 [Experimental Unit Description] Benefeciary Claim
 
-[Number of Observations] 13,916
+[Number of Observations] 13,916      
 
 [Number of Features] 10
 
 [Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads
 /DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
-was downloaded and edited to produce file by subsetting to get 2010 year
+was downloaded and edited to produce file by subsetting to get 2010 year 
 
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master
 /data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" and "CLM_LN" form 
 a composite key
+
 ;
 %let inputDataset1DSN = Ip2010line;
 %let inputDataset1URL =
@@ -38,7 +39,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatien
 
 [Experimental Unit Description] Beneficiary Claim
 
-[Number of Observations] 13,916
+[Number of Observations] 13,916     
 
 [Number of Features] 36
 
@@ -51,6 +52,7 @@ was downloaded and edited to produce the file by subsetting to get 2010 year
 data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
+
 ;
 %let inputDataset2DSN = Ip2010claim;
 %let inputDataset2URL =
@@ -101,7 +103,7 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Benefici
 [Data Source]  The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2008_to_2010_Outpatient_
 Claims_Sample_1.zip
-was downloaded and edited to produce file by subsetting to get 2010 year
+was downloaded and edited to produce file by subsetting to get 2010 year 
 
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
@@ -161,9 +163,11 @@ options fullstimer;
 %loadDatasets
 
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
+
 proc sql;
-/* check for duplicate unique id values; after executing this query, we
-see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+    /* check for duplicate unique id values; after executing this query, we
+       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -178,9 +182,11 @@ see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
 quit;
 
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
-    see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+       see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -195,6 +201,7 @@ proc sql;
 quit;
 
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values*/
@@ -210,6 +217,9 @@ proc sql;
             row_count_for_unique_id_value > 1
     ;
 quit;
+
+* check Op2010claim for bad unique id values, where the column Clm_ID is a unique key;
+
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Op2010claim_dups has no rows. No mitigation needed for ID values*/
@@ -226,8 +236,8 @@ proc sql;
     ;
 quit;
 
-* inspect columns of interest in cleaned versions of data sets
-/*
+* inspect columns of interest in cleaned versions of data sets;
+
     title "Inspect Inpatient Claim Payment Amount in Ip2010line";
 	proc sql;
     	    select
@@ -268,11 +278,12 @@ quit;
     	    ;
 	quit;
 	title;
-*/
+
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
 (BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
 program.
+
 PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
 
 data contenr_2010;
@@ -330,12 +341,12 @@ proc sort data=op2010line_wide;
 run; 
 
 *combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.03 seconds of combined "real time" to execute and a maximum of
   about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
   proc sort step) on the computer they were tested on;
-
 
 /* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
 data op2010_v1;
@@ -369,6 +380,7 @@ proc sort data=op2010_v1;
 run;
 
 * combine out2010 and out2010line_wide horizontally using proc sql;
+
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.03
   seconds of "real time" to execute and about 35 MB of memory on the computer
@@ -397,6 +409,7 @@ proc sql;
 quit;
 
 * verify that ip2010_v1 and ip2010_v2 are identical;
+
 proc compare
         base=op2010_v1
         compare=op2010_v2
@@ -407,6 +420,7 @@ title;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using a data-step 
 match-merge;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.18 seconds of combined "real time" to execute and a maximum of
@@ -439,10 +453,11 @@ proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
 run;
 
 * combine Mbsf_AB_2010 and Ip2010line horizontally using proc sql;
+
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.13 seconds of combined "real time" to execute and a maximum of
-  about 40.6 MB of memory on the computer they were tested on;
+  about 14.6 MB of memory on the computer they were tested on;
   
 proc sql;
     create table Mbsf_AB_2010_and_Ip2010line_v2 as
@@ -472,9 +487,8 @@ proc compare
     ;
 run;
 
+* combine ip2010claim and op2010claim vertically using a data-step interweave;
 
-
-* combine ip2010claim and op2010claim vertically using a data-step interweave,
 * note: After running the data step and proc sort step below several times
   and averaging the fullstimer output in the system log, they tend to take
   about 0.11 seconds of combined "real time" to execute and a maximum of
@@ -539,6 +553,7 @@ proc sort data=ip2010claim_and_op2010claim_v1;
 run;
 
 * combine ip2010claim and op2010claim vertically using proc sql;
+
 * note: After running the proc sql step below several times and averaging
   the fullstimer output in the system log, they tend to take about 0.21
   seconds of "real time" to execute and about 25 MB of memory on the computer
@@ -579,6 +594,7 @@ quit;
 
 * verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
   identical;
+
 proc compare
         base=ip2010claim_and_op2010claim_v1
         compare=ip2010claim_and_op2010claim_v2
@@ -589,6 +605,7 @@ run;
 *PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
 CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
 PROGRAM IN 2010
+
 /* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
 
 data msabea_ssa;
@@ -616,7 +633,7 @@ AND MERGE WITH MSABEA FILE */
 proc sort data=contenr_2010_fnl; by ssa; run;
 
 data contenr_2010_fnl;
-	merge contenr_2010_fnl(in=a) msabea_ssa(in=b);
+	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
 	by ssa;
 	if a;
 run;
@@ -625,4 +642,5 @@ run;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
+
 title;
