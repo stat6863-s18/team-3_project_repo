@@ -34,9 +34,9 @@ away in 2010.
 *INVESTIGATION OF SEX AND RACE IN THE 2010 DATA BY CREATING FORMATS */;
 proc format; 
     value $sex_cats_fmt
-	'0'='UNKNOWN'
-    '1'='MALE'
-    '2'='FEMALE';
+	      '0'='UNKNOWN'
+          '1'='MALE'
+          '2'='FEMALE';
 run;
 
 title "FREQUENCY OF SEX IN 2010 DATA";
@@ -47,13 +47,13 @@ run;
 
 proc format; 
     value $race_cats_fmt
-    '0'='UNKNOWN'
-    '1'='WHITE' 
-    '2'='BLACK'
-    '3'='OTHER'
-    '4'='ASIAN'
-	'5'='HISPANIC'
-	'6'='NORTH AMERICAN NATIVE';
+          '0'='UNKNOWN'
+          '1'='WHITE' 
+          '2'='BLACK'
+          '3'='OTHER'
+          '4'='ASIAN'
+	      '5'='HISPANIC'
+	      '6'='NORTH AMERICAN NATIVE';
 run;
 
 title "FREQUENCY OF RACE IN 2010 DATA";
@@ -90,11 +90,11 @@ was calculated as of January 1, 2010.
 /* CALCULATING VARIABLE AGE_CATS THAT GROUPS STUDY_AGE INTO AGE CATEGORIES */;
 proc format; 
     value age_cats_fmt
-    0='AGE LESS THAN 65'
-    1='AGE BETWEEN 65 AND 74, INCLUSIVE' 
-    2='AGE BETWEEN 75 AND 84, INCLUSIVE'
-    3='AGE BETWEEN 85 AND 94, INCLUSIVE'
-    4='AGE GREATER THAN OR EQUAL TO 95';
+          0='AGE LESS THAN 65'
+          1='AGE BETWEEN 65 AND 74, INCLUSIVE' 
+          2='AGE BETWEEN 75 AND 84, INCLUSIVE'
+          3='AGE BETWEEN 85 AND 94, INCLUSIVE'
+          4='AGE GREATER THAN OR EQUAL TO 95';
 run;
 
 data contenr_2010_fnl;
