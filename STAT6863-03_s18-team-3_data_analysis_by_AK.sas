@@ -110,7 +110,7 @@ data contenr_2010_fnl;
         when (study_age>=95)     age_cats=4;
 	end;
     label age_cats='Beneficiary age category at beginning of reference year
-(January 1, 2010)';
+    (January 1, 2010)';
 run;
 
 /* DISPLAY AGE GROUP CHARACTERISTICS IN 2010 ENROLLMENT DATA */
