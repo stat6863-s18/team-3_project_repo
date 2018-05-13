@@ -165,8 +165,9 @@ options fullstimer;
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
 
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Ip2010line_dups has no rows. No mitigation needed for ID values*/
+
+    * check for duplicate unique id values; after executing this query, we
+    see that Ip2010line_dups has no rows. No mitigation needed for ID values;  
 
     create table Ip2010line_dups as
         select
@@ -203,8 +204,8 @@ quit;
 * check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key;
 
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values*/
+    *check for duplicate unique id values; after executing this query, we
+     see that Mbsf_AB_2010_dups has no rows. No mitigation needed for ID values;
     create table Mbsf_AB_2010_dups as
         select
              Bene_ID
@@ -221,8 +222,8 @@ quit;
 * check Op2010claim for bad unique id values, where the column Clm_ID is a unique key;
 
 proc sql;
-    /* check for duplicate unique id values; after executing this query, we
-       see that Op2010claim_dups has no rows. No mitigation needed for ID values*/
+    *check for duplicate unique id values; after executing this query, we
+     see that Op2010claim_dups has no rows. No mitigation needed for ID values;
     create table Op2010claim_dups as
         select
              Clm_ID
@@ -238,6 +239,7 @@ quit;
 
 * inspect columns of interest in cleaned versions of data sets;
 
+*
     title "Inspect Inpatient Claim Payment Amount in Ip2010line";
 	proc sql;
     	    select
@@ -278,6 +280,7 @@ quit;
     	    ;
 	quit;
 	title;
+;
 
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
@@ -289,29 +292,29 @@ PREPARE DATASETS TO GET CONTINUOUS ENROLLMENT IN MBSF_AB_2010 FILE;
 data contenr_2010;
     set mbsf_ab_2010;
 	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
-    /* IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE */
+    * IDENTIFY BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE;
     if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
     contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
     if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
     else contenrl_hmo_2010='nohmo'; 
-	/* CLASSIFY BENEFICIARIES THAT PASSED AWAY IN 2010 */
+	* CLASSIFY BENEFICIARIES THAT PASSED AWAY IN 2010;
 	if death_dt ne . then death_2010=1; else death_2010=0;
 run;
 title;
 
 *CREATE A 2010 ENROLLMENT FILE OF ONLY CONTINUOUSLY ENROLLED BENEFICIARIES
-BY COMBINING ALIVE BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE*/;
+BY COMBINING ALIVE BENEFICIARIES WITH PARTS A AND B OR HMO COVERAGE;
 data contenr_2010_fnl;
     set contenr_2010;
 	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
 run;
 
-/* SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION */
+*SORT OUTPATIENT CLAIM LINES FILE IN PREPARATION FOR TRANSFORMATION;
 proc sort data=op2010line out=op2010line; 
 	by bene_id clm_id clm_ln; 
 run;
 
-/* TRANSFORM OUTPATIENT CLAIM LINE FILE */;
+*TRANSFORM OUTPATIENT CLAIM LINE FILE;
 data op2010line_wide(drop=i clm_ln hcpcs_cd);
 	format	hcpcs_cd1-hcpcs_cd45 $5.;
 	set op2010line;
@@ -331,7 +334,7 @@ data op2010line_wide(drop=i clm_ln hcpcs_cd);
 	if last.clm_id then output;
 run;
 
-/* SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE */
+*SORT CLAIM AND TRANSFORMED CLAIM LINES FILES IN PREPARATION FOR MERGE;
 proc sort data=op2010claim out=op2010claim; 
 	by bene_id clm_id; 
 run; 
@@ -348,7 +351,7 @@ run;
   about 27.9 MB of memory (25076 KB for the data step vs. 27908 KB for the
   proc sort step) on the computer they were tested on;
 
-/* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES */
+* MERGE OUTPATIENT BASE CLAIM AND TRANSFORMED REVENUE CENTER FILES;
 data op2010_v1;
     retain
         bene_id
@@ -604,9 +607,9 @@ run;
 
 *PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
 CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
-PROGRAM IN 2010
+PROGRAM IN 2010;
 
-/* LOAD SSA STATE AND COUNTY CODE INFORMATION */;
+*LOAD SSA STATE AND COUNTY CODE INFORMATION;
 
 data msabea_ssa;
 filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03_State_County_Code.TXT";
@@ -617,19 +620,19 @@ filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_r
 		ssa    $ 30-34; 
 run; 
 
-/* SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD */
+* SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD;
 proc sort data=msabea_ssa nodupkey; 
 	by ssa; 
 run;
 
-/* CREATE SSA VARIABLE ON ENROLLMENT DATA*/
+*CREATE SSA VARIABLE ON ENROLLMENT DATA;
 data contenr_2010_fnl;
 	set contenr_2010_fnl;
 	ssa=state_cd||cnty_cd;
 run;
 
-/* SORT CONTINUOUS ENROLLMENT DATA CONTENR_2010_FNL
-AND MERGE WITH MSABEA FILE */
+* SORT CONTINUOUS ENROLLMENT DATA CONTENR_2010_FNL
+AND MERGE WITH MSABEA FILE;
 proc sort data=contenr_2010_fnl; by ssa; run;
 
 data contenr_2010_fnl;
@@ -638,7 +641,7 @@ data contenr_2010_fnl;
 	if a;
 run;
 
-/* CREATE FINAL ENROLLMENT FILE WITH STATE AND COUNTY CODE*/
+*CREATE FINAL ENROLLMENT FILE WITH STATE AND COUNTY CODE;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
