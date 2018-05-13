@@ -239,7 +239,7 @@ quit;
 
 * inspect columns of interest in cleaned versions of data sets;
 
-*
+/*
     title "Inspect Inpatient Claim Payment Amount in Ip2010line";
 	proc sql;
     	    select
@@ -280,7 +280,7 @@ quit;
     	    ;
 	quit;
 	title;
-;
+*/
 
 *We have in this file information about Medicare beneficiaries who
 enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
