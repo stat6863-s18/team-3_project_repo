@@ -165,8 +165,10 @@ options fullstimer;
 * check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
 
 proc sql;
+
     * check for duplicate unique id values; after executing this query, we
     see that Ip2010line_dups has no rows. No mitigation needed for ID values;  
+
     create table Ip2010line_dups as
         select
              CLM_ID
@@ -185,6 +187,7 @@ quit;
 proc sql;
     /* check for duplicate unique id values; after executing this query, we
        see that Ip2010claim_dups has no rows. No mitigation needed for ID values*/
+
     create table Ip2010claim_dups as
         select
              CLM_ID
@@ -594,7 +597,7 @@ quit;
 
 * verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
   identical;
-  
+
 proc compare
         base=ip2010claim_and_op2010claim_v1
         compare=ip2010claim_and_op2010claim_v2
@@ -642,3 +645,5 @@ run;
 proc sort data=contenr_2010_fnl; 
 	by bene_id; 
 run;
+
+title;
