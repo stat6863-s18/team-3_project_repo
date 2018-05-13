@@ -1,3 +1,4 @@
+
 *******************************************************************************;
 **************** 80-character banner for column width reference ***************;
 * (set window width to banner width to calibrate line length to 80 characters *;
@@ -17,8 +18,10 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *
 Question: What was the percentage of Medicare benefeciaries by sex and race?
 What is the race with most of benefeciaries enrolled in 2010?
+
 Rationale: This should help identify benefeciaries of Medicare services by Sex
 and by Race in 2010 to explore the composition of our population. 
+
 Note: This compares "Sex", "Race" columns from prepared analytic datasets
 contenr_2010fnl. 
 
@@ -31,9 +34,9 @@ away in 2010.
 *INVESTIGATION OF SEX AND RACE IN THE 2010 DATA BY CREATING FORMATS */;
 proc format; 
     value $sex_cats_fmt
-		'0'='UNKNOWN'
-        '1'='MALE'
-        '2'='FEMALE';
+	      '0'='UNKNOWN'
+          '1'='MALE'
+          '2'='FEMALE';
 run;
 
 title "FREQUENCY OF SEX IN 2010 DATA";
@@ -44,13 +47,13 @@ run;
 
 proc format; 
     value $race_cats_fmt
-        '0'='UNKNOWN'
-        '1'='WHITE' 
-        '2'='BLACK'
-        '3'='OTHER'
-        '4'='ASIAN'
-		'5'='HISPANIC'
-		'6'='NORTH AMERICAN NATIVE';
+          '0'='UNKNOWN'
+          '1'='WHITE' 
+          '2'='BLACK'
+          '3'='OTHER'
+          '4'='ASIAN'
+	      '5'='HISPANIC'
+	      '6'='NORTH AMERICAN NATIVE';
 run;
 
 title "FREQUENCY OF RACE IN 2010 DATA";
@@ -66,9 +69,11 @@ title;
 *
 Question: What is the proportion of benefeciaries who was enrolled in Medicare
 program by age categories? 
+
 Rationale: This should help identify benefeciaries of Medicare services by age
 group from 65 to over 95 years old. It shows the top age group in Medicare 
 program. It also gets information about proportion of Americans by age category.
+
 Note: It calculates column Study_Age that contains age as of 01.01.2010. 
 It also uses variable Age_cats to group benefeciaries by value of Study Age
 column 
@@ -85,11 +90,11 @@ was calculated as of January 1, 2010.
 /* CALCULATING VARIABLE AGE_CATS THAT GROUPS STUDY_AGE INTO AGE CATEGORIES */;
 proc format; 
     value age_cats_fmt
-        0='AGE LESS THAN 65'
-        1='AGE BETWEEN 65 AND 74, INCLUSIVE' 
-        2='AGE BETWEEN 75 AND 84, INCLUSIVE'
-        3='AGE BETWEEN 85 AND 94, INCLUSIVE'
-        4='AGE GREATER THAN OR EQUAL TO 95';
+          0='AGE LESS THAN 65'
+          1='AGE BETWEEN 65 AND 74, INCLUSIVE' 
+          2='AGE BETWEEN 75 AND 84, INCLUSIVE'
+          3='AGE BETWEEN 85 AND 94, INCLUSIVE'
+          4='AGE GREATER THAN OR EQUAL TO 95';
 run;
 
 data contenr_2010_fnl;
@@ -105,7 +110,7 @@ data contenr_2010_fnl;
         when (study_age>=95)     age_cats=4;
 	end;
     label age_cats='Beneficiary age category at beginning of reference year
-(January 1, 2010)';
+    (January 1, 2010)';
 run;
 
 /* DISPLAY AGE GROUP CHARACTERISTICS IN 2010 ENROLLMENT DATA */
@@ -121,7 +126,6 @@ title;
 *******************************************************************************;
 *
 Question: What is the proportion of benefeciaries who are still alive in 2010?
-
 What was the proportion of benefeciaries who passed away? What was the proportion
 of inpatient and outpatient benefeciaries and HMO benefeciaries continiously 
 enrolled in Medicare program in 2010? What is the proportion of beneficiaries who
@@ -141,14 +145,6 @@ Limitation: We have benefeciaries for 2010 year, who continiously enrolled in
 Medicare program. To get proportion of benefeciaries we analyse in formation
 in the dataset for Part A, Part B and HMO. Also, it includes information about 
 benefeciaries who passed away in 2010.
-
-Rationale: It should identify benefeciarie as of January 2010 who continiously enrolled
-in Medicare program (Part A, Part B and Part C ). This should also help identify 
-the proportion of benefeciaries of Medicare services by state and by counties
-Note: It compares Column "contenrl_ab_2010" (Part A and B) and "contenrl_hmo" 
-(HMO) and death_2010 columns from contenr_2010 dataset. It also compares the column
-"County" and "State" from contenr_2010_fnl analytical
-file.
 
 *FREQUENCY OF CONTINUOUS ENROLLMENT ALIVE BENEFECIARIES (PART A, B AND HMO); 
 
@@ -223,12 +219,6 @@ investigation. Values of Admtg_dgns_cd equal to zero should be excluded from thi
 analysis, since they are potentialy missing values. In addition values of hcpcs_cd1
 and hcpcs_cd3 equal to missing should be excluded from analysis;
 
-Note: This compares the column BENE_ID, Claim_ID and CLN_ID from 
-Master_inpatient_claim file after merging with Inpatient_Claim_2 file
-by composite key. It also compares the column "County" and "State" from 
-contenr_2010fnl to the column of the BENE_ID and Claim_ID from 
-Master_Beneficiary_Summary_2010.
-
 proc sql outobs=10;
     select
          bene_id
@@ -253,3 +243,7 @@ data op_2010 op_nomatch;
 	if a and b then output op_2010;
     else output op_nomatch;
 run;
+
+
+
+
