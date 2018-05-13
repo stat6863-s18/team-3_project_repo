@@ -116,6 +116,35 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Clai
 ;
 %let inputDataset4Type = CSV;
 
+
+*
+[Dataset 5 Name] MSABEA03.csv
+
+[Dataset Description] US State and County Codes
+
+[Experimental Unit Description] US State Code
+
+[Number of Observations] 32,090
+
+[Number of Features] 3
+
+[Data Source]  https://www.cms.gov/Research-Statistics-Data-and-Systems/
+Statistics-Trends-and-Reports/HealthPlanRepFileData/Downloads/SCP-2003.zip
+was downloaded and edited to produce file by subsetting to get State,
+County and SSA Code. 
+
+[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
+data/Data_Dictionary_Medicare.doc
+
+[Unique ID Schema] "State", "County" form a composite key
+;
+%let inputDataset5DSN = Msabea_ssa;
+%let inputDataset5URL =
+https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03.csv?raw=true
+;
+%let inputDataset5Type = CSV;
+
+
 * set global system options;
 options fullstimer;
 
@@ -152,7 +181,7 @@ options fullstimer;
         %end;
 %mend;
 %macro loadDatasets;
-    %do i = 1 %to 4;
+    %do i = 1 %to 5;
         %loadDataIfNotAlreadyAvailable(
             &&inputDataset&i.DSN.,
             &&inputDataset&i.URL.,
@@ -608,17 +637,6 @@ run;
 *PREPARATION OF STATE AND COUNTY INFORMATION FOR CONTENR2010_FNL DATASET THAT
 CONTAINS ALL BENEFECIARIES (PART A, B and HMO) WHO ENROLLED IN MEDICARE
 PROGRAM IN 2010;
-
-*LOAD SSA STATE AND COUNTY CODE INFORMATION;
-
-data msabea_ssa;
-filename msabea url "https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03_State_County_Code.TXT";
-	infile msabea missover; 
-	input 
-		county $  1-25
-		state  $ 26-27
-		ssa    $ 30-34; 
-run; 
 
 * SORT SSA STATE AND COUNTY CODES FILE TO REMOVE DUPLICATE RECORD;
 proc sort data=msabea_ssa nodupkey; 
