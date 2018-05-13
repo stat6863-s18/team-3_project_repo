@@ -25,6 +25,7 @@ with certain chronic conditions.
 Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Inpatient admission date" in 
 Master_Inpatient_Claim_2010.csv.
+;
 
 proc sql outobs=10;
     select
@@ -97,12 +98,12 @@ proc sql outobs=10;
     ;
 quit;
 
-/*Data Exploration*/
+*Data Exploration;
 
 title "Inspect Inpatient Claim Payment Amount in Ip2010line";
 
-/* check for distribution of IP Claim Payments to ensure sufficient info to
-answer research questions*/
+* check for distribution of IP Claim Payments to ensure sufficient info to
+answer research questions;
 
 proc sql;
     select
@@ -119,8 +120,8 @@ title;
 
 title "Inspect Outpatient Claim Payment Amount in Op2010claim";
 
-/* check for distribution of OP Claim Payments to ensure sufficient info to
-answer research questions*/
+* check for distribution of OP Claim Payments to ensure sufficient info to
+answer research questions;
 
 proc sql;
     select
