@@ -38,7 +38,7 @@ proc sql;
     select
          contenrl_ab_2010 
         ,count(*) as AB_2010
-	from contenr_2010
+	from contenr_2010_fnl
         
     group by
         contenrl_ab_2010
@@ -49,7 +49,7 @@ proc sql;
     select
          contenrl_hmo_2010 
         ,count(*) as AB_2010
-	from contenr_2010
+	from contenr_2010_fnl
         
     group by
         contenrl_hmo_2010
@@ -60,14 +60,14 @@ proc sql;
     select
          death_2010 
         ,count(*) as AB_2010
-	from contenr_2010
+	from contenr_2010_fnl
         
     group by
         death_2010
     ;
 quit;
 
-proc freq data=contenr_2010; 
+proc freq data=contenr_2010_fnl; 
     tables contenrl_ab_2010 contenrl_hmo_2010 death_2010; 
 run;
 
@@ -157,7 +157,7 @@ proc format;
           1='Age Between 65 and 74, Inclusive' 
           2='Age Between 75 and 84, Inclusive'
           3='Age Between 85 and 94, Inclusive'
-          4='Age Greater Than Or Equal To 95';
+          4='Age Greater Than or Equal To 95';
 run;
 
 data contenr_2010_fnl;
