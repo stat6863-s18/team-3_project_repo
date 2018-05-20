@@ -674,7 +674,7 @@ proc sql;
     create table contenr2010_analytic_file_raw as
         select
 	     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-
+             AS Bene_ID
 	     ,c.thru_dt 
 	     ,c.from_dt 
              ,a.bene_hi_cvrage_tot_mons as Part_A
@@ -692,7 +692,7 @@ proc sql;
 
             full join
 
-        ip2010claim as c
+        ip2010line as c
 
             on A.Bene_ID = C.Bene_ID
 
