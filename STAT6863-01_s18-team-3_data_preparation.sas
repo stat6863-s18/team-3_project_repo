@@ -730,25 +730,25 @@ quit;
 
 proc sql;
 	create table contenr2010_analytic_file_raw as
-		select A.bene_id, a.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.* 
-		from IP2010claim A 
+		select A.bene_id, a.clm_ID, D.* 
+			from IP2010claim A 
 
-		full join MBSF_ab_2010 C  
+			full join MBSF_ab_2010 C  
 
-		on A.bene_id=C.bene_id  /****first join****/ 
+			on A.bene_id=C.bene_id  /****first join****/ 
 
-		full join msabea_ssa D on ssa=D.SSA /*second join*/
+			full join msabea_ssa D on compress(C.state_Cd||C.CNTY_CD)=D.SSA /*second join*/
 		
 union corr
 
-		select B.bene_id,  B.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.*  
-		from OP2010claim B 
+		select B.bene_id,  B.clm_ID, D.*  
+			from OP2010claim B 
 
-		full join MBSF_ab_2010 C  
+			full join MBSF_ab_2010 C  
 
-		on b.bene_id=c.bene_id /*****first join****/
+			on b.bene_id=c.bene_id /*****first join****/
 
-		full join msabea_ssa D on ssa=D.SSA /*second join*/
+			full join msabea_ssa D on compress(C.state_Cd||C.CNTY_CD)=D.SSA /*second join*/
 		;
 quit;
 
