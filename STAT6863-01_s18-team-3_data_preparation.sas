@@ -761,6 +761,8 @@ proc sql;
 		and (ssa=D.ssa); 
 quit;
 
+* One single PROC SQL query to get analytic file;
+
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select A.bene_id, a.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.*  from IP2010claim A 
