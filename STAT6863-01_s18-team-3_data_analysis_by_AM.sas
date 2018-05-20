@@ -17,7 +17,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 *
 Question: Do Medicare patients with RA/OA have more inpatient claims than 
-patients that not have RA/OA? Is there a statistically significant difference?
+patients that do not have RA/OA? Is there a statistically significant difference?
 
 Rationale: This should help identify trends in hospitalization for patients 
 with certain chronic conditions.
@@ -25,6 +25,9 @@ with certain chronic conditions.
 Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Inpatient admission date" in 
 Master_Inpatient_Claim_2010.csv.
+
+Limitations: This question assumes that each admission is logged individually
+as referenced by claim ID. This may not be acccurate.
 ;
 
 proc sql outobs=10;
@@ -54,6 +57,8 @@ patients with/without certain chronic conditions.
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Inpatient_Claim_2010.csv.
+
+Limitations: No limitations identified during exploratory steps.
 ;
 
 proc sql outobs=10;
@@ -83,6 +88,8 @@ patients with/without certain chronic conditions.
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Outpatient_Claim_1_2010.csv.
+
+Limitations: No limitations identified during exploratory steps.
 ;
 
 proc sql outobs=10;
