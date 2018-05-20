@@ -669,24 +669,41 @@ title;
 * First, we try to do full join with 3 files:ip2010claim, op2010claim
 and msbf_2010_ab;
 
+* First, we try to do full join with 3 files:ip2010claim, op2010claim
+and msbf_2010_ab;
+
 proc sql;
     create table contenr2010_analytic_file_raw as
         select
 		     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
+<<<<<<< HEAD
              AS Bene_ID
 			 			 		 
+=======
+             AS Bene_ID			 		 
+>>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
 			 ,c.thru_dt 
 			 ,c.from_dt 
-             ,a.bene_hi_cvrage_tot_mons as Part_A
+             		 ,a.bene_hi_cvrage_tot_mons as Part_A
 			 ,a.bene_smi_cvrage_tot_mons as Part_B
 			 ,a.bene_hmo_cvrage_tot_mons as Non_HMO
 			 ,a.death_dt as Alive
-			 
+			 ,a.sp_ra_oa as RA_OA_Status
+			 ,a.sp_copd as COPD_Status
+			 ,c.clm_id as IP_Claim
+			 ,c.pmt_amt as IP_Pmt_Amt
+			 ,d.clm_id as OP_Claim
+			 ,d.pmt_amt as OP_Pmt_Amt	 
+      
         from mbsf_ab_2010 as A
 
             full join
 
+<<<<<<< HEAD
         ip2010claim as C
+=======
+        ip2010line as C
+>>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
             on A.Bene_ID = C.Bene_ID
 
             full join
@@ -705,6 +722,7 @@ proc sql;
 			 coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
 			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
 			,A.SSa
+<<<<<<< HEAD
 
 		from ip2010claim A 
 
@@ -714,6 +732,13 @@ proc sql;
 
 		full join MBSF_ab_2010 C 
 
+=======
+		from ip2010claim A 
+		full join op2010claim B
+
+		on (A.bene_id=B.bene_id and A.clm_id=B.clm_id)
+		full join MBSF_ab_2010 C 
+>>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
 		on (A.bene_id=C.bene_id )
     ;
 quit;
@@ -736,6 +761,7 @@ proc sql;
 		and (ssa=D.ssa); 
 quit;
 
+<<<<<<< HEAD
 /* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
@@ -760,6 +786,8 @@ quit;
         id values are not duplicated in the original input datasets 
 */
 
+=======
+>>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
 * we use proc sort to indiscriminately remove
   duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
   a composite key;
