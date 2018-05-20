@@ -676,15 +676,10 @@ proc sql;
     create table contenr2010_analytic_file_raw as
         select
 		     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-<<<<<<< HEAD
-             AS Bene_ID
-			 			 		 
-=======
-             AS Bene_ID			 		 
->>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
+
 			 ,c.thru_dt 
 			 ,c.from_dt 
-             		 ,a.bene_hi_cvrage_tot_mons as Part_A
+             ,a.bene_hi_cvrage_tot_mons as Part_A
 			 ,a.bene_smi_cvrage_tot_mons as Part_B
 			 ,a.bene_hmo_cvrage_tot_mons as Non_HMO
 			 ,a.death_dt as Alive
@@ -699,11 +694,8 @@ proc sql;
 
             full join
 
-<<<<<<< HEAD
-        ip2010claim as C
-=======
-        ip2010line as C
->>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
+        ip2010claim as c
+
             on A.Bene_ID = C.Bene_ID
 
             full join
@@ -713,33 +705,6 @@ proc sql;
 
 	order by
         Bene_ID
-    ;
-quit;
-
-proc sql;
-	create table contenr2010_analytic_file_raw as
-		select
-			 coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
-			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
-			,A.SSa
-<<<<<<< HEAD
-
-		from ip2010claim A 
-
-		full join op2010claim B
-
-		on (A.bene_id=B.bene_id and A.clm_id=B.clm_id)
-
-		full join MBSF_ab_2010 C 
-
-=======
-		from ip2010claim A 
-		full join op2010claim B
-
-		on (A.bene_id=B.bene_id and A.clm_id=B.clm_id)
-		full join MBSF_ab_2010 C 
->>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
-		on (A.bene_id=C.bene_id )
     ;
 quit;
 
@@ -761,27 +726,33 @@ proc sql;
 		and (ssa=D.ssa); 
 quit;
 
-* One single PROC SQL query to get analytic file;
+* Attempt to use one single PROC SQL query to get analytic file;
 
 proc sql;
 	create table contenr2010_analytic_file_raw as
-		select A.bene_id, a.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.*  from IP2010claim A 
+		select A.bene_id, a.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.* 
+		from IP2010claim A 
 
 		full join MBSF_ab_2010 C  
+
 		on A.bene_id=C.bene_id  /****first join****/ 
+
 		full join msabea_ssa D on ssa=D.SSA /*second join*/
 		
 union corr
 
-		select B.bene_id,  B.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.*  from OP2010claim B 
+		select B.bene_id,  B.clm_ID, cats(c.state_cd,c.cnty_cd) as ssa, D.*  
+		from OP2010claim B 
+
 		full join MBSF_ab_2010 C  
+
 		on b.bene_id=c.bene_id /*****first join****/
+
 		full join msabea_ssa D on ssa=D.SSA /*second join*/
 		;
 quit;
 
-<<<<<<< HEAD
-/* notes to learners:
+	/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
         often faster and less code to use data steps and proc sort steps to
@@ -805,8 +776,6 @@ quit;
         id values are not duplicated in the original input datasets 
 */
 
-=======
->>>>>>> b2d098e268681921f4cac51b9af86fe18c654027
 * we use proc sort to indiscriminately remove
   duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
   a composite key;
