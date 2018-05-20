@@ -664,10 +664,7 @@ run;
 
 title;
 
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
-and msbf_2010_ab;
-
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
+* First, we try to do full join with 3 files:ip2010line, op2010claim
 and msbf_2010_ab;
 
 proc sql;
@@ -699,7 +696,7 @@ proc sql;
             full join
 
         op2010claim as D
-            on c.Bene_ID = d.Bene_ID
+            on a.Bene_ID = d.Bene_ID
 
 	order by
         Bene_ID
