@@ -661,3 +661,61 @@ run;
     run;
 
     title;
+
+proc sql;
+    create table contenr2010_analytic_file_raw as
+        select
+		     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
+             AS Benefeciary
+			 			 		 
+			 ,c.thru_dt 
+			 ,c.from_dt 
+             ,a.bene_hi_cvrage_tot_mons as Part_A
+			 ,a.bene_smi_cvrage_tot_mons as Part_B
+			 ,a.bene_hmo_cvrage_tot_mons as Non_HMO
+			 ,a.death_dt as Alive
+			 
+        from mbsf_ab_2010 as A
+
+            full join
+
+        ip_2010 as C
+            on A.Bene_ID = C.Bene_ID
+
+            full join
+
+        op_2010 as D
+            on c.Bene_ID = d.Bene_ID
+
+	order by
+        Benefeciary
+    ;
+quit;
+
+proc sql;
+	create table contenr2010_analytic_file_raw as
+		select
+			coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
+			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
+			,A.SSa
+		from ip A 
+		full join op B
+
+		on (A.bene_id=B.bene_id and A.clm_id=B.clm_id)
+		full join MBSF C 
+		on (A.bene_id=C.bene_id )
+    ;
+quit;
+
+proc sql;
+	create table contenr2010_analytic_file_raw as
+		select
+			 coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
+			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
+			,A.SSa
+		from ip A,  op B, MBSF C, Country D
+		where (A.bene_id=B.bene_id  and A.clm_id=b.clm_id)
+		and (A.bene_id=C.bene_id and A.clm_id=C.clm_id)
+		and (C.ssa=D.ssa)
+    ; 
+quit;
