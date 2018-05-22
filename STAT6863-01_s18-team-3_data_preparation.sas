@@ -372,285 +372,283 @@ proc sort data=op2010line_wide;
     by bene_id clm_id;
 run; 
 
-* Combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
+/*
 
-* Note: after running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about 0.03 seconds of combined "real time" to execute and a maximum of
-  about 27.9 mb of memory (25076 kb for the data step vs. 27908 Kb for the
-  proc sort step) on the computer they were tested on;
+    * Combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
 
-* Merge outpatient base claim and transformed revenue center files;
-data op2010_v1;
-    retain
-        bene_id
-        clm_id
-        from_dt
-        thru_dt
-        hcpcs_cd1
+    * Note: after running the data step and proc sort step below several times
+      and averaging the fullstimer output in the system log, they tend to take
+      about 0.03 seconds of combined "real time" to execute and a maximum of
+      about 27.9 mb of memory (25076 kb for the data step vs. 27908 Kb for the
+      proc sort step) on the computer they were tested on;
+
+    * Merge outpatient base claim and transformed revenue center files;
+    data op2010_v1;
+        retain
+            bene_id
+            clm_id
+            from_dt
+            thru_dt
+            hcpcs_cd1
 		hcpcs_cd3
 		admtg_dgns_cd
-    ;
-    keep
-        bene_id
-        clm_id
-        from_dt
-        thru_dt
-        hcpcs_cd1
+        ;
+        keep
+            bene_id
+            clm_id
+            from_dt
+            thru_dt
+            hcpcs_cd1
 		hcpcs_cd3
 		admtg_dgns_cd
-    ;
-    merge
-        op2010claim
-        op2010line_wide
-    ;
-    by bene_id clm_id;
+        ;
+        merge
+            op2010claim
+            op2010line_wide
+        ;
+        by bene_id clm_id;
+    run;
+    
+    proc sort data=op2010_v1;
+        by bene_id clm_id;
+    run;
 
-run;
-proc sort data=op2010_v1;
-    by bene_id clm_id;
-run;
+    * Combine out2010 and out2010line_wide horizontally using proc sql;
 
-* Combine out2010 and out2010line_wide horizontally using proc sql;
+    * Note: after running the proc sql step below several times and averaging
+      the fullstimer output in the system log, they tend to take about 0.03
+      seconds of "real time" to execute and about 35 mb of memory on the computer
+      they were tested on. Consequently, the proc sql step appears to take roughly
+      the same amount of time to execute as the combined data step and proc sort
+      steps above, but to use 5mb more memory;
 
-* Note: after running the proc sql step below several times and averaging
-  the fullstimer output in the system log, they tend to take about 0.03
-  seconds of "real time" to execute and about 35 mb of memory on the computer
-  they were tested on. Consequently, the proc sql step appears to take roughly
-  the same amount of time to execute as the combined data step and proc sort
-  steps above, but to use 5mb more memory;
-
-proc sql;
-    create table op2010_v2 as
-        select
-             coalesce(A.bene_id,B.bene_id) as bene_id
-            ,coalesce(A.clm_id,B.clm_id) as clm_id
-            ,B.hcpcs_cd1 as Revenue_Center_1
-            ,B.hcpcs_cd3 as Revenue_Center_2
-            ,A.from_dt as from_dt
-            ,A.thru_dt as thru_dt
+    proc sql;
+        create table op2010_v2 as
+            select
+                coalesce(A.bene_id,B.bene_id) as bene_id
+               ,coalesce(A.clm_id,B.clm_id) as clm_id
+               ,B.hcpcs_cd1 as Revenue_Center_1
+               ,B.hcpcs_cd3 as Revenue_Center_2
+               ,A.from_dt as from_dt
+               ,A.thru_dt as thru_dt
 			,A.admtg_dgns_cd
-        from
-            op2010claim as A
-            full join
-            op2010line_wide as B
-            on A.bene_id=B.bene_id and A.clm_id=B.clm_id
-        order by
-            bene_id, clm_id
-    ;
-quit;
+            from
+                op2010claim as A
+                full join
+                op2010line_wide as B
+                on A.bene_id=B.bene_id and A.clm_id=B.clm_id
+            order by
+                bene_id, clm_id
+        ;
+    quit;
 
-* Verify that ip2010_v1 and ip2010_v2 are identical;
+    * Verify that ip2010_v1 and ip2010_v2 are identical;
 
-proc compare
+    proc compare
         base=op2010_v1
         compare=op2010_v2
         novalues
     ;
-run;
-title;
+    run;
+    title;
 
-* Combine mbsf_ab_2010 and ip2010line horizontally using a data-step 
-match-merge;
+    * Combine mbsf_ab_2010 and ip2010line horizontally using a data-step 
+     match-merge;
 
-* Note: after running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about 0.18 seconds of combined "real time" to execute and a maximum of
-  about 26.5 mb of memory on the computer they were tested on;
+    * Note: after running the data step and proc sort step below several times
+      and averaging the fullstimer output in the system log, they tend to take
+      about 0.18 seconds of combined "real time" to execute and a maximum of
+      about 26.5 mb of memory on the computer they were tested on;
   
-data Mbsf_AB_2010_and_Ip2010line_v1;
-    retain
-        BENE_ID
-        SP_RA_OA
-        SP_COPD
-        CLM_ID
-        PMT_AMT
-    ;
-    keep
-        BENE_ID
-        SP_RA_OA
-        SP_COPD
-        CLM_ID
-        PMT_AMT
-    ;
-    merge
-        Mbsf_AB_2010
-        Ip2010line 
-    ;
-    by BENE_ID;
-run;
-
-proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
-    by BENE_ID;
-run;
-
-* Combine mbsf_ab_2010 and ip2010line horizontally using proc sql;
-
-* Note: after running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about 0.13 seconds of combined "real time" to execute and a maximum of
-  about 14.6 mb of memory on the computer they were tested on;
-  
-proc sql;
-    create table Mbsf_AB_2010_and_Ip2010line_v2 as
-        select
-             coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
-             A.SP_RA_OA as RA_OA_Status
-             A.SP_COPD as COPD_Status
-             B.CLM_ID as CLM_ID
-	     B.PMT_AMT as InP_PMT_AMT
-        from
-            Mbsf_AB_2010 as A
-            full join
-            Ip2010line as B
-            on A.BENE_ID=B.BENE_ID
-        order by
+    data Mbsf_AB_2010_and_Ip2010line_v1;
+        retain
             BENE_ID
-    ;
-quit;
+            SP_RA_OA
+            SP_COPD
+            CLM_ID
+            PMT_AMT
+        ;
+        keep
+            BENE_ID
+            SP_RA_OA
+            SP_COPD
+            CLM_ID
+            PMT_AMT
+       ;
+       merge
+           Mbsf_AB_2010
+           Ip2010line 
+       ;
+       by BENE_ID;
+    run;
 
-* Verify that mbsf_ab_2010_and_ip2010line_v1 and mbsf_ab_2010_and_ip2010line_v2
-are identical;
+    proc sort data= data Mbsf_AB_2010_and_Ip2010line_v1;
+        by BENE_ID;
+    run;
 
-proc compare
+    * Combine mbsf_ab_2010 and ip2010line horizontally using proc sql;
+
+    * Note: after running the data step and proc sort step below several times
+      and averaging the fullstimer output in the system log, they tend to take
+      about 0.13 seconds of combined "real time" to execute and a maximum of
+      about 14.6 mb of memory on the computer they were tested on;
+  
+    proc sql;
+        create table Mbsf_AB_2010_and_Ip2010line_v2 as
+            select
+                coalesce(A.BENE_ID,B.BENE_ID) as BENE_ID
+                A.SP_RA_OA as RA_OA_Status
+                A.SP_COPD as COPD_Status
+                B.CLM_ID as CLM_ID
+	        B.PMT_AMT as InP_PMT_AMT
+            from
+                Mbsf_AB_2010 as A
+                full join
+                Ip2010line as B
+                on A.BENE_ID=B.BENE_ID
+            order by
+                BENE_ID
+        ;
+    quit;
+
+    * Verify that mbsf_ab_2010_and_ip2010line_v1 and mbsf_ab_2010_and_ip2010line_v2
+     are identical;
+
+    proc compare
         base= Mbsf_AB_2010_and_Ip2010line_v1        
         compare= Mbsf_AB_2010_and_Ip2010line_v2
         novalues
     ;
-run;
+    run;
 
-* Combine ip2010claim and op2010claim vertically using a data-step interweave;
+    * Combine ip2010claim and op2010claim vertically using a data-step interweave;
 
-* Note: after running the data step and proc sort step below several times
-  and averaging the fullstimer output in the system log, they tend to take
-  about 0.11 seconds of combined "real time" to execute and a maximum of
-  about 24 mb of memory (984 kb for the data step vs. 24000 Kb for the
-  proc sort step) on the computer they were tested on;
+    * Note: after running the data step and proc sort step below several times
+      and averaging the fullstimer output in the system log, they tend to take
+      about 0.11 seconds of combined "real time" to execute and a maximum of
+      about 24 mb of memory (984 kb for the data step vs. 24000 Kb for the
+      proc sort step) on the computer they were tested on;
 
-data ip2010claim_and_op2010claim_v1;
-    retain
-        Bene_ID
-        Claim_ID
-        Admtg_dgns_CD
-        From_DT
-        Thru_DT
-        Provider
-    ;
-    keep
-        Bene_ID
-        Clm_ID
-        Admtg_dgns_CD
-        From_DT
-        Thru_DT
-        Provider
-    ;
-    length    
-        Bene_ID $16.
-        Clm_ID  $15.
-        Admtg_dgns_CD  $5.
+    data ip2010claim_and_op2010claim_v1;
+        retain
+            Bene_ID
+            Claim_ID
+            Admtg_dgns_CD
+            From_DT
+            Thru_DT
+            Provider
+        ;
+        keep
+            Bene_ID
+            Clm_ID
+            Admtg_dgns_CD
+            From_DT
+            Thru_DT
+            Provider
+        ;
+        length    
+            Bene_ID $16.
+            Clm_ID  $15.
+            Admtg_dgns_CD  $5.
 		From_DT   4.
 		Thru_DT   4.
 		Provider  $6.
+        ;
+        set
+            ip2010claim(
+                in = ip2010claim_row    
+            )
+            op2010claim(
+            )
+        ;
+        by
+            Bene_ID
+            Clm_ID
+        ;
+        if
+            ip2010claim_row=1
+        then
+            do;
+                Type = "IP-2010";
+            end;
+        else
+            do;
+                Type = "OP-2010";
+            end;
+    run;
+    
+    proc sort data=ip2010claim_and_op2010claim_v1;
+        by Bene_ID Clm_ID;
+    run;
 
-    ;
-    set
-        ip2010claim(
-            in = ip2010claim_row
-            
-        )
-        op2010claim(
-            
-        )
-    ;
-    by
-        Bene_ID
-        Clm_ID
-    ;
+    * Combine ip2010claim and op2010claim vertically using proc sql;
 
-    if
-        ip2010claim_row=1
-    then
-        do;
-            Type = "IP-2010";
-           
-        end;
-    else
-        do;
-            Type = "OP-2010";
-            
-        end;
-run;
-proc sort data=ip2010claim_and_op2010claim_v1;
-    by Bene_ID Clm_ID;
-run;
+    * Note: after running the proc sql step below several times and averaging
+      the fullstimer output in the system log, they tend to take about 0.21
+      seconds of "real time" to execute and about 25 MB of memory on the computer
+      they were tested on. Consequently, the proc sql step appears to take more
+      time to execute as the combined data step and proc sort steps
+      above, but to use the same amount of memory;
 
-* Combine ip2010claim and op2010claim vertically using proc sql;
-
-* Note: after running the proc sql step below several times and averaging
-  the fullstimer output in the system log, they tend to take about 0.21
-  seconds of "real time" to execute and about 25 MB of memory on the computer
-  they were tested on. Consequently, the proc sql step appears to take more
-  time to execute as the combined data step and proc sort steps
-  above, but to use the same amount of memory;
-
-proc sql;
-    create table ip2010claim_and_op2010claim_v2 as
-        (
-            select
-                 a.Bene_ID
-                 ,a.Clm_ID
-                 ,a.Admtg_dgns_CD
-                 ,a.From_DT
-                 ,a.Thru_DT
-                 ,a.Provider
-            from
-                Ip2010claim as a
-        )
+    proc sql;
+        create table ip2010claim_and_op2010claim_v2 as
+            (
+                select
+                     a.Bene_ID
+                    ,a.Clm_ID
+                    ,a.Admtg_dgns_CD
+                    ,a.From_DT
+                    ,a.Thru_DT
+                    ,a.Provider
+                from
+                    Ip2010claim as a
+            )
 		outer union corr
-        (
-            select
-                 b.Bene_ID
-                 ,b.Clm_ID
-                 ,b.Admtg_dgns_CD
-                 ,b.From_DT
-                 ,b.Thru_DT
-                 ,b.Provider
-            from
-                Op2010claim as b
-        )
+            (
+                select
+                     b.Bene_ID
+                    ,b.Clm_ID
+                    ,b.Admtg_dgns_CD
+                    ,b.From_DT
+                    ,b.Thru_DT
+                    ,b.Provider
+                from
+                    Op2010claim as b
+            )
 		order by
-             Bene_ID
-            ,Clm_ID
-	;
-quit;
+                    Bene_ID
+                   ,Clm_ID
+	    ;
+    quit;
 
-* Verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
-  identical;
+    * Verify that ip2010claim_and_op2010claim_v1 and ip2010claim_and_op2010claim_v2 are
+      identical;
 
-proc compare
+    proc compare
         base=ip2010claim_and_op2010claim_v1
         compare=ip2010claim_and_op2010claim_v2
         novalues
-    ;
-run;
+        ;
+    run;
+*/    
 
 * Preparation of state and county information for contenr2010_fnl dataset that
 contains all benefeciaries (part a, b and hmo) who enrolled in medicare
 program in 2010;
 
 * Sort ssa state and county codes file to remove duplicate record;
-proc sort data=msabea_ssa nodupkey; 
+    proc sort data=msabea_ssa nodupkey; 
 	by ssa; 
-run;
+    run;
 
 * Create ssa variable on enrollment data;
-data contenr_2010_fnl;
+    data contenr_2010_fnl;
 	set contenr_2010_fnl;
 	ssa=state_cd||cnty_cd;
-run;
+    run;
 
 * Sort continuous enrollment data contenr_2010_fnl
-and merge with msabea file;
+  and merge with msabea file;
 proc sort data=contenr_2010_fnl; by ssa; run;
 
 data contenr_2010_fnl;
@@ -666,49 +664,46 @@ run;
 
 title;
 
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
-and msbf_2010_ab;
-
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
+* First, we try to do full join with 3 files:ip2010line, op2010claim
 and msbf_2010_ab;
 
 proc sql;
     create table contenr2010_analytic_file_raw as
         select
-		     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-
-			 ,c.thru_dt 
-			 ,c.from_dt 
+	     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
+             AS Bene_ID
+	     ,c.thru_dt 
+	     ,c.from_dt 
              ,a.bene_hi_cvrage_tot_mons as Part_A
-			 ,a.bene_smi_cvrage_tot_mons as Part_B
-			 ,a.bene_hmo_cvrage_tot_mons as Non_HMO
-			 ,a.death_dt as Alive
-			 ,a.sp_ra_oa as RA_OA_Status
-			 ,a.sp_copd as COPD_Status
-			 ,c.clm_id as IP_Claim
-			 ,c.pmt_amt as IP_Pmt_Amt
-			 ,d.clm_id as OP_Claim
-			 ,d.pmt_amt as OP_Pmt_Amt	 
+	     ,a.bene_smi_cvrage_tot_mons as Part_B
+	     ,a.bene_hmo_cvrage_tot_mons as Non_HMO
+	     ,a.death_dt as Alive
+	     ,a.sp_ra_oa as RA_OA_Status
+	     ,a.sp_copd as COPD_Status
+	     ,c.clm_id as IP_Claim
+	     ,c.pmt_amt as IP_Pmt_Amt
+	     ,d.clm_id as OP_Claim
+	     ,d.pmt_amt as OP_Pmt_Amt	 
       
         from mbsf_ab_2010 as A
 
             full join
 
-        ip2010claim as c
+        ip2010line as c
 
             on A.Bene_ID = C.Bene_ID
 
             full join
 
         op2010claim as D
-            on c.Bene_ID = d.Bene_ID
+            on a.Bene_ID = d.Bene_ID
 
 	order by
         Bene_ID
     ;
 quit;
 
-* Second we do full join of combined file i n previous step
+* Second we do full join of combined file in previous step
 and msabea_ssa data set to get state, county code in final
 file.;
 
