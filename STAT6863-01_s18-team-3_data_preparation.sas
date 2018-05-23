@@ -693,47 +693,66 @@ proc sql;
 		and (ssa=D.ssa); 
 quit;
 
+*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+in final analytic file named contenr2010_analytic_file using full join and union;
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select
-			a.bene_id
-			,a.clm_id format= 20. 
-			,c.race
-			,c.sex
-			,c.bene_dob
-			,d.county format=$25. length=25
-			,d.state length=2
+			a.bene_id 'Benefeciary Code'
+			,a.clm_id 'Benefeciary Claim' format= 20. 
+			,c.race 'Benefeciary Race Code'
+			,c.sex 'Sex'
+			,c.bene_dob 'Date of Birth'
+			,d.county format=$25. length=25 'County Name'
+			,d.state length=2 'State Name'
 		from
-			ip2010claim A 
+			ip2010claim A
+ 
 		full join
 			mbsf_ab_2010 C  
 
-		on a.bene_id=c.bene_id  /*****first join****/ 
+		on a.bene_id=c.bene_id  
+ 
 		full join
 			msabea_ssa D
-		on c.ssa=d.ssa /* second join*/
+
+		on c.ssa=d.ssa 
+
+		where c.bene_hi_cvrage_tot_mons=12 and
+			  c.bene_smi_cvrage_tot_mons=12 and
+			  c.bene_hmo_cvrage_tot_mons ne 12 and
+			  c.death_dt is missing
  
 	union corr
 		select
-			b.bene_id
-			,b.clm_id format= 20.
-			,c.race
-			,c.sex
-			,c.bene_dob
-			,D.county format=$25. length=25
-			,D.state length=2
+			b.bene_id 'Benefeciary Code'
+			,b.clm_id 'Benefeciary Claim' format= 20.
+			,c.race 'Benefeciary Race Code'
+			,c.sex 'Sex'
+			,c.bene_dob 'Date of Birth'
+			,D.county format=$25. length=25 'County Name'
+			,D.state length=2 'State Name'
 		from
 			op2010claim B
+
 		full join
-			mbsf_ab_2010 C  
-		on b.bene_id=c.bene_id /*****first join****/
+			mbsf_ab_2010 C
+ 
+		on b.bene_id=c.bene_id 
+
 		full join
-			msabea_ssa D 
-		on c.ssa=d.ssa /*second join*/
+			msabea_ssa D
+ 
+		on c.ssa=d.ssa 
+
+		where c.bene_hi_cvrage_tot_mons=12 and
+			  c.bene_smi_cvrage_tot_mons=12 and
+		      c.bene_hmo_cvrage_tot_mons ne 12 and
+		      c.death_dt is missing
+
 		order by bene_id, clm_id
 		;
 quit;
-
 	/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
@@ -767,7 +786,7 @@ proc sort
         out=contenr2010_analytic_file
     ;
     by
-        Bene_ID, clm_id
+        Bene_ID clm_id
     ;
 run;
 
