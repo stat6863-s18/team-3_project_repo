@@ -3,37 +3,8 @@
 * (set window width to banner width to calibrate line length to 80 characters *;
 *******************************************************************************;
 
-* 
-[Dataset 1 Name] Master_Inpatient_Claim_2010.csv
-
-[Dataset Description] Impatient Medicare Data by Service Line, 2010
-
-[Experimental Unit Description] Benefeciary Claim
-
-[Number of Observations] 13,916      
-
-[Number of Features] 10
-
-[Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
-/Downloadable-Public-Use-Files/SynPUFs/Downloads
-/DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
-was downloaded and edited to produce file by subsetting to get 2010 year 
-
-[Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master
-/data/Data_Dictionary_Medicare.doc
-
-[Unique ID Schema] The columns "Claim_ID", "Bene_ID" and "CLM_LN" form 
-a composite key
-
-;
-%let inputDataset1DSN = Ip2010line;
-%let inputDataset1URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Inpatient_Claim_2010.csv?raw=true
-;
-%let inputDataset1Type = CSV;
-
 *
-[Dataset 2 Name] Inpatient_Claim_2_2010.csv
+[Dataset 1 Name] Inpatient_Claim_2_2010.csv
 
 [Dataset Description] Impatient Medicare Data by claim, 2010
 
@@ -54,15 +25,15 @@ data/Data_Dictionary_Medicare.doc
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
 
 ;
-%let inputDataset2DSN = Ip2010claim;
-%let inputDataset2URL =
+%let inputDataset1DSN = Ip2010claim;
+%let inputDataset1URL =
 https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim_2_2010.csv?raw=true
 ;
-%let inputDataset2Type = CSV;
+%let inputDataset1Type = CSV;
 
 
 *
-[Dataset 3 Name] Master_Beneficiary_Summary_2010.csv
+[Dataset 2 Name] Master_Beneficiary_Summary_2010.csv
 
 [Dataset Description] Master Beneficiary Medicare Summary, 2010
 
@@ -82,15 +53,15 @@ data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] The column BENE_ID is a unique id.
 ;
-%let inputDataset3DSN = Mbsf_AB_2010;
-%let inputDataset3URL =
+%let inputDataset2DSN = Mbsf_AB_2010;
+%let inputDataset2URL =
 https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Beneficiary_Summary_2010.csv?raw=true
 ;
-%let inputDataset3Type = CSV;
+%let inputDataset2Type = CSV;
 
 
 *
-[Dataset 4 Name] Outpatient_Claim_2_2010.csv
+[Dataset 3 Name] Outpatient_Claim_2_2010.csv
 
 [Dataset Description] Outpatient Medicare Data by Claim, 2010
 
@@ -110,15 +81,15 @@ data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] "Claim_ID", "Bene_ID" form a composite key
 ;
-%let inputDataset4DSN = Op2010claim;
-%let inputDataset4URL =
+%let inputDataset3DSN = Op2010claim;
+%let inputDataset3URL =
 https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Claim_2_2010.csv?raw=true
 ;
-%let inputDataset4Type = CSV;
+%let inputDataset3Type = CSV;
 
 
 *
-[Dataset 5 Name] MSABEA03.csv
+[Dataset 4 Name] MSABEA03.csv
 
 [Dataset Description] US State and County Codes
 
@@ -138,11 +109,11 @@ data/Data_Dictionary_Medicare.doc
 
 [Unique ID Schema] "State", "County" form a composite key
 ;
-%let inputDataset5DSN = Msabea_ssa;
-%let inputDataset5URL =
+%let inputDataset4DSN = Msabea_ssa;
+%let inputDataset4URL =
 https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABEA03.csv?raw=true
 ;
-%let inputDataset5Type = CSV;
+%let inputDataset4Type = CSV;
 
 
 * set global system options;
@@ -181,7 +152,7 @@ options fullstimer;
         %end;
 %mend;
 %macro loadDatasets;
-    %do i = 1 %to 5;
+    %do i = 1 %to 4;
         %loadDataIfNotAlreadyAvailable(
             &&inputDataset&i.DSN.,
             &&inputDataset&i.URL.,
@@ -310,68 +281,68 @@ quit;
 	quit;
 	title;
 */
+/*
+	* We have in this file information about Medicare beneficiaries who
+	  enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
+	  (BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
+	  program.
 
-* We have in this file information about Medicare beneficiaries who
-enrolled in Part A (BENE_HI_CVRAGE_TOT_MONS), Part B
-(BENE_SMI_CVRAGE_TOT_MONS) and Part C (BENE_HMO_CVRAGE_TOT_MONS)
-program.
+	Prepare datasets to get continious enrollment in mbsf_ab_2010 file;
 
-Prepare datasets to get continious enrollment in mbsf_ab_2010 file;
+	data contenr_2010;
+	    set mbsf_ab_2010;
+		length contenrl_ab_2010 contenrl_hmo_2010 $5.;
+	    * Identify Benefeciaries With Parts A And B or HMO Coverage;
+	    if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
+	    contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
+	    if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
+	    else contenrl_hmo_2010='nohmo'; 
+		* classify benefeciaries that passed away in 2010;
+		if death_dt ne . then death_2010=1; else death_2010=0;
+	run;
+	title;
 
-data contenr_2010;
-    set mbsf_ab_2010;
-	length contenrl_ab_2010 contenrl_hmo_2010 $5.;
-    * Identify Benefeciaries With Parts A And B or HMO Coverage;
-    if bene_hi_cvrage_tot_mons=12 and bene_smi_cvrage_tot_mons=12 then
-    contenrl_ab_2010='ab'; else contenrl_ab_2010='noab'; 
-    if bene_hmo_cvrage_tot_mons=12 then contenrl_hmo_2010='hmo';
-    else contenrl_hmo_2010='nohmo'; 
-	* classify benefeciaries that passed away in 2010;
-	if death_dt ne . then death_2010=1; else death_2010=0;
-run;
-title;
+	* Create a 2010 enrollment file of only continuously enrolled beneficiaries
+	  by combining alive beneficiaries with parts a and b or hmo coverage;
+	  data contenr_2010_fnl;
+	      set contenr_2010;
+		  if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
+	  run;
 
-* Create a 2010 enrollment file of only continuously enrolled beneficiaries
-by combining alive beneficiaries with parts a and b or hmo coverage;
-data contenr_2010_fnl;
-    set contenr_2010;
-	if contenrl_ab_2010='ab' and contenrl_hmo_2010='nohmo' and death_2010 ne 1;
-run;
+	* Sort outpatient claim lines file in preparation for transformation;
+	  proc sort data=op2010line out=op2010line; 
+		by bene_id clm_id clm_ln; 
+	  run;
 
-*Sort outpatient claim lines file in preparation for transformation;
-proc sort data=op2010line out=op2010line; 
-	by bene_id clm_id clm_ln; 
-run;
+	* Transform outpatient claim line file;
+	  data op2010line_wide(drop=i clm_ln hcpcs_cd);
+	  	format hcpcs_cd1-hcpcs_cd45 $5.;
+		set op2010line;
+		by bene_id clm_id clm_ln;
+		retain 	hcpcs_cd1-hcpcs_cd45;
 
-* Transform outpatient claim line file;
-data op2010line_wide(drop=i clm_ln hcpcs_cd);
-	format	hcpcs_cd1-hcpcs_cd45 $5.;
-	set op2010line;
-	by bene_id clm_id clm_ln;
-	retain 	hcpcs_cd1-hcpcs_cd45;
+		array	xhcpcs_cd(45) hcpcs_cd1-hcpcs_cd45;
 
-	array	xhcpcs_cd(45) hcpcs_cd1-hcpcs_cd45;
-
-	if first.clm_id then do;
-		do i=1 to 45;
-			xhcpcs_cd(clm_ln)='';
+		if first.clm_id then do;
+			do i=1 to 45;
+				xhcpcs_cd(clm_ln)='';
+			end;
 		end;
-	end;
 
-	xhcpcs_cd(clm_ln)=hcpcs_cd;
+		xhcpcs_cd(clm_ln)=hcpcs_cd;
 
-	if last.clm_id then output;
-run;
+		if last.clm_id then output;
+	  run;
 
-* Sort claim and transformed claim lines files in preparation for merge;
-proc sort data=op2010claim out=op2010claim; 
-	by bene_id clm_id; 
-run; 
+	* Sort claim and transformed claim lines files in preparation for merge;
+	  proc sort data=op2010claim out=op2010claim; 
+		  by bene_id clm_id; 
+	  run; 
 
-proc sort data=op2010line_wide;
-    by bene_id clm_id;
-run; 
-
+	  proc sort data=op2010line_wide;
+	    by bene_id clm_id;
+	  run; 
+*/
 /*
 
     * Combine op2010claim and op2010line_wide horizontally using a data-step match-merge;
@@ -636,35 +607,36 @@ run;
 contains all benefeciaries (part a, b and hmo) who enrolled in medicare
 program in 2010;
 
-* Sort ssa state and county codes file to remove duplicate record;
-    proc sort data=msabea_ssa nodupkey; 
-	by ssa; 
-    run;
+/*
+	* Sort ssa state and county codes file to remove duplicate record;
+	    proc sort data=msabea_ssa nodupkey; 
+		by ssa; 
+	    run;
 
-* Create ssa variable on enrollment data;
-    data contenr_2010_fnl;
-	set contenr_2010_fnl;
-	ssa=state_cd||cnty_cd;
-    run;
+	* Create ssa variable on enrollment data;
+	    data contenr_2010_fnl;
+		set contenr_2010_fnl;
+		ssa=state_cd||cnty_cd;
+	    run;
 
-* Sort continuous enrollment data contenr_2010_fnl
-  and merge with msabea file;
-proc sort data=contenr_2010_fnl; by ssa; run;
+	* Sort continuous enrollment data contenr_2010_fnl
+	  and merge with msabea file;
+	proc sort data=contenr_2010_fnl; by ssa; run;
 
-data contenr_2010_fnl;
-	merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
-	by ssa;
-	if a;
-run;
+	data contenr_2010_fnl;
+		merge contenr_2010_fnl(in=a) src.msabea_ssa(in=b);
+		by ssa;
+		if a;
+	run;
 
-* Create final enrollment file with state and county code;
-proc sort data=contenr_2010_fnl; 
-	by bene_id; 
-run;
+	* Create final enrollment file with state and county code;
+	proc sort data=contenr_2010_fnl; 
+		by bene_id; 
+	run;
+	title;
+*/
 
-title;
-
-* First, we try to do full join with 3 files:ip2010line, op2010claim
+* First, we try to do full join with 3 files:ip2010claim, op2010claim
 and msbf_2010_ab;
 
 proc sql;
@@ -721,29 +693,44 @@ proc sql;
 		and (ssa=D.ssa); 
 quit;
 
-* Attempt to use one single PROC SQL query to get analytic file;
-
 proc sql;
 	create table contenr2010_analytic_file_raw as
-		select A.bene_id, a.clm_ID, D.* 
-			from IP2010claim A 
+		select
+			a.bene_id
+			,a.clm_id format= 20. 
+			,c.race
+			,c.sex
+			,c.bene_dob
+			,d.county format=$25. length=25
+			,d.state length=2
+		from
+			ip2010claim A 
+		full join
+			mbsf_ab_2010 C  
 
-			full join MBSF_ab_2010 C  
-
-			on A.bene_id=C.bene_id  /****first join****/ 
-
-			full join msabea_ssa D on compress(C.state_Cd||C.CNTY_CD)=D.SSA /*second join*/
-		
-union corr
-
-		select B.bene_id,  B.clm_ID, D.*  
-			from OP2010claim B 
-
-			full join MBSF_ab_2010 C  
-
-			on b.bene_id=c.bene_id /*****first join****/
-
-			full join msabea_ssa D on compress(C.state_Cd||C.CNTY_CD)=D.SSA /*second join*/
+		on a.bene_id=c.bene_id  /*****first join****/ 
+		full join
+			msabea_ssa D
+		on c.ssa=d.ssa /* second join*/
+ 
+	union corr
+		select
+			b.bene_id
+			,b.clm_id format= 20.
+			,c.race
+			,c.sex
+			,c.bene_dob
+			,D.county format=$25. length=25
+			,D.state length=2
+		from
+			op2010claim B
+		full join
+			mbsf_ab_2010 C  
+		on b.bene_id=c.bene_id /*****first join****/
+		full join
+			msabea_ssa D 
+		on c.ssa=d.ssa /*second join*/
+		order by bene_id, clm_id
 		;
 quit;
 
