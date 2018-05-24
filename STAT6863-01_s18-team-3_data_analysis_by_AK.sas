@@ -35,44 +35,34 @@ in the dataset for Part A, Part B and HMO. Also, it includes information about
 benefeciaries who passed away in 2010.; 
 
 proc sql;
-    select
-         contenrl_ab_2010 
-        ,count(*) as AB_2010
-	from contenr_2010_fnl
-        
-    group by
-        contenrl_ab_2010
-    ;
+create table contenr2010_analytic_file as
+select 
+		Bene_ID
+		, 
+       case 
+	      when bene_hi_cvrage_tot_mons=12 
+		  and bene_smi_cvrage_tot_mons=12 then "ab"
+	      else "noab"
+	   end as contenrl_ab_2010
+	   ,
+	   case
+	      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+		  else "nohmo"
+	   end as contenrl_hmo_2010
+	   ,
+	   case
+ 	      when death_dt ne . then 1
+		  else 0
+	   end as death_2010
+from contenr2010_analytic_file;
 quit;
 
-proc sql;
-    select
-         contenrl_hmo_2010 
-        ,count(*) as AB_2010
-	from contenr_2010_fnl
-        
-    group by
-        contenrl_hmo_2010
-    ;
-quit;
-
-proc sql;
-    select
-         death_2010 
-        ,count(*) as AB_2010
-	from contenr_2010_fnl
-        
-    group by
-        death_2010
-    ;
-quit;
-
-proc freq data=contenr_2010_fnl; 
-    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010; 
+proc freq data=c2010_analytic_file; 
+    tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
 run;
 
 title "Frequency of Benefeciaries by State and County in 2010 Data";
-proc freq data=contenr_2010_fnl; 
+proc freq data=contenr2010_analytic_file order=freq; 
     tables state county /missing;
 run;
 title;
@@ -104,7 +94,7 @@ proc format;
 run;
 
 title "Frequency of sex in 2010 data";
-proc freq data=contenr_2010_fnl; 
+proc freq data=contenr2010_analytic_file; 
 	tables sex / missing;
 	format sex $sex_cats_fmt.; 
 run;

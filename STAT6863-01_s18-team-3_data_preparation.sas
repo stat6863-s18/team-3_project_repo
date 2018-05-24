@@ -162,26 +162,6 @@ options fullstimer;
 %mend;
 %loadDatasets
 
-* check Ip2010line for bad unique id values, where the column CLM_ID is a unique key;
-
-proc sql;
-
-    * check for duplicate unique id values after executing this query, we
-    see that Ip2010line_dups has no rows. No mitigation needed for ID values;  
-
-    create table Ip2010line_dups as
-        select
-             CLM_ID
-            ,count(*) as row_count_for_unique_id_value
-        from
-            Ip2010line
-        group by
-             CLM_Id
-        having
-            row_count_for_unique_id_value > 1
-    ;
-quit;
-
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key;
 
 proc sql;
@@ -701,8 +681,12 @@ proc sql;
 			a.bene_id 'Benefeciary Code'
 			,a.clm_id 'Benefeciary Claim' format= 20. 
 			,c.race 'Benefeciary Race Code'
-			,c.sex 'Sex'
+			,put(c.sex,2.) 'Sex' as Sex
 			,c.bene_dob 'Date of Birth'
+			,c.bene_hi_cvrage_tot_mons 'Part A'
+			,c.bene_smi_cvrage_tot_mons 'Part B'
+			,c.bene_hmo_cvrage_tot_mons 'HMO'
+			,c.death_dt 'Date of Death'
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
 		from
@@ -718,18 +702,18 @@ proc sql;
 
 		on c.ssa=d.ssa 
 
-		where c.bene_hi_cvrage_tot_mons=12 and
-			  c.bene_smi_cvrage_tot_mons=12 and
-			  c.bene_hmo_cvrage_tot_mons ne 12 and
-			  c.death_dt is missing
- 
-	union corr
+   	union corr
+
 		select
 			b.bene_id 'Benefeciary Code'
 			,b.clm_id 'Benefeciary Claim' format= 20.
 			,c.race 'Benefeciary Race Code'
-			,c.sex 'Sex'
+			,put(c.sex,2.) 'Sex' as Sex
 			,c.bene_dob 'Date of Birth'
+			,c.bene_hi_cvrage_tot_mons 'Part A'
+			,c.bene_smi_cvrage_tot_mons 'Part B'
+			,c.bene_hmo_cvrage_tot_mons 'HMO'
+			,c.death_dt 'Date of Death'
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
 		from
@@ -744,11 +728,6 @@ proc sql;
 			msabea_ssa D
  
 		on c.ssa=d.ssa 
-
-		where c.bene_hi_cvrage_tot_mons=12 and
-			  c.bene_smi_cvrage_tot_mons=12 and
-		      c.bene_hmo_cvrage_tot_mons ne 12 and
-		      c.death_dt is missing
 
 		order by bene_id, clm_id
 		;
