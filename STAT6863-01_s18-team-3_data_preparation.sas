@@ -194,74 +194,64 @@ proc sql;
             full join
 
         op2010claim as D
-            on A.Bene_ID = D.Bene_ID
+            on a.Bene_ID = d.Bene_ID
 
 	order by
-            Bene_ID
+        Bene_ID
     ;
 quit;
 
-* Second we do full join of combined file in previous stepnand msabea_ssa data 
-  set to get state, county code in final file.;
-
-proc sql;
-	create table contenr2010_analytic_file_raw as
-		select
-			coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
-		       ,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
-		       ,Compress(C.state_Cd||C.CNTY_CD) as SSA
-			from ip2010claim A,  op2010claim B, MBSF_ab_2010 C, msabea_ssa D
-		where 
-			(A.bene_id=B.bene_id  and A.clm_id=B.clm_id)
-			and (A.bene_id=C.bene_id )
-			and 
-		and (ssa=D.ssa); 
-quit;
-
-*We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
-
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select
 			a.bene_id 'Benefeciary Code'
 			,a.clm_id 'Benefeciary Claim' format= 20. 
-			,c.race 'Benefeciary Race Code'
+			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth'
+			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
 			,c.death_dt 'Date of Death'
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
+			,c.sp_ra_oa as RA_OA_Status
+	        ,c.sp_copd as COPD_Status
+			,a.pmt_amt as IP_Pmt_Amt
+	        	
 		from
 			ip2010claim A
  
 		full join
 			mbsf_ab_2010 C  
 
-		on A.bene_id=C.bene_id  
+		on a.bene_id=c.bene_id  
  
 		full join
 			msabea_ssa D
 
-		on C.ssa=D.ssa 
+		on c.ssa=d.ssa 
 
    	union corr
 
 		select
 			b.bene_id 'Benefeciary Code'
-		        ,b.clm_id 'Benefeciary Claim' format= 20.
-			,c.race 'Benefeciary Race Code'
+			,b.clm_id 'Benefeciary Claim' format= 20.
+			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth'
+			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
 			,c.death_dt 'Date of Death'
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
+			,c.sp_ra_oa as RA_OA_Status
+	        ,c.sp_copd as COPD_Status
+	        ,b.pmt_amt as OP_Pmt_Amt
+	        
 		from
 			op2010claim B
 
@@ -279,7 +269,42 @@ proc sql;
 		;
 quit;
 
-/* notes to learners:
+*Since incorporating this query to our single SQL query above causing to produce 
+more complicated code, we buld separate SQL query to prepare continious enrollment
+benefeciaries in 2010 (Part A, Part B, without HMO benefeciaries, 
+who are still alive in 2010);
+
+proc sql;
+create table contenr2010_analytic_file as
+select 
+	   Bene_ID
+       , 
+       case 
+	      when bene_hi_cvrage_tot_mons=12 
+		  and bene_smi_cvrage_tot_mons=12 then "ab"
+	      else "noab"
+	   end as contenrl_ab_2010
+	   ,
+	   case
+	      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+		  else "nohmo"
+	   end as contenrl_hmo_2010
+	   ,
+	   case
+ 	      when death_dt ne . then 1
+		  else 0
+	   end as death_2010
+from contenr2010_analytic_file;
+quit;
+
+	/* notes to learners:
+    (1) even though the data-integrity check and mitigation steps below could
+        be performed with SQL queries, as was used earlier in this file, it's
+        often faster and less code to use data steps and proc sort steps to
+        check for and remove duplicates; in particular, by-group processing
+        is much more convenient when checking for duplicates than the SQL row
+        aggregation and in-line view tricks used above; in practice, though,
+        you should use whatever methodology you're most comfortable with
     (2) when determining what type of join to use to combine tables, it's
         common to designate one of the table as the "master" table, and to use
         left (outer) joins to add columns from the other "auxiliary" tables
@@ -290,14 +315,20 @@ quit;
         possible combinations of all rows with respect to unique id values to
         be included in the output dataset, such as in this example, where not
         every dataset will necessarily have every possible of Bene_ID
-	and clm_id in it.
+		and clm_id in it.
     (5) unfortunately, though, full joins of more than two tables can also
         introduce duplicates with respect to unique id values, even if unique
         id values are not duplicated in the original input datasets 
 */
 
-* we use proc sort to indiscriminately remove duplicates, after which column 
-  Bene_ID and Clm_ID is guaranteed to form a composite key;
+data contenr2010_analytic_file_raw;
+set contenr2010_analytic_file_raw;
+where clm_id > 1 ;
+run;
+
+* we use proc sort to indiscriminately remove
+  duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
+  a composite key;
 proc sort
         nodupkey
         data=contenr2010_analytic_file_raw
