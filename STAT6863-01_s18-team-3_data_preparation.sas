@@ -194,33 +194,33 @@ proc sql;
             full join
 
         op2010claim as D
-            on a.Bene_ID = d.Bene_ID
+            on A.Bene_ID = D.Bene_ID
 
 	order by
-        Bene_ID
+            Bene_ID
     ;
 quit;
 
-* Second we do full join of combined file in previous step
-and msabea_ssa data set to get state, county code in final
-file.;
+* Second we do full join of combined file in previous stepnand msabea_ssa data 
+  set to get state, county code in final file.;
 
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select
 			coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
-			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID,
-			Compress(C.state_Cd||C.CNTY_CD) as SSA
+		       ,coalesce(A.clm_ID,B.clm_ID) AS clm_ID
+		       ,Compress(C.state_Cd||C.CNTY_CD) as SSA
 			from ip2010claim A,  op2010claim B, MBSF_ab_2010 C, msabea_ssa D
 		where 
-			(A.bene_id=B.bene_id  and A.clm_id=b.clm_id)
+			(A.bene_id=B.bene_id  and A.clm_id=B.clm_id)
 			and (A.bene_id=C.bene_id )
 			and 
 		and (ssa=D.ssa); 
 quit;
 
-*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+*We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
+
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select
@@ -241,18 +241,18 @@ proc sql;
 		full join
 			mbsf_ab_2010 C  
 
-		on a.bene_id=c.bene_id  
+		on A.bene_id=C.bene_id  
  
 		full join
 			msabea_ssa D
 
-		on c.ssa=d.ssa 
+		on C.ssa=D.ssa 
 
    	union corr
 
 		select
 			b.bene_id 'Benefeciary Code'
-			,b.clm_id 'Benefeciary Claim' format= 20.
+		        ,b.clm_id 'Benefeciary Claim' format= 20.
 			,c.race 'Benefeciary Race Code'
 			,put(c.sex,2.) 'Sex' as Sex
 			,c.bene_dob 'Date of Birth'
@@ -278,7 +278,8 @@ proc sql;
 		order by bene_id, clm_id
 		;
 quit;
-	/* notes to learners:
+
+/* notes to learners:
     (2) when determining what type of join to use to combine tables, it's
         common to designate one of the table as the "master" table, and to use
         left (outer) joins to add columns from the other "auxiliary" tables
