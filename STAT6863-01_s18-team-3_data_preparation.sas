@@ -203,6 +203,7 @@ quit;
 
 */We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
+
 proc sql;
 	create table contenr2010_analytic_file_raw as
 		select
@@ -275,26 +276,38 @@ benefeciaries in 2010 (Part A, Part B, without HMO benefeciaries,
 who are still alive in 2010);
 
 proc sql;
-create table contenr2010_analytic_file as
-select 
-	   Bene_ID
-       , 
-       case 
-	      when bene_hi_cvrage_tot_mons=12 
-		  and bene_smi_cvrage_tot_mons=12 then "ab"
-	      else "noab"
-	   end as contenrl_ab_2010
-	   ,
-	   case
-	      when bene_hmo_cvrage_tot_mons=12 then "hmo"
-		  else "nohmo"
-	   end as contenrl_hmo_2010
-	   ,
-	   case
- 	      when death_dt ne . then 1
-		  else 0
-	   end as death_2010
-from contenr2010_analytic_file;
+create table contenr2010_analytic_file_raw1 as
+	   select
+		   bene_id 
+	       ,clm_id
+	       ,Sex
+	       ,Race
+	       ,death_dt
+		   ,state
+	       ,county
+	       ,COPD_Status
+           ,RA_OA_Status
+		   ,bene_hi_cvrage_tot_mons
+		   ,bene_smi_cvrage_tot_mons
+	       ,bene_hmo_cvrage_tot_mons
+	       ,bene_dob
+	       ,
+		   case 
+		      when bene_hi_cvrage_tot_mons=12 
+			  and bene_smi_cvrage_tot_mons=12 then "ab"
+		      else "noab"
+		   end as contenrl_ab_2010
+		   ,
+		   case
+		      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+			  else "nohmo"
+		   end as contenrl_hmo_2010
+		   ,
+		   case
+	 	      when death_dt ne . then 1
+			  else 0
+		   end as death_2010
+from contenr2010_analytic_file_raw;
 quit;
 
 	/* notes to learners:
@@ -319,10 +332,14 @@ quit;
     (5) unfortunately, though, full joins of more than two tables can also
         introduce duplicates with respect to unique id values, even if unique
         id values are not duplicated in the original input datasets 
-*/
+	*/
 
-data contenr2010_analytic_file_raw;
-set contenr2010_analytic_file_raw;
+* After combining all data sets and adding several vars to define continious
+enrollement for data analysis we still have missing values because of full 
+join, so we need to fix it;
+ 
+data contenr2010_analytic_file_raw1;
+set contenr2010_analytic_file_raw1;
 where clm_id > 1 ;
 run;
 
@@ -331,7 +348,7 @@ run;
   a composite key;
 proc sort
         nodupkey
-        data=contenr2010_analytic_file_raw
+        data=contenr2010_analytic_file_raw1
         out=contenr2010_analytic_file
     ;
     by
@@ -339,3 +356,5 @@ proc sort
     ;
 run;
 
+* check everything looks fine now;
+proc print data=contenr2010_analytic_file(obs=25); run;
