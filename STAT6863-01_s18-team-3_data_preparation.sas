@@ -201,24 +201,6 @@ proc sql;
     ;
 quit;
 
-* Second we do full join of combined file in previous step
-and msabea_ssa data set to get state, county code in final
-file.;
-
-proc sql;
-	create table contenr2010_analytic_file_raw as
-		select
-			coalesce(A.Bene_ID,B.Bene_ID,C.Bene_ID) AS Bene_ID
-			,coalesce(A.clm_ID,B.clm_ID) AS clm_ID,
-			Compress(C.state_Cd||C.CNTY_CD) as SSA
-			from ip2010claim A,  op2010claim B, MBSF_ab_2010 C, msabea_ssa D
-		where 
-			(A.bene_id=B.bene_id  and A.clm_id=b.clm_id)
-			and (A.bene_id=C.bene_id )
-			and 
-		and (ssa=D.ssa); 
-quit;
-
 */We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 proc sql;
@@ -287,8 +269,8 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file as
 select 
-		Bene_ID
-		, 
+	   Bene_ID
+       , 
        case 
 	      when bene_hi_cvrage_tot_mons=12 
 		  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -306,7 +288,6 @@ select
 	   end as death_2010
 from contenr2010_analytic_file;
 quit;
-
 
 	/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
