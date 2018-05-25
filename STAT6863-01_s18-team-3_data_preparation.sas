@@ -217,6 +217,10 @@ proc sql;
 			,c.death_dt 'Date of Death'
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
+			,c.sp_ra_oa as RA_OA_Status
+	        ,c.sp_copd as COPD_Status
+			,a.pmt_amt as IP_Pmt_Amt
+	        	
 		from
 			ip2010claim A
  
@@ -244,6 +248,10 @@ proc sql;
 			,c.death_dt 'Date of Death'
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
+			,c.sp_ra_oa as RA_OA_Status
+	        ,c.sp_copd as COPD_Status
+	        ,b.pmt_amt as OP_Pmt_Amt
+	        
 		from
 			op2010claim B
 
