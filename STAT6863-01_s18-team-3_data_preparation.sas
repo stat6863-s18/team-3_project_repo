@@ -210,7 +210,7 @@ proc sql;
 			,a.clm_id 'Benefeciary Claim' format= 20. 
 			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth' format=YYMMDD10.
+			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
@@ -241,7 +241,7 @@ proc sql;
 			,b.clm_id 'Benefeciary Claim' format= 20.
 			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth' format=YYMMDD10.
+			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
@@ -320,6 +320,11 @@ quit;
         introduce duplicates with respect to unique id values, even if unique
         id values are not duplicated in the original input datasets 
 */
+
+data contenr2010_analytic_file_raw;
+set contenr2010_analytic_file_raw;
+where clm_id > 1 ;
+run;
 
 * we use proc sort to indiscriminately remove
   duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
