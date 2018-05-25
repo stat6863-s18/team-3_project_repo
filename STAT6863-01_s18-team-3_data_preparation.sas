@@ -680,9 +680,9 @@ proc sql;
 		select
 			a.bene_id 'Benefeciary Code'
 			,a.clm_id 'Benefeciary Claim' format= 20. 
-			,c.race 'Benefeciary Race Code'
+			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth'
+			,c.bene_dob 'Date of Birth' format=YYMMDD10.
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
@@ -707,9 +707,9 @@ proc sql;
 		select
 			b.bene_id 'Benefeciary Code'
 			,b.clm_id 'Benefeciary Claim' format= 20.
-			,c.race 'Benefeciary Race Code'
+			,put(c.race,2.) 'Benefeciary Race Code' as Race
 			,put(c.sex,2.) 'Sex' as Sex
-			,c.bene_dob 'Date of Birth'
+			,c.bene_dob 'Date of Birth' format=YYMMDD10.
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
 			,c.bene_hmo_cvrage_tot_mons 'HMO'
@@ -732,6 +732,36 @@ proc sql;
 		order by bene_id, clm_id
 		;
 quit;
+
+*Since incorporating this query to our single SQL query above causing to produce 
+more complicated code, we buld separate SQL query to prepare continious enrollment
+benefeciaries in 2010 (Part A, Part B, without HMO benefeciaries, 
+who are still alive in 2010);
+
+proc sql;
+create table contenr2010_analytic_file as
+select 
+		Bene_ID
+		, 
+       case 
+	      when bene_hi_cvrage_tot_mons=12 
+		  and bene_smi_cvrage_tot_mons=12 then "ab"
+	      else "noab"
+	   end as contenrl_ab_2010
+	   ,
+	   case
+	      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+		  else "nohmo"
+	   end as contenrl_hmo_2010
+	   ,
+	   case
+ 	      when death_dt ne . then 1
+		  else 0
+	   end as death_2010
+from contenr2010_analytic_file;
+quit;
+
+
 	/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
