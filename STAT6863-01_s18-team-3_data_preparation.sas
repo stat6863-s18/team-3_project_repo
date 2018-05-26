@@ -55,7 +55,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset2DSN = Mbsf_AB_2010;
 %let inputDataset2URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Beneficiary_Summary_2010.csv?raw=true
+https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Beneficiary_Summary_2010_v2.csv?raw=true
 ;
 %let inputDataset2Type = CSV;
 
@@ -221,6 +221,7 @@ proc sql;
 			,c.sp_ra_oa as RA_OA_Status
 	        ,c.sp_copd as COPD_Status
 			,a.pmt_amt as IP_Pmt_Amt
+			,a.clm_ID as IP_ClmID format=20.
 	        	
 		from
 			ip2010claim A
@@ -235,7 +236,7 @@ proc sql;
 
 		on c.ssa=d.ssa 
 
-   	union corr
+   	outer union corr
 
 		select
 			b.bene_id 'Benefeciary Code'
@@ -251,7 +252,8 @@ proc sql;
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
 	        ,c.sp_copd as COPD_Status
-	        ,b.pmt_amt as OP_Pmt_Amt
+			,b.pmt_amt as OP_Pmt_Amt
+	        ,b.clm_id as OP_ClmID format=20.
 	        
 		from
 			op2010claim B
@@ -278,20 +280,26 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		   bene_id 
+		     bene_id 
 	       ,clm_id
 	       ,Sex
 	       ,Race
 	       ,death_dt
-		   ,state
+		     ,state
 	       ,county
 	       ,COPD_Status
-           ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
+         ,RA_OA_Status
+		     ,bene_hi_cvrage_tot_mons
+		     ,bene_smi_cvrage_tot_mons
 	       ,bene_hmo_cvrage_tot_mons
 	       ,bene_dob
-	       ,
+
+		     ,OP_Pmt_Amt
+         ,OP_ClmID
+         ,IP_Pmt_Amt
+         ,IP_ClmID
+
+         ,
 		   case 
 		      when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -340,7 +348,7 @@ join, so we need to fix it;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw1;
-where clm_id > 1 ;
+where bene_id is not missing and clm_id > 1 and county is not missing;
 run;
 
 * we use proc sort to indiscriminately remove
