@@ -220,7 +220,7 @@ proc sql;
 			,d.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
 	        ,c.sp_copd as COPD_Status
-			,a.pmt_amt as IP_Pmt_Amt
+			
 	        	
 		from
 			ip2010claim A
@@ -251,7 +251,7 @@ proc sql;
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
 	        ,c.sp_copd as COPD_Status
-	        ,b.pmt_amt as OP_Pmt_Amt
+	        
 	        
 		from
 			op2010claim B
@@ -358,3 +358,12 @@ run;
 
 * check everything looks fine now;
 proc print data=contenr2010_analytic_file(obs=25); run;
+
+proc print data=contenr2010_analytic_file;
+where bene_id is missing;
+run;
+
+proc sql noprint;
+select * from contenr2010_analytic_file
+where bene_id is missing;
+run;
