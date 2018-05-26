@@ -12,6 +12,26 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 
 *create aggregate data set from analytic fileto answer research questions;
 
+
+
+*******************************************************************************;
+* Research Question Analysis Starting Point;
+*******************************************************************************;
+*
+Question: Do Medicare patients with RA/OA have more inpatient claims than 
+patients that do not have RA/OA? Is there a statistically significant difference?
+
+Rationale: This should help identify trends in hospitalization for patients 
+with certain chronic conditions.
+
+Note: This compares the variable "Chronic Condition: RA/OA" in 
+Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
+Master_Inpatient_Claim_2010.csv.
+
+Limitations: This question assumes that each admission is logged individually
+as referenced by claim ID. This may not be acccurate.
+;
+
 PROC SORT DATA= contenr2010_analytic_file;
     by 
         BENE_ID;
@@ -39,27 +59,9 @@ proc sort
         out=Total_Pmt
     ;
     by
-        Bene_ID
+        Bene_ID and OP_Num_Clm and IP_Num_Clm
     ;
 run;
-
-*******************************************************************************;
-* Research Question Analysis Starting Point;
-*******************************************************************************;
-*
-Question: Do Medicare patients with RA/OA have more inpatient claims than 
-patients that do not have RA/OA? Is there a statistically significant difference?
-
-Rationale: This should help identify trends in hospitalization for patients 
-with certain chronic conditions.
-
-Note: This compares the variable "Chronic Condition: RA/OA" in 
-Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
-Master_Inpatient_Claim_2010.csv.
-
-Limitations: This question assumes that each admission is logged individually
-as referenced by claim ID. This may not be acccurate.
-;
 
 proc sql outobs=10;
     select
@@ -92,6 +94,36 @@ Master_Inpatient_Claim_2010.csv.
 Limitations: No limitations identified during exploratory steps.
 ;
 
+PROC SORT DATA= contenr2010_analytic_file;
+    by 
+        BENE_ID;
+run;
+
+PROC SQL;
+    create table Total_Pmt_raw AS
+        select
+            Bene_ID
+	   ,COUNT(OP_Claim) AS OP_Num_Clm
+	   ,COUNT(IP_Claim) AS IP_Num_Clm
+	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
+	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
+	   ,RA_OA_Status
+	   ,COPD_Status
+        from
+            contenr2010_analytic_file
+       group by 
+            BENE_ID;
+quit;
+
+proc sort
+        nodupkey
+        data=Total_Pmt_raw
+        out=Total_Pmt
+    ;
+    by
+        Bene_ID and OP_Num_Clm and IP_Num_Clm
+    ;
+run;
 proc sql outobs=10;
     select
         Bene_ID
@@ -122,7 +154,36 @@ Master_Outpatient_Claim_1_2010.csv.
 
 Limitations: No limitations identified during exploratory steps.
 ;
+PROC SORT DATA= contenr2010_analytic_file;
+    by 
+        BENE_ID;
+run;
 
+PROC SQL;
+    create table Total_Pmt_raw AS
+        select
+            Bene_ID
+	   ,COUNT(OP_Claim) AS OP_Num_Clm
+	   ,COUNT(IP_Claim) AS IP_Num_Clm
+	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
+	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
+	   ,RA_OA_Status
+	   ,COPD_Status
+        from
+            contenr2010_analytic_file
+       group by 
+            BENE_ID;
+quit;
+
+proc sort
+        nodupkey
+        data=Total_Pmt_raw
+        out=Total_Pmt
+    ;
+    by
+        Bene_ID and OP_Num_Clm and IP_Num_Clm
+    ;
+run;
 proc sql outobs=10;
     select
         Bene_ID
