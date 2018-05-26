@@ -27,7 +27,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset1DSN = Ip2010claim;
 %let inputDataset1URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim_2_2010.csv?raw=true
+https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Master_Inpatient_Claim_2010_sorted.csv?raw=true
 ;
 %let inputDataset1Type = CSV;
 
@@ -83,7 +83,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset3DSN = Op2010claim;
 %let inputDataset3URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Claim_2_2010.csv?raw=true
+https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Master_OP_Claim_2010_sorted.csv?raw=true
 ;
 %let inputDataset3Type = CSV;
 
@@ -162,46 +162,7 @@ options fullstimer;
 %mend;
 %loadDatasets
 
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
-and msbf_2010_ab;
-
-proc sql;
-    create table contenr2010_analytic_file_raw as
-        select
-	     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-             AS Bene_ID
-	     ,c.thru_dt 
-	     ,c.from_dt 
-             ,a.bene_hi_cvrage_tot_mons as Part_A
-	     ,a.bene_smi_cvrage_tot_mons as Part_B
-	     ,a.bene_hmo_cvrage_tot_mons as Non_HMO
-	     ,a.death_dt as Alive
-	     ,a.sp_ra_oa as RA_OA_Status
-	     ,a.sp_copd as COPD_Status
-	     ,c.clm_id as IP_Claim
-	     ,c.pmt_amt as IP_Pmt_Amt
-	     ,d.clm_id as OP_Claim
-	     ,d.pmt_amt as OP_Pmt_Amt	 
-      
-        from mbsf_ab_2010 as A
-
-            full join
-
-        ip2010line as c
-
-            on A.Bene_ID = C.Bene_ID
-
-            full join
-
-        op2010claim as D
-            on a.Bene_ID = d.Bene_ID
-
-	order by
-        Bene_ID
-    ;
-quit;
-
-*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+*We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
@@ -219,8 +180,13 @@ proc sql;
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
+<<<<<<< HEAD
 	        ,c.sp_copd as COPD_Status
 			
+=======
+	        	,c.sp_copd as COPD_Status
+			,a.pmt_amt as IP_Pmt_Amt
+>>>>>>> 48988672a13e1cd85f432c5c42124ce7c48377c2
 	        	
 		from
 			ip2010claim A
@@ -250,8 +216,13 @@ proc sql;
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
+<<<<<<< HEAD
 	        ,c.sp_copd as COPD_Status
 	        
+=======
+	        	,c.sp_copd as COPD_Status
+	        	,b.pmt_amt as OP_Pmt_Amt
+>>>>>>> 48988672a13e1cd85f432c5c42124ce7c48377c2
 	        
 		from
 			op2010claim B
@@ -278,39 +249,40 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		   bene_id 
-	       ,clm_id
-	       ,Sex
-	       ,Race
-	       ,death_dt
-		   ,state
-	       ,county
-	       ,COPD_Status
-           ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
-	       ,bene_hmo_cvrage_tot_mons
-	       ,bene_dob
-	       ,
-		   case 
-		      when bene_hi_cvrage_tot_mons=12 
+		bene_id 
+		,clm_id
+		,Sex
+		,Race
+		,death_dt
+		,state
+		,county
+		,COPD_Status
+		,RA_OA_Status
+		,bene_hi_cvrage_tot_mons
+		,bene_smi_cvrage_tot_mons
+		,bene_hmo_cvrage_tot_mons
+		,bene_dob
+		,OP_Pmt_Amt
+		,
+	    case 
+		 when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
 		      else "noab"
-		   end as contenrl_ab_2010
+		 end as contenrl_ab_2010
 		   ,
-		   case
-		      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+	    case
+		 when bene_hmo_cvrage_tot_mons=12 then "hmo"
 			  else "nohmo"
-		   end as contenrl_hmo_2010
+		 end as contenrl_hmo_2010
 		   ,
-		   case
-	 	      when death_dt ne . then 1
+	    case
+	 	 when death_dt ne . then 1
 			  else 0
-		   end as death_2010
+		 end as death_2010
 from contenr2010_analytic_file_raw;
 quit;
 
-	/* notes to learners:
+/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
         often faster and less code to use data steps and proc sort steps to
