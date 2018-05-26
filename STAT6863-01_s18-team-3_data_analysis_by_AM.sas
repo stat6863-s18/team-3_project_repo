@@ -10,10 +10,6 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 * load external file that will generate final analytic file;
 %include '.\STAT6863-01_s18-team-3_data_preparation.sas';
 
-*create aggregate data set from analytic fileto answer research questions;
-
-
-
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
@@ -32,21 +28,12 @@ Limitations: This question assumes that each admission is logged individually
 as referenced by claim ID. This may not be acccurate.
 ;
 
-PROC SORT DATA= contenr2010_analytic_file;
-    by 
-        BENE_ID;
-run;
-
 PROC SQL;
-    create table Total_Pmt_raw AS
+    create table RAOA_IPClaim_raw AS
         select
             Bene_ID
-	   ,COUNT(OP_Claim) AS OP_Num_Clm
 	   ,COUNT(IP_Claim) AS IP_Num_Clm
-	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
-	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
 	   ,RA_OA_Status
-	   ,COPD_Status
         from
             contenr2010_analytic_file
        group by 
@@ -55,26 +42,13 @@ quit;
 
 proc sort
         nodupkey
-        data=Total_Pmt_raw
-        out=Total_Pmt
+        data=RAOA_IPClaim_raw
+        out=RAOA_IPClaim
     ;
     by
-        Bene_ID and OP_Num_Clm and IP_Num_Clm
+        Bene_ID
     ;
 run;
-
-proc sql outobs=10;
-    select
-        Bene_ID
-        IP_Num_Clm
-        IPTot_Pmt
-        RA_OA_Status
-    from
-        Total_pmt
-    order by
-        BENE_ID
-    ;
-quit;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -94,20 +68,12 @@ Master_Inpatient_Claim_2010.csv.
 Limitations: No limitations identified during exploratory steps.
 ;
 
-PROC SORT DATA= contenr2010_analytic_file;
-    by 
-        BENE_ID;
-run;
-
 PROC SQL;
-    create table Total_Pmt_raw AS
+    create table COPD_IPTotal_Pmt_raw AS
         select
             Bene_ID
-	   ,COUNT(OP_Claim) AS OP_Num_Clm
 	   ,COUNT(IP_Claim) AS IP_Num_Clm
 	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
-	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
-	   ,RA_OA_Status
 	   ,COPD_Status
         from
             contenr2010_analytic_file
@@ -117,25 +83,13 @@ quit;
 
 proc sort
         nodupkey
-        data=Total_Pmt_raw
-        out=Total_Pmt
+        data=COPD_IPTotal_Pmt_raw
+        out=COPD_IPTotal_Pmt
     ;
     by
-        Bene_ID and OP_Num_Clm and IP_Num_Clm
+        Bene_ID
     ;
 run;
-proc sql outobs=10;
-    select
-        Bene_ID
-        IP_Num_Clm
-        IPTot_Pmt
-        COPD_Status
-    from
-        Total_pmt
-    order by
-        BENE_ID
-    ;
-quit;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -154,21 +108,14 @@ Master_Outpatient_Claim_1_2010.csv.
 
 Limitations: No limitations identified during exploratory steps.
 ;
-PROC SORT DATA= contenr2010_analytic_file;
-    by 
-        BENE_ID;
-run;
 
 PROC SQL;
-    create table Total_Pmt_raw AS
+    create table COPD_OPTotal_Pmt_raw AS
         select
             Bene_ID
 	   ,COUNT(OP_Claim) AS OP_Num_Clm
-	   ,COUNT(IP_Claim) AS IP_Num_Clm
-	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
 	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
 	   ,RA_OA_Status
-	   ,COPD_Status
         from
             contenr2010_analytic_file
        group by 
@@ -177,29 +124,17 @@ quit;
 
 proc sort
         nodupkey
-        data=Total_Pmt_raw
-        out=Total_Pmt
+        data=COPD_OPTotal_Pmt_raw 
+        out=COPD_OPTotal_Pmt 
     ;
     by
-        Bene_ID and OP_Num_Clm and IP_Num_Clm
+        Bene_ID
     ;
 run;
-proc sql outobs=10;
-    select
-        Bene_ID
-        OP_Num_Clm
-        OPTot_Pmt
-        RA_OA_Status
-    from
-        Total_pmt
-    order by
-        BENE_ID
-    ;
-quit;
 
 *Data Exploration;
 
-title "Inspect Inpatient Claim Payment Amount in Total_pmt";
+title "Inspect Inpatient Claim Payment Amount in COPD_IPTotal_Pmt";
 
 * check for distribution of IP Claim Payments to ensure sufficient info to
 answer research questions;
@@ -212,12 +147,12 @@ proc sql;
         ,median(IPTot_Pmt) as median
         ,nmiss(IPTot_Pmt) as missing
     from
-         Total_pmt
+         COPD_IPTotal_Pmt
     ;
 quit;
 title;
 
-title "Inspect Outpatient Claim Payment Amount in Op2010claim";
+title "Inspect Outpatient Claim Payment Amount in COPD_OPTotal_Pmt;
 
 * check for distribution of OP Claim Payments to ensure sufficient info to
 answer research questions;
@@ -230,7 +165,7 @@ proc sql;
         ,median(OPTot_Pmt) as median
         ,nmiss(OPTot_Pmt) as missing
     from
-         Total_pmt
+         COPD_OPTotal_Pmt
     ;
 quit;
 title;
