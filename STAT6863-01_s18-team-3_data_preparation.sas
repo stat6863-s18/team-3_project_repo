@@ -162,46 +162,7 @@ options fullstimer;
 %mend;
 %loadDatasets
 
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
-and msbf_2010_ab;
-
-proc sql;
-    create table contenr2010_analytic_file_raw as
-        select
-	     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-             AS Bene_ID
-	     ,c.thru_dt 
-	     ,c.from_dt 
-             ,a.bene_hi_cvrage_tot_mons as Part_A
-	     ,a.bene_smi_cvrage_tot_mons as Part_B
-	     ,a.bene_hmo_cvrage_tot_mons as Non_HMO
-	     ,a.death_dt as Alive
-	     ,a.sp_ra_oa as RA_OA_Status
-	     ,a.sp_copd as COPD_Status
-	     ,c.clm_id as IP_Claim
-	     ,c.pmt_amt as IP_Pmt_Amt
-	     ,d.clm_id as OP_Claim
-	     ,d.pmt_amt as OP_Pmt_Amt	 
-      
-        from mbsf_ab_2010 as A
-
-            full join
-
-        ip2010line as c
-
-            on A.Bene_ID = C.Bene_ID
-
-            full join
-
-        op2010claim as D
-            on a.Bene_ID = d.Bene_ID
-
-	order by
-        Bene_ID
-    ;
-quit;
-
-*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+*We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
@@ -219,7 +180,7 @@ proc sql;
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
-	        ,c.sp_copd as COPD_Status
+	        	,c.sp_copd as COPD_Status
 			,a.pmt_amt as IP_Pmt_Amt
 	        	
 		from
@@ -250,8 +211,8 @@ proc sql;
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
-	        ,c.sp_copd as COPD_Status
-	        ,b.pmt_amt as OP_Pmt_Amt
+	        	,c.sp_copd as COPD_Status
+	        	,b.pmt_amt as OP_Pmt_Amt
 	        
 		from
 			op2010claim B
@@ -310,7 +271,7 @@ create table contenr2010_analytic_file_raw1 as
 from contenr2010_analytic_file_raw;
 quit;
 
-	/* notes to learners:
+/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
         often faster and less code to use data steps and proc sort steps to
