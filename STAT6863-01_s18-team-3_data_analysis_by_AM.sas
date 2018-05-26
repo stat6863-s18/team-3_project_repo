@@ -65,9 +65,21 @@ proc sort
     ;
 run;
 
-proc freq data = RAOA_IPClaim;
-    by RA_OA_Status
+data RAOA_2way;
+input RA_Status$ Claims$ Count;
+datalines;
+yes 0 5901
+yes 1 2621
+no 0 37021
+no 1 9694
+;
 run;
+
+proc freq data=RAOA_2way order=data;
+tables RA_Status*Claim / chisq;
+weight Count;
+run;
+
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
