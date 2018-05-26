@@ -27,7 +27,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset1DSN = Ip2010claim;
 %let inputDataset1URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Inpatient_Claim_2_2010.csv?raw=true
+https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Master_Inpatient_Claim_2010_sorted.csv?raw=true
 ;
 %let inputDataset1Type = CSV;
 
@@ -83,7 +83,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset3DSN = Op2010claim;
 %let inputDataset3URL =
-https://github.com/stat6863/team-3_project_repo/blob/master/data/Outpatient_Claim_2_2010.csv?raw=true
+?raw=true
 ;
 %let inputDataset3Type = CSV;
 
