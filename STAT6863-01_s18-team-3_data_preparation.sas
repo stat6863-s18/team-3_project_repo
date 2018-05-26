@@ -83,7 +83,7 @@ data/Data_Dictionary_Medicare.doc
 ;
 %let inputDataset3DSN = Op2010claim;
 %let inputDataset3URL =
-?raw=true
+https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Master_OP_Claim_2010_sorted.csv?raw=true
 ;
 %let inputDataset3Type = CSV;
 
