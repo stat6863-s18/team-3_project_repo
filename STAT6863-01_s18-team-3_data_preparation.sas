@@ -241,24 +241,26 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		   bene_id 
+		     bene_id 
 	       ,clm_id
 	       ,Sex
 	       ,Race
 	       ,death_dt
-		   ,state
+		     ,state
 	       ,county
 	       ,COPD_Status
-           ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
+         ,RA_OA_Status
+		     ,bene_hi_cvrage_tot_mons
+		     ,bene_smi_cvrage_tot_mons
 	       ,bene_hmo_cvrage_tot_mons
 	       ,bene_dob
-		   ,OP_Pmt_Amt
-           ,OP_ClmID
-           ,IP_Pmt_Amt
-           ,IP_ClmID
-	       ,
+
+		     ,OP_Pmt_Amt
+         ,OP_ClmID
+         ,IP_Pmt_Amt
+         ,IP_ClmID
+
+         ,
 		   case 
 		      when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -325,4 +327,3 @@ run;
 
 * check everything looks fine now;
 proc print data=contenr2010_analytic_file(obs=25); run;
-
