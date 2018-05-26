@@ -14,11 +14,23 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: Do Medicare patients with RA/OA have more inpatient claims than 
-patients that do not have RA/OA? Is there a statistically significant difference?
 
-Rationale: This should help identify trends in hospitalization for patients 
-with certain chronic conditions.
+title1 justify=left
+'Question: What proportion of patients that have made one or more inpatient
+claims are identified as having rheumatoid arthritis or osteoarthritis?
+
+title2 justify=left
+'Rationale: This should help identify trends in hospitalization for patients 
+with certain chronic conditions.'
+;
+
+footnote1 justify=left
+"XXXXXXXXXXXX"
+;
+
+footnote2 justify=left
+"XXXXXXXXXXXX"
+;
 
 Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
@@ -28,7 +40,7 @@ Limitations: This question assumes that each admission is logged individually
 as referenced by claim ID. This may not be acccurate.
 ;
 
-PROC SQL;
+proc sql;
     create table RAOA_IPClaim_raw AS
         select
             Bene_ID
@@ -36,36 +48,45 @@ PROC SQL;
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
-       group by 
+	where
+	    IP_Num_Clm >= 1 
+        group by 
             BENE_ID;
 quit;
 
 proc sort
         nodupkey
-        data=RAOA_IPClaim_raw
-        out=RAOA_IPClaim
+        data=COPD_OPTotal_Pmt_raw 
+        out=COPD_OPTotal_Pmt 
     ;
     by
         Bene_ID
     ;
 run;
-/*
-data RAOA_IPClaim;
- set RAOA_IPClaim;
- where IP_Num_Clm ge 1 ;
- run;
-*/
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 *
-Question: What is the median inpatient claim amount for Medicare patients with 
-COPD versus patients that do not have COPD? Is there a statistically significant
-difference?
 
-Rationale: This should help identify differences in hospitalization costs for 
-patients with/without certain chronic conditions.
+title1 justify=left
+'Research Question: Of patients that have made inpatient claims, is there a 
+significant difference in claim amounts for patients with COPD versus patients 
+that do not have COPD?'
+;
+
+title2 justify=left
+'Rationale: This should help identify differences in hospitalization costs for 
+patients with/without certain chronic conditions.'
+;
+
+footnote1 justify=left
+"XXXXXXXXXXXXXXX"
+;
+
+footnote2 justify=left
+"XXXXXXXXXXXXXXX"
+;
 
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
@@ -74,7 +95,7 @@ Master_Inpatient_Claim_2010.csv.
 Limitations: No limitations identified during exploratory steps.
 ;
 
-PROC SQL;
+proc sql;
     create table COPD_IPTotal_Pmt_raw AS
         select
             Bene_ID
@@ -83,7 +104,9 @@ PROC SQL;
 	   ,COPD_Status
         from
             contenr2010_analytic_file
-       group by 
+	where
+	    IP_Num_Clm >= 1
+        group by 
             BENE_ID;
 quit;
 
@@ -100,13 +123,25 @@ run;
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
-*
-Question: What is the median outpatient claim amount for Medicare patients with 
-COPD versus patients that do not have COPD? Is the difference statistically
-significant?
 
-Rationale: This should help identify differences in outpatient costs for 
-patients with/without certain chronic conditions.
+title1 justify=left
+'Research Question: Of patients that have made outpatient claims, is there a 
+significant difference in claim amounts for patients with COPD versus patients 
+that do not have COPD?'
+;
+
+title2 justify=left
+'Rationale: This should help identify differences in outpatient costs for 
+patients with/without certain chronic conditions.'
+;
+
+footnote1 justify=left
+"XXXXXXXXXXXXXXX"
+;
+
+footnote2 justify=left
+"XXXXXXXXXXXXXXX"
+;
 
 Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
@@ -121,10 +156,12 @@ PROC SQL;
             Bene_ID
 	   ,COUNT(OP_Claim) AS OP_Num_Clm
 	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
-	   ,RA_OA_Status
+	   ,COPD_Status
         from
             contenr2010_analytic_file
-       group by 
+	where
+	    OP_Num_Clm
+        group by 
             BENE_ID;
 quit;
 
