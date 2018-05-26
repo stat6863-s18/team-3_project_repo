@@ -153,7 +153,7 @@ proc sql;
 			,c.sp_ra_oa as RA_OA_Status
 	    ,c.sp_copd as COPD_Status
 			,a.pmt_amt as IP_Pmt_Amt
-			,a.clm_ID as IP_ClmID
+			,a.clm_ID as IP_ClmID format=20.
 	        	
 		from
 			ip2010claim A
@@ -183,9 +183,9 @@ proc sql;
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
-	    ,c.sp_copd as COPD_Status
-	    ,b.pmt_amt as OP_Pmt_Amt
-	    ,b.clm_id as OP_ClmID
+	    		,c.sp_copd as COPD_Status
+	   		,b.pmt_amt as OP_Pmt_Amt
+	    		,b.clm_id as OP_ClmID format=20.
 		from
 			op2010claim B
 
