@@ -239,35 +239,36 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		   bene_id 
-	       ,clm_id
-	       ,Sex
-	       ,Race
-	       ,death_dt
-		   ,state
-	       ,county
-	       ,COPD_Status
-           ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
-	       ,bene_hmo_cvrage_tot_mons
-	       ,bene_dob
-	       ,
-		   case 
-		      when bene_hi_cvrage_tot_mons=12 
+		bene_id 
+		,clm_id
+		,Sex
+		,Race
+		,death_dt
+		,state
+		,county
+		,COPD_Status
+		,RA_OA_Status
+		,bene_hi_cvrage_tot_mons
+		,bene_smi_cvrage_tot_mons
+		,bene_hmo_cvrage_tot_mons
+		,bene_dob
+		,OP_Pmt_Amt
+		,
+	    case 
+		 when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
 		      else "noab"
-		   end as contenrl_ab_2010
+		 end as contenrl_ab_2010
 		   ,
-		   case
-		      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+	    case
+		 when bene_hmo_cvrage_tot_mons=12 then "hmo"
 			  else "nohmo"
-		   end as contenrl_hmo_2010
+		 end as contenrl_hmo_2010
 		   ,
-		   case
-	 	      when death_dt ne . then 1
+	    case
+	 	 when death_dt ne . then 1
 			  else 0
-		   end as death_2010
+		 end as death_2010
 from contenr2010_analytic_file_raw;
 quit;
 
