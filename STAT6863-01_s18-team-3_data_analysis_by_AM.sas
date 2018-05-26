@@ -16,8 +16,8 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *
 
 title1 justify=left
-'Question: What proportion of patients that have made one or more inpatient
-claims are identified as having rheumatoid arthritis or osteoarthritis?
+'Question: What proportions of patients have made zero or more than one inpatient
+claims by rheumatoid arthritis or osteoarthritis status?'
 
 title2 justify=left
 'Rationale: This should help identify trends in hospitalization for patients 
@@ -25,14 +25,16 @@ with certain chronic conditions.'
 ;
 
 footnote1 justify=left
-"XXXXXXXXXXXX"
+'There appears to be a large number of patients that have submitted zero claims.'
 ;
 
 footnote2 justify=left
-"XXXXXXXXXXXX"
+'Depending on the magnitude of the imbalance in the number of claims submitted,
+parametric methods may not be appropriate for data analysis and a non-parametric
+method may need to be further explored.'
 ;
 
-Note: This compares the variable "Chronic Condition: RA/OA" in 
+*Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
 Master_Inpatient_Claim_2010.csv.
 
@@ -48,20 +50,22 @@ proc sql;
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
-	where
-	    IP_Num_Clm >= 1 
         group by 
-            BENE_ID;
+            BENE_ID
+;	    
 quit;
 
 proc sort
         nodupkey
-        data=COPD_OPTotal_Pmt_raw 
-        out=COPD_OPTotal_Pmt 
+        data=RAOA_IPClaim_raw
+        out=RAOA_IPClaim 
     ;
     by
         Bene_ID
     ;
+run;
+
+proc print data = RAOA_IPClaim (obs=50);
 run;
 
 *******************************************************************************;
@@ -81,14 +85,16 @@ patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-"XXXXXXXXXXXXXXX"
+'In the exploratory analysis, there appears to be a minimal difference in the
+distribution and magnitude of claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
-"XXXXXXXXXXXXXXX"
+'This apparent lack of difference should be explored in further detail using an
+inferential method.'
 ;
 
-Note: This compares the variable "Chronic Condition: COPD" in 
+*Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Inpatient_Claim_2010.csv.
 
@@ -104,10 +110,11 @@ proc sql;
 	   ,COPD_Status
         from
             contenr2010_analytic_file
-	where
-	    IP_Num_Clm >= 1
         group by 
-            BENE_ID;
+            BENE_ID
+	having 
+	    SUM(IP_PMT_AMT) >0
+;
 quit;
 
 proc sort
@@ -119,6 +126,19 @@ proc sort
         Bene_ID
     ;
 run;
+
+proc sql;
+    select
+         min(IPTot_Pmt) as min
+        ,max(IPTot_Pmt) as max
+        ,mean(IPTot_Pmt) as mean
+        ,median(IPTot_Pmt) as median
+    from
+         COPD_IPTotal_Pmt
+    group by
+        COPD_Status
+    ;
+quit;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -136,33 +156,34 @@ patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-"XXXXXXXXXXXXXXX"
+'In the exploratory analysis, there appears to be a significant difference in the
+distribution and magnitude of outpatient claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
-"XXXXXXXXXXXXXXX"
-;
+'This difference should be explored in further detail using an inferential method.'
 
-Note: This compares the variable "Chronic Condition: COPD" in 
+*Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Outpatient_Claim_1_2010.csv.
 
 Limitations: No limitations identified during exploratory steps.
 ;
 
-PROC SQL;
+proc sql;
     create table COPD_OPTotal_Pmt_raw AS
         select
             Bene_ID
-	   ,COUNT(OP_Claim) AS OP_Num_Clm
+	   ,COUNT(OP_ClmID) AS OP_Num_Clm
 	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
 	   ,COPD_Status
         from
             contenr2010_analytic_file
-	where
-	    OP_Num_Clm
         group by 
-            BENE_ID;
+            BENE_ID
+	having
+	    SUM(OP_PMT_AMT) >0
+;
 quit;
 
 proc sort
@@ -175,40 +196,15 @@ proc sort
     ;
 run;
 
-*Data Exploration;
-
-title "Inspect Inpatient Claim Payment Amount in COPD_IPTotal_Pmt";
-
-* check for distribution of IP Claim Payments to ensure sufficient info to
-answer research questions;
-
-proc sql;
-    select
-         min(IPTot_Pmt) as min
-        ,max(IPTot_Pmt) as max
-        ,mean(IPTot_Pmt) as mean
-        ,median(IPTot_Pmt) as median
-        ,nmiss(IPTot_Pmt) as missing
-    from
-         COPD_IPTotal_Pmt
-    ;
-quit;
-title;
-
-title "Inspect Outpatient Claim Payment Amount in COPD_OPTotal_Pmt;
-
-* check for distribution of OP Claim Payments to ensure sufficient info to
-answer research questions;
-
 proc sql;
     select
          min(OPTot_Pmt) as min
         ,max(OPTot_Pmt) as max
         ,mean(OPTot_Pmt) as mean
         ,median(OPTot_Pmt) as median
-        ,nmiss(OPTot_Pmt) as missing
     from
-         COPD_OPTotal_Pmt
-    ;
+        COPD_OPTotal_Pmt
+    group by 
+        COPD_Status    
+;
 quit;
-title;
