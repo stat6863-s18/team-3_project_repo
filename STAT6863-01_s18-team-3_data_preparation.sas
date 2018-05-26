@@ -5,25 +5,17 @@
 
 *
 [Dataset 1 Name] Inpatient_Claim_2_2010.csv
-
 [Dataset Description] Impatient Medicare Data by claim, 2010
-
 [Experimental Unit Description] Beneficiary Claim
-
 [Number of Observations] 13,916     
-
 [Number of Features] 36
-
 [Data Source] The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads
 /DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.zip
 was downloaded and edited to produce the file by subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] The columns "Claim_ID", "Bene_ID" form a composite key.
-
 ;
 %let inputDataset1DSN = Ip2010claim;
 %let inputDataset1URL =
@@ -34,23 +26,16 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Maste
 
 *
 [Dataset 2 Name] Master_Beneficiary_Summary_2010.csv
-
 [Dataset Description] Master Beneficiary Medicare Summary, 2010
-
 [Experimental Unit Description] Beneficiary Claim
-
 [Number of Observations] 112,374
-
 [Number of Features] 32
-
 [Data Source] https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2010_Beneficiary_
 Summary_File_Sample_1.zip was downloaded and edited to produce the file by
 subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] The column BENE_ID is a unique id.
 ;
 %let inputDataset2DSN = Mbsf_AB_2010;
@@ -62,23 +47,16 @@ https://github.com/stat6863/team-3_project_repo/blob/master/data/Master_Benefici
 
 *
 [Dataset 3 Name] Outpatient_Claim_2_2010.csv
-
 [Dataset Description] Outpatient Medicare Data by Claim, 2010
-
 [Experimental Unit Description] Beneficiary Claim
-
 [Number of Observations] 175,005
-
 [Number of Features] 31
-
 [Data Source]  The file https://www.cms.gov/Research-Statistics-Data-and-Systems
 /Downloadable-Public-Use-Files/SynPUFs/Downloads/DE1_0_2008_to_2010_Outpatient_
 Claims_Sample_1.zip
 was downloaded and edited to produce file by subsetting to get 2010 year 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] "Claim_ID", "Bene_ID" form a composite key
 ;
 %let inputDataset3DSN = Op2010claim;
@@ -90,23 +68,16 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/Maste
 
 *
 [Dataset 4 Name] MSABEA03.csv
-
 [Dataset Description] US State and County Codes
-
 [Experimental Unit Description] US State Code
-
 [Number of Observations] 32,090
-
 [Number of Features] 3
-
 [Data Source]  https://www.cms.gov/Research-Statistics-Data-and-Systems/
 Statistics-Trends-and-Reports/HealthPlanRepFileData/Downloads/SCP-2003.zip
 was downloaded and edited to produce file by subsetting to get State,
 County and SSA Code. 
-
 [Data Dictionary] https://github.com/stat6863/team-3_project_repo/blob/master/
 data/Data_Dictionary_Medicare.doc
-
 [Unique ID Schema] "State", "County" form a composite key
 ;
 %let inputDataset4DSN = Msabea_ssa;
@@ -180,8 +151,9 @@ proc sql;
 			,d.county format=$25. length=25 'County Name'
 			,d.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
-	        	,c.sp_copd as COPD_Status
+	        ,c.sp_copd as COPD_Status
 			,a.pmt_amt as IP_Pmt_Amt
+			,a.clm_ID as IP_ClmID
 	        	
 		from
 			ip2010claim A
@@ -196,7 +168,7 @@ proc sql;
 
 		on c.ssa=d.ssa 
 
-   	union corr
+   	outer union corr
 
 		select
 			b.bene_id 'Benefeciary Code'
@@ -211,9 +183,9 @@ proc sql;
 			,D.county format=$25. length=25 'County Name'
 			,D.state length=2 'State Name'
 			,c.sp_ra_oa as RA_OA_Status
-	        	,c.sp_copd as COPD_Status
-	        	,b.pmt_amt as OP_Pmt_Amt
-	        
+	        ,c.sp_copd as COPD_Status
+	        ,b.pmt_amt as OP_Pmt_Amt
+	        ,b.clm_id as OP_ClmID
 		from
 			op2010claim B
 
@@ -239,35 +211,39 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		   bene_id 
-	       ,clm_id
-	       ,Sex
-	       ,Race
-	       ,death_dt
-		   ,state
-	       ,county
-	       ,COPD_Status
-           ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
-	       ,bene_hmo_cvrage_tot_mons
-	       ,bene_dob
-	       ,
-		   case 
-		      when bene_hi_cvrage_tot_mons=12 
+		bene_id 
+		,clm_id
+		,Sex
+		,Race
+		,death_dt
+		,state
+		,county
+		,COPD_Status
+		,RA_OA_Status
+		,bene_hi_cvrage_tot_mons
+		,bene_smi_cvrage_tot_mons
+		,bene_hmo_cvrage_tot_mons
+		,bene_dob
+		,OP_Pmt_Amt
+		,OP_ClmID
+		,IP_Pmt_Amt
+		,IP_ClmID
+		,
+	    case 
+		 when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
 		      else "noab"
-		   end as contenrl_ab_2010
+		 end as contenrl_ab_2010
 		   ,
-		   case
-		      when bene_hmo_cvrage_tot_mons=12 then "hmo"
+	    case
+		 when bene_hmo_cvrage_tot_mons=12 then "hmo"
 			  else "nohmo"
-		   end as contenrl_hmo_2010
+		 end as contenrl_hmo_2010
 		   ,
-		   case
-	 	      when death_dt ne . then 1
+	    case
+	 	 when death_dt ne . then 1
 			  else 0
-		   end as death_2010
+		 end as death_2010
 from contenr2010_analytic_file_raw;
 quit;
 
