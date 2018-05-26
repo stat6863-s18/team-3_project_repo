@@ -162,45 +162,6 @@ options fullstimer;
 %mend;
 %loadDatasets
 
-* First, we try to do full join with 3 files:ip2010claim, op2010claim
-and msbf_2010_ab;
-
-proc sql;
-    create table contenr2010_analytic_file_raw as
-        select
-	     coalesce(A.Bene_ID,C.Bene_ID,D.Bene_ID)
-             AS Bene_ID
-	     ,c.thru_dt 
-	     ,c.from_dt 
-             ,a.bene_hi_cvrage_tot_mons as Part_A
-	     ,a.bene_smi_cvrage_tot_mons as Part_B
-	     ,a.bene_hmo_cvrage_tot_mons as Non_HMO
-	     ,a.death_dt as Alive
-	     ,a.sp_ra_oa as RA_OA_Status
-	     ,a.sp_copd as COPD_Status
-	     ,c.clm_id as IP_Claim
-	     ,c.pmt_amt as IP_Pmt_Amt
-	     ,d.clm_id as OP_Claim
-	     ,d.pmt_amt as OP_Pmt_Amt	 
-      
-        from mbsf_ab_2010 as A
-
-            full join
-
-        ip2010line as c
-
-            on A.Bene_ID = C.Bene_ID
-
-            full join
-
-        op2010claim as D
-            on a.Bene_ID = d.Bene_ID
-
-	order by
-        Bene_ID
-    ;
-quit;
-
 */We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
@@ -280,26 +241,24 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		     bene_id 
+		   bene_id 
 	       ,clm_id
 	       ,Sex
 	       ,Race
 	       ,death_dt
-		     ,state
+		   ,state
 	       ,county
 	       ,COPD_Status
-         ,RA_OA_Status
-		     ,bene_hi_cvrage_tot_mons
-		     ,bene_smi_cvrage_tot_mons
+           ,RA_OA_Status
+		   ,bene_hi_cvrage_tot_mons
+		   ,bene_smi_cvrage_tot_mons
 	       ,bene_hmo_cvrage_tot_mons
 	       ,bene_dob
-
-		     ,OP_Pmt_Amt
-         ,OP_ClmID
-         ,IP_Pmt_Amt
-         ,IP_ClmID
-
-         ,
+		   ,OP_Pmt_Amt
+           ,OP_ClmID
+           ,IP_Pmt_Amt
+           ,IP_ClmID
+	       ,
 		   case 
 		      when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -315,7 +274,7 @@ create table contenr2010_analytic_file_raw1 as
 	 	      when death_dt ne . then 1
 			  else 0
 		   end as death_2010
-from contenr2010_analytic_file_raw;
+		from contenr2010_analytic_file_raw;
 quit;
 
 	/* notes to learners:
@@ -343,26 +302,25 @@ quit;
 	*/
 
 * After combining all data sets and adding several vars to define continious
-enrollement for data analysis we still have missing values because of full 
-join, so we need to fix it;
+enrollement for data analysis we still have missing values, so we need to fix it;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw1;
 where bene_id is not missing and clm_id > 1 and county is not missing;
 run;
 
-* we use proc sort to indiscriminately remove
-  duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
-  a composite key;
+* we use proc sort to indiscriminately remove   duplicates, after which column
+Bene_ID and Clm_ID is guaranteed to form   a composite key;
 proc sort
-        nodupkey
-        data=contenr2010_analytic_file_raw1
-        out=contenr2010_analytic_file
+    nodupkey
+    data=contenr2010_analytic_file_raw1
+    out=contenr2010_analytic_file
     ;
     by
-        Bene_ID clm_id
+    Bene_ID clm_id
     ;
 run;
 
 * check everything looks fine now;
 proc print data=contenr2010_analytic_file(obs=25); run;
+
