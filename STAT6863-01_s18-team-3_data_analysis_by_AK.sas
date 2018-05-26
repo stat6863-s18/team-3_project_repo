@@ -91,7 +91,7 @@ run;
 title "Frequency of race in 2010 data";
 proc freq data=contenr2010_analytic_file order=freq; 
     tables race / missing;
-	format race $race_cats_fmt.; 
+    format race $race_cats_fmt.; 
 run;
 title;
 
