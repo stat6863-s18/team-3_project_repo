@@ -130,8 +130,7 @@ run;
 data contenr2010_analytic_file;
     set contenr2010_analytic_file;
     format age_cats age_cats_fmt.;
-    study_age=floor((intck('month', bene_dob, '01jan2010'd) - (day('01jan2010'd) 
-    < day(bene_dob))) / 12);
+    study_age=floor((intck('month', bene_dob, '01jan2010'd) - (day('01jan2010'd) < day(bene_dob))) / 12);
     select;
     	when (study_age<65)      age_cats=0;
         when (65<=study_age<=74) age_cats=1;
