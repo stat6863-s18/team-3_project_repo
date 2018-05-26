@@ -66,8 +66,8 @@ are of our primary interest.;
 proc format; 
 	value $sex_cats_fmt
 	      '0'='Unknown'
-          '1'='Male'
-          '2'='Female';
+              '1'='Male'
+              '2'='Female';
 run;
 
 title "Frequency of sex in 2010 data";
@@ -84,8 +84,8 @@ proc format;
           '2'='Black'
           '3'='Other'
           '4'='Asian'
-	      '5'='Hispanic'
-	      '6'='North American Native';
+	  '5'='Hispanic'
+	  '6'='North American Native';
 run;
 
 title "Frequency of race in 2010 data";
