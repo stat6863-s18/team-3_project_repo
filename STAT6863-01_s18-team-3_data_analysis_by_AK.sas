@@ -128,7 +128,7 @@ proc format;
 run;
 
 data contenr2010_analytic_file;
-	set contenr2010_analytic_file;
+    set contenr2010_analytic_file;
     format age_cats age_cats_fmt.;
     study_age=floor((intck('month', bene_dob, '01jan2010'd) - (day('01jan2010'd) 
     < day(bene_dob))) / 12);
