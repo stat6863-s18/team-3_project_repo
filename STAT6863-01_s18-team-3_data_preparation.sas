@@ -241,26 +241,24 @@ who are still alive in 2010);
 proc sql;
 create table contenr2010_analytic_file_raw1 as
 	   select
-		     bene_id 
+		   bene_id 
 	       ,clm_id
 	       ,Sex
 	       ,Race
 	       ,death_dt
-		     ,state
+		   ,state
 	       ,county
 	       ,COPD_Status
-         ,RA_OA_Status
-		     ,bene_hi_cvrage_tot_mons
-		     ,bene_smi_cvrage_tot_mons
+           ,RA_OA_Status
+		   ,bene_hi_cvrage_tot_mons
+		   ,bene_smi_cvrage_tot_mons
 	       ,bene_hmo_cvrage_tot_mons
 	       ,bene_dob
-
-		     ,OP_Pmt_Amt
-         ,OP_ClmID
-         ,IP_Pmt_Amt
-         ,IP_ClmID
-
-         ,
+		   ,OP_Pmt_Amt
+           ,OP_ClmID
+           ,IP_Pmt_Amt
+           ,IP_ClmID
+	       ,
 		   case 
 		      when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -304,26 +302,25 @@ quit;
 	*/
 
 * After combining all data sets and adding several vars to define continious
-enrollement for data analysis we still have missing values because of full 
-join, so we need to fix it;
+enrollement for data analysis we still have missing values, so we need to fix it;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw1;
 where bene_id is not missing and clm_id > 1 and county is not missing;
 run;
 
-* we use proc sort to indiscriminately remove
-  duplicates, after which column Bene_ID and Clm_ID is guaranteed to form
-  a composite key;
+* we use proc sort to indiscriminately remove   duplicates, after which column
+Bene_ID and Clm_ID is guaranteed to form   a composite key;
 proc sort
-        nodupkey
-        data=contenr2010_analytic_file_raw1
-        out=contenr2010_analytic_file
+    nodupkey
+    data=contenr2010_analytic_file_raw1
+    out=contenr2010_analytic_file
     ;
     by
-        Bene_ID clm_id
+    Bene_ID clm_id
     ;
 run;
 
 * check everything looks fine now;
 proc print data=contenr2010_analytic_file(obs=25); run;
+

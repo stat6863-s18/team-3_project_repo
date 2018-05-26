@@ -34,30 +34,7 @@ Medicare program. To get proportion of benefeciaries we analyse in formation
 in the dataset for Part A, Part B and HMO. Also, it includes information about 
 benefeciaries who passed away in 2010.; 
 
-proc sql;
-create table contenr2010_analytic_file as
-select 
-		Bene_ID
-		, 
-       case 
-	      when bene_hi_cvrage_tot_mons=12 
-		  and bene_smi_cvrage_tot_mons=12 then "ab"
-	      else "noab"
-	   end as contenrl_ab_2010
-	   ,
-	   case
-	      when bene_hmo_cvrage_tot_mons=12 then "hmo"
-		  else "nohmo"
-	   end as contenrl_hmo_2010
-	   ,
-	   case
- 	      when death_dt ne . then 1
-		  else 0
-	   end as death_2010
-from contenr2010_analytic_file;
-quit;
-
-proc freq data=c2010_analytic_file; 
+proc freq data=contenr2010_analytic_file; 
     tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
 run;
 
@@ -112,7 +89,7 @@ proc format;
 run;
 
 title "Frequency of race in 2010 data";
-proc freq data=contenr_2010_fnl; 
+proc freq data=contenr2010_analytic_file order=freq; 
     tables race / missing;
 	format race $race_cats_fmt.; 
 run;
@@ -150,8 +127,8 @@ proc format;
           4='Age Greater Than or Equal To 95';
 run;
 
-data contenr_2010_fnl;
-	set contenr_2010_fnl;
+data contenr2010_analytic_file;
+	set contenr2010_analytic_file;
     format age_cats age_cats_fmt.;
     study_age=floor((intck('month', bene_dob, '01jan2010'd) - (day('01jan2010'd) 
     < day(bene_dob))) / 12);
@@ -166,8 +143,8 @@ data contenr_2010_fnl;
     (January 1, 2010)';
 run;
 
-title "study_age and age_cats in 2010 data";
-proc freq data=contenr_2010_fnl;
+title "Age by Category in 2010 data";
+proc freq data=contenr2010_analytic_file order=freq;
     tables study_age * age_cats / list missing;
     format age_cats age_cats_fmt.; 
 run;
@@ -196,30 +173,6 @@ investigation. Values of Admtg_dgns_cd equal to zero should be excluded from thi
 analysis, since they are potentialy missing values. In addition values of hcpcs_cd1
 and hcpcs_cd3 equal to missing should be excluded from analysis;
 
-proc sql outobs=10;
-    select
-         bene_id
-        ,clm_id
-        ,input(admtg_dgns_cd, best15.) as Admit_Code
-		,Revenue_Center_1
-		,Revenue_Center_2
-    from
-        op2010_v2
-    where
-        calculated Admit_Code > 0
-		and Revenue_Center_1 is missing
-		and Revenue_Center_2 is missing
-    order by
-        bene_id, clm_id
-    ;
-quit;
-
-data op_2010 op_nomatch;
-    merge op2010claim(in=a) op2010line_wide(in=b);
-	by bene_id clm_id;
-	if a and b then output op_2010;
-    else output op_nomatch;
-run;
 
 
 
