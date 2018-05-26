@@ -32,7 +32,7 @@ PROC SQL;
     create table RAOA_IPClaim_raw AS
         select
             Bene_ID
-	   ,COUNT(IP_Claim) AS IP_Num_Clm
+	   ,COUNT(IP_ClmID) AS IP_Num_Clm
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
@@ -72,7 +72,7 @@ PROC SQL;
     create table COPD_IPTotal_Pmt_raw AS
         select
             Bene_ID
-	   ,COUNT(IP_Claim) AS IP_Num_Clm
+	   ,COUNT(IP_ClmID) AS IP_Num_Clm
 	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
 	   ,COPD_Status
         from
