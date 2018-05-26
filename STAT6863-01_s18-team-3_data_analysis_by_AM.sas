@@ -65,7 +65,8 @@ proc sort
     ;
 run;
 
-proc print data = RAOA_IPClaim (obs=50);
+proc freq data = RAOA_IPClaim;
+    by RA_OA_Status
 run;
 
 *******************************************************************************;
