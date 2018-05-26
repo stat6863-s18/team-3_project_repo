@@ -49,6 +49,12 @@ proc sort
         Bene_ID
     ;
 run;
+/*
+data RAOA_IPClaim;
+ set RAOA_IPClaim;
+ where IP_Num_Clm ge 1 ;
+ run;
+*/
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
