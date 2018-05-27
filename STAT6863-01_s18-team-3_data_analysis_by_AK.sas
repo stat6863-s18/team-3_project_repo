@@ -148,7 +148,7 @@ footnote2
 
 proc sgplot data=contenr2010_analytic_file;
 hbar study_age / stat=mean
-		         group=gender;
+                 group=gender;
 run;
 
 title1
