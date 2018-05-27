@@ -80,8 +80,20 @@ contenr2010_analytic_file.
 
 Limitation: We analysed information in the data set contenr2010_analytic_file 
 for only inpatient and outpatient beneficiaries who are continiously enrolled 
+<<<<<<< HEAD
 in 2010 year. The other type of Medicare services are not included in our data
 set;
+=======
+in 2010 year. The other type of Medicare services are not included in our data set.;
+
+
+proc format; 
+	value $sex_cats_fmt
+	      '0'='Unknown'
+              '1'='Male'
+              '2'='Female';
+run;
+>>>>>>> 0e7006539db2da3fe3d9bbb26c6736b8f2f6a598
 
 title "Frequency of Sex in 2010 data";
 proc freq data=contenr2010_analytic_file; 
@@ -90,6 +102,20 @@ proc freq data=contenr2010_analytic_file;
 run;
 title;
 
+<<<<<<< HEAD
+=======
+proc format; 
+    value $race_cats_fmt
+          '0'='Unknown'
+          '1'='White' 
+          '2'='Black'
+          '3'='Other'
+          '4'='Asian'
+	  '5'='Hispanic'
+	  '6'='North American Native';
+run;
+
+>>>>>>> 0e7006539db2da3fe3d9bbb26c6736b8f2f6a598
 title "Frequency of Race in 2010 data";
 proc freq data=contenr2010_analytic_file order=freq; 
     tables race / missing;
@@ -125,10 +151,43 @@ and 94 and greater 95. It also compares the column "County" and "State" with
 the column of the bene_id and claim_id from contenr2010_analytic_file.
 
 Limitation: We have information about inpatient and outpatient benefeciaries,
+<<<<<<< HEAD
 who continiously enrolled in Medicare program in 2010. The other type of 
 Medicare services are excluded from the data set. Counties that do not have 
 information about benefeciaries and their claims under Medicare program are 
 excluded from data analysis;
+=======
+who continiously enrolled in Medicare program in 2010. The other type of Medicare
+services are excluded from the data set. Counties that do not have information about
+benefeciaries and their claims under Medicare program are excluded from data analysis*/
+
+proc format; 
+    value age_cats_fmt
+          0=' < 65'
+          1='65 and 74' 
+          2='75 and 84'
+          3='85 and 94'
+          4=' > or = 95';
+run;
+
+data contenr2010_analytic_file;
+    set contenr2010_analytic_file;
+    format age_cats age_cats_fmt.;
+    study_age=floor(
+        (
+	    intck('month', bene_dob, '01jan2010'd) - 
+	    (day('01jan2010'd) < day(bene_dob))
+	) / 12);
+    select;
+    	when (study_age<65)      age_cats=0;
+        when (65<=study_age<=74) age_cats=1;
+        when (75<=study_age<=84) age_cats=2;
+        when (85<=study_age<=94) age_cats=3;
+        when (study_age>=95)     age_cats=4;
+	end;
+    label age_cats='Beneficiary age category at beginning of ref year (January 1, 2010)';
+run;
+>>>>>>> 0e7006539db2da3fe3d9bbb26c6736b8f2f6a598
 
 title "Age by Category in 2010 data";
 proc freq data=contenr2010_analytic_file order=freq;
