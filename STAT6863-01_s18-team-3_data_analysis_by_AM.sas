@@ -65,8 +65,21 @@ proc sort
     ;
 run;
 
-proc print data = RAOA_IPClaim (obs=50);
+data RAOA_2way;
+input RA_Status$ Claims$ Count;
+datalines;
+yes 0 5901
+yes 1 2621
+no 0 37021
+no 1 9694
+;
 run;
+
+proc freq data=RAOA_2way order=data;
+tables RA_Status*Claim / chisq;
+weight Count;
+run;
+
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -90,8 +103,8 @@ distribution and magnitude of claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
-'This apparent lack of difference should be explored in further detail using an
-inferential method.'
+'This apparent lack of difference could be explored in further detail using an
+graphical method.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
@@ -127,18 +140,14 @@ proc sort
     ;
 run;
 
-proc sql;
-    select
-         min(IPTot_Pmt) as min
-        ,max(IPTot_Pmt) as max
-        ,mean(IPTot_Pmt) as mean
-        ,median(IPTot_Pmt) as median
-    from
-         COPD_IPTotal_Pmt
-    group by
-        COPD_Status
-    ;
-quit;
+title 'Comparison of Claims by COPD Status';
+proc univariate data=COPD_IPTotal_Pmt;
+   var IPTot_Pmt;
+   class COPD_Status;
+   histogram IPTot_Pmt / kernel(color=red)
+                                cfill=ltgray;
+   label COPD_Status = 'COPD Status';
+run;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
