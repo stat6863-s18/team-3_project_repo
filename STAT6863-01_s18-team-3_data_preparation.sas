@@ -166,71 +166,71 @@ options fullstimer;
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
-	create table contenr2010_analytic_file_raw as
-		select
-			a.bene_id 'Benefeciary Code'
-			,a.clm_id 'Benefeciary Claim' format= 20. 
-			,put(c.race,2.) 'Benefeciary Race Code' as Race
-			,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
-			,c.bene_dob 'Date of Birth' 
-			,c.bene_hi_cvrage_tot_mons 'Part A'
-			,c.bene_smi_cvrage_tot_mons 'Part B'
-			,c.bene_hmo_cvrage_tot_mons 'HMO'
-			,c.death_dt 'Date of Death'
-			,d.county format=$25. length=25 'County Name'
-			,d.state length=2 'State Name'
-			,c.sp_ra_oa as RA_OA_Status
-	        ,c.sp_copd as COPD_Status
-			,a.pmt_amt as IP_Pmt_Amt
-			,a.clm_ID as IP_ClmID format=20.
-	        	
-		from
-			ip2010claim A
+    create table contenr2010_analytic_file_raw as
+        select
+            a.bene_id 'Benefeciary Code'
+            ,a.clm_id 'Benefeciary Claim' format= 20. 
+            ,put(c.race,2.) 'Benefeciary Race Code' as Race
+            ,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
+            ,c.bene_dob 'Date of Birth' 
+            ,c.bene_hi_cvrage_tot_mons 'Part A'
+            ,c.bene_smi_cvrage_tot_mons 'Part B'
+            ,c.bene_hmo_cvrage_tot_mons 'HMO'
+            ,c.death_dt 'Date of Death'
+            ,d.county format=$25. length=25 'County Name'
+            ,d.state length=2 'State Name'
+            ,c.sp_ra_oa as RA_OA_Status
+            ,c.sp_copd as COPD_Status
+            ,a.pmt_amt as IP_Pmt_Amt
+            ,a.clm_ID as IP_ClmID format=20.
+                
+        from
+            ip2010claim A
  
-		full join
-			mbsf_ab_2010 C  
+        full join
+            mbsf_ab_2010 C  
 
-		on a.bene_id=c.bene_id  
+        on a.bene_id=c.bene_id  
  
-		full join
-			msabea_ssa D
+        full join
+            msabea_ssa D
 
-		on c.ssa=d.ssa 
+        on c.ssa=d.ssa 
 
-   	outer union corr
+    outer union corr
 
-		select
-			b.bene_id 'Benefeciary Code'
-			,b.clm_id 'Benefeciary Claim' format= 20.
-			,put(c.race,2.) 'Benefeciary Race Code' as Race
-			,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
-			,c.bene_dob 'Date of Birth' 
-			,c.bene_hi_cvrage_tot_mons 'Part A'
-			,c.bene_smi_cvrage_tot_mons 'Part B'
-			,c.bene_hmo_cvrage_tot_mons 'HMO'
-			,c.death_dt 'Date of Death'
-			,D.county format=$25. length=25 'County Name'
-			,D.state length=2 'State Name'
-			,c.sp_ra_oa as RA_OA_Status
-	        ,c.sp_copd as COPD_Status
-			,b.pmt_amt as OP_Pmt_Amt
-	        ,b.clm_id as OP_ClmID format=20.
-	        
-		from
-			op2010claim B
+        select
+            b.bene_id 'Benefeciary Code'
+            ,b.clm_id 'Benefeciary Claim' format= 20.
+            ,put(c.race,2.) 'Benefeciary Race Code' as Race
+            ,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
+            ,c.bene_dob 'Date of Birth' 
+            ,c.bene_hi_cvrage_tot_mons 'Part A'
+            ,c.bene_smi_cvrage_tot_mons 'Part B'
+            ,c.bene_hmo_cvrage_tot_mons 'HMO'
+            ,c.death_dt 'Date of Death'
+            ,D.county format=$25. length=25 'County Name'
+            ,D.state length=2 'State Name'
+            ,c.sp_ra_oa as RA_OA_Status
+            ,c.sp_copd as COPD_Status
+            ,b.pmt_amt as OP_Pmt_Amt
+            ,b.clm_id as OP_ClmID format=20.
+            
+        from
+            op2010claim B
 
-		full join
-			mbsf_ab_2010 C
+        full join
+            mbsf_ab_2010 C
  
-		on b.bene_id=c.bene_id 
+        on b.bene_id=c.bene_id 
 
-		full join
-			msabea_ssa D
+        full join
+            msabea_ssa D
  
-		on c.ssa=d.ssa 
+        on c.ssa=d.ssa 
 
-		order by bene_id, clm_id
-		;
+        order by bene_id, clm_id
+        ;
 quit;
 
 *Since incorporating this query to our single SQL query above causing to produce 
@@ -240,53 +240,53 @@ who are still alive in 2010);
 
 proc sql;
 create table contenr2010_analytic_file_raw1 as
-	   select
-		   bene_id 
-	       ,clm_id
-	       ,Sex
-	       ,Race
-	       ,death_dt
-		   ,state
-	       ,county
-	       ,COPD_Status
+       select
+           bene_id 
+           ,clm_id
+           ,Sex
+           ,Race
+           ,death_dt
+           ,state
+           ,county
+           ,COPD_Status
            ,RA_OA_Status
-		   ,bene_hi_cvrage_tot_mons
-		   ,bene_smi_cvrage_tot_mons
-	       ,bene_hmo_cvrage_tot_mons
-	       ,bene_dob
-		   ,OP_Pmt_Amt
+           ,bene_hi_cvrage_tot_mons
+           ,bene_smi_cvrage_tot_mons
+           ,bene_hmo_cvrage_tot_mons
+           ,bene_dob
+           ,OP_Pmt_Amt
            ,OP_ClmID
            ,IP_Pmt_Amt
            ,IP_ClmID
-		   , 
+           , 
            case
-		      when sex=" 1" then "Male"
-			  else "Female"
-		   end as gender
+              when sex=" 1" then "Male"
+              else "Female"
+           end as gender
            ,
-		   case
-		      when race=" 1" then "White"
+           case
+              when race=" 1" then "White"
               when race=" 2" then "Black"
               when race=" 3" then "Other"
               else "Hispanic"
            end as ethnicity
            ,
-		   case 
-		      when bene_hi_cvrage_tot_mons=12 
-			  and bene_smi_cvrage_tot_mons=12 then "ab"
-		      else "noab"
-		   end as contenrl_ab_2010
-		   ,
-		   case
-		      when bene_hmo_cvrage_tot_mons=12 then "hmo"
-			  else "nohmo"
-		   end as contenrl_hmo_2010
-		   ,
-		   case
-	 	      when death_dt ne . then 1
-			  else 0
-		   end as death_2010
-		from contenr2010_analytic_file_raw;
+           case 
+              when bene_hi_cvrage_tot_mons=12 
+              and bene_smi_cvrage_tot_mons=12 then "ab"
+              else "noab"
+           end as contenrl_ab_2010
+           ,
+           case
+              when bene_hmo_cvrage_tot_mons=12 then "hmo"
+              else "nohmo"
+           end as contenrl_hmo_2010
+           ,
+           case
+              when death_dt ne . then 1
+              else 0
+           end as death_2010
+        from contenr2010_analytic_file_raw;
 quit;
 
 * Note: To investigate the distribution of age of benefeciaries in the 2010
@@ -304,24 +304,24 @@ proc format;
 run;
 
 data contenr2010_analytic_file_raw1;
-	set contenr2010_analytic_file_raw1;
+    set contenr2010_analytic_file_raw1;
     format age_cats age_cats_fmt.;
-	study_age=floor(
+    study_age=floor(
         (
-	    intck('month', bene_dob, '01jan2010'd) - 
+        intck('month', bene_dob, '01jan2010'd) - 
         (day('01jan2010'd) < day(bene_dob))
-	    ) / 12);
+        ) / 12);
     select;
-    	when (study_age<65)      age_cats=0;
+        when (study_age<65)      age_cats=0;
         when (65<=study_age<=74) age_cats=1;
         when (75<=study_age<=84) age_cats=2;
         when (85<=study_age<=94) age_cats=3;
         when (study_age>=95)     age_cats=4;
-	end;
+    end;
     label age_cats='Beneficiary age category at January 1, 2010';
 run;
 
-	/* notes to learners:
+    /* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
         be performed with SQL queries, as was used earlier in this file, it's
         often faster and less code to use data steps and proc sort steps to
@@ -339,11 +339,11 @@ run;
         possible combinations of all rows with respect to unique id values to
         be included in the output dataset, such as in this example, where not
         every dataset will necessarily have every possible of Bene_ID
-		and clm_id in it.
+        and clm_id in it.
     (5) unfortunately, though, full joins of more than two tables can also
         introduce duplicates with respect to unique id values, even if unique
         id values are not duplicated in the original input datasets 
-	*/
+    */
 
 * After combining all data sets and adding several vars to define continious
 enrollement for data analysis we still have missing values, so we need to fix it;
