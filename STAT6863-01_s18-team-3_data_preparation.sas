@@ -162,7 +162,7 @@ options fullstimer;
 %mend;
 %loadDatasets
 
-*/We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+* We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
@@ -171,7 +171,7 @@ proc sql;
 			a.bene_id 'Benefeciary Code'
 			,a.clm_id 'Benefeciary Claim' format= 20. 
 			,put(c.race,2.) 'Benefeciary Race Code' as Race
-			,put(c.sex,2.) 'Sex' as Sex
+			,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
 			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
@@ -203,7 +203,7 @@ proc sql;
 			b.bene_id 'Benefeciary Code'
 			,b.clm_id 'Benefeciary Claim' format= 20.
 			,put(c.race,2.) 'Benefeciary Race Code' as Race
-			,put(c.sex,2.) 'Sex' as Sex
+			,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
 			,c.bene_dob 'Date of Birth' 
 			,c.bene_hi_cvrage_tot_mons 'Part A'
 			,c.bene_smi_cvrage_tot_mons 'Part B'
@@ -258,7 +258,19 @@ create table contenr2010_analytic_file_raw1 as
            ,OP_ClmID
            ,IP_Pmt_Amt
            ,IP_ClmID
-	       ,
+		   , 
+           case
+		      when sex=" 1" then "Male"
+			  else "Female"
+		   end as gender
+           ,
+		   case
+		      when race=" 1" then "White"
+              when race=" 2" then "Black"
+              when race=" 3" then "Other"
+              else "Hispanic"
+           end as ethnicity
+           ,
 		   case 
 		      when bene_hi_cvrage_tot_mons=12 
 			  and bene_smi_cvrage_tot_mons=12 then "ab"
@@ -276,6 +288,38 @@ create table contenr2010_analytic_file_raw1 as
 		   end as death_2010
 		from contenr2010_analytic_file_raw;
 quit;
+
+* Note: To investigate the distribution of age of benefeciaries in the 2010
+we created the appropriate age categories. Since it seems that the comparison 
+operators with numerical variable is not working within Proc SQL Case statement
+we used SAS data step instead to calculate age and apply formats.;
+
+proc format; 
+    value age_cats_fmt
+          0=' < 65'
+          1='65 and 74' 
+          2='75 and 84'
+          3='85 and 94'
+          4=' > or = 95';
+run;
+
+data contenr2010_analytic_file_raw1;
+	set contenr2010_analytic_file_raw1;
+    format age_cats age_cats_fmt.;
+	study_age=floor(
+        (
+	    intck('month', bene_dob, '01jan2010'd) - 
+        (day('01jan2010'd) < day(bene_dob))
+	    ) / 12);
+    select;
+    	when (study_age<65)      age_cats=0;
+        when (65<=study_age<=74) age_cats=1;
+        when (75<=study_age<=84) age_cats=2;
+        when (85<=study_age<=94) age_cats=3;
+        when (study_age>=95)     age_cats=4;
+	end;
+    label age_cats='Beneficiary age category at January 1, 2010';
+run;
 
 	/* notes to learners:
     (1) even though the data-integrity check and mitigation steps below could
@@ -323,4 +367,6 @@ run;
 
 * check everything looks fine now;
 proc print data=contenr2010_analytic_file(obs=25); run;
+
+
 
