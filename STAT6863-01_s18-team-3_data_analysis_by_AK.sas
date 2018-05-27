@@ -96,8 +96,8 @@ in 2010 year. The other type of Medicare services are not included in our data s
 proc format; 
 	value $sex_cats_fmt
 	      '0'='Unknown'
-          '1'='Male'
-          '2'='Female';
+              '1'='Male'
+              '2'='Female';
 run;
 
 title "Frequency of Sex in 2010 data";
@@ -114,14 +114,14 @@ proc format;
           '2'='Black'
           '3'='Other'
           '4'='Asian'
-	      '5'='Hispanic'
-	      '6'='North American Native';
+	  '5'='Hispanic'
+	  '6'='North American Native';
 run;
 
 title "Frequency of Race in 2010 data";
 proc freq data=contenr2010_analytic_file order=freq; 
     tables race / missing;
-	format race $race_cats_fmt.; 
+    format race $race_cats_fmt.; 
 run;
 title;
 
@@ -168,10 +168,13 @@ proc format;
 run;
 
 data contenr2010_analytic_file;
-	set contenr2010_analytic_file;
+    set contenr2010_analytic_file;
     format age_cats age_cats_fmt.;
-    study_age=floor((intck('month', bene_dob, '01jan2010'd) - (day('01jan2010'd) 
-    < day(bene_dob))) / 12);
+    study_age=floor(
+        (
+	    intck('month', bene_dob, '01jan2010'd) - 
+	    (day('01jan2010'd) < day(bene_dob))
+	) / 12);
     select;
     	when (study_age<65)      age_cats=0;
         when (65<=study_age<=74) age_cats=1;
