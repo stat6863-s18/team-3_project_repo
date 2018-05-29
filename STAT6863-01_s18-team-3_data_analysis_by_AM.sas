@@ -16,12 +16,10 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *
 
 title1 justify=left
-'Question: What proportions of patients have made zero or more than one inpatient
-claims by rheumatoid arthritis or osteoarthritis status?'
+'Question: What proportions of patients have made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status?'
 
 title2 justify=left
-'Rationale: This should help identify trends in hospitalization for patients 
-with certain chronic conditions.'
+'Rationale: This should help identify trends in hospitalization for patients with certain chronic conditions.'
 ;
 
 footnote1 justify=left
@@ -29,9 +27,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'Depending on the magnitude of the imbalance in the number of claims submitted,
-parametric methods may not be appropriate for data analysis and a non-parametric
-method may need to be further explored.'
+'Depending on the magnitude of the imbalance in the number of claims submitted, parametric methods may not be appropriate for data analysis and a non-parametric method may need to be further explored.'
 ;
 
 *Note: This compares the variable "Chronic Condition: RA/OA" in 
@@ -87,24 +83,19 @@ run;
 *
 
 title1 justify=left
-'Research Question: Of patients that have made inpatient claims, is there a 
-significant difference in claim amounts for patients with COPD versus patients 
-that do not have COPD?'
+'Research Question: Of patients that have made inpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
-'Rationale: This should help identify differences in hospitalization costs for 
-patients with/without certain chronic conditions.'
+'Rationale: This should help identify differences in hospitalization costs for patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a minimal difference in the
-distribution and magnitude of claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a minimal difference in the distribution and magnitude of claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
-'This apparent lack of difference could be explored in further detail using an
-graphical method.'
+'This apparent lack of difference could be explored in further detail using a graphical method.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
@@ -154,19 +145,15 @@ run;
 *******************************************************************************;
 
 title1 justify=left
-'Research Question: Of patients that have made outpatient claims, is there a 
-significant difference in claim amounts for patients with COPD versus patients 
-that do not have COPD?'
+'Research Question: Of patients that have made outpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
-'Rationale: This should help identify differences in outpatient costs for 
-patients with/without certain chronic conditions.'
+'Rationale: This should help identify differences in outpatient costs for patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a significant difference in the
-distribution and magnitude of outpatient claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a significant difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
