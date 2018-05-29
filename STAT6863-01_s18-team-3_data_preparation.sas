@@ -115,10 +115,6 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
 ;
 %let inputDataset4Type = CSV;
 
-
-* set global system options;
-options fullstimer;
-
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
     %put &=dsn;
@@ -320,41 +316,14 @@ data contenr2010_analytic_file_raw1;
     end;
     label age_cats='Beneficiary age category at January 1, 2010';
 run;
-
-    /* notes to learners:
-    (1) even though the data-integrity check and mitigation steps below could
-        be performed with SQL queries, as was used earlier in this file, it's
-        often faster and less code to use data steps and proc sort steps to
-        check for and remove duplicates; in particular, by-group processing
-        is much more convenient when checking for duplicates than the SQL row
-        aggregation and in-line view tricks used above; in practice, though,
-        you should use whatever methodology you're most comfortable with
-    (2) when determining what type of join to use to combine tables, it's
-        common to designate one of the table as the "master" table, and to use
-        left (outer) joins to add columns from the other "auxiliary" tables
-    (3) however, if this isn't the case, an inner joins typically makes sense
-        whenever we're only interested in rows whose unique id values match up
-        in the tables to be joined
-    (4) similarly, full (outer) joins tend to make sense whenever we want all
-        possible combinations of all rows with respect to unique id values to
-        be included in the output dataset, such as in this example, where not
-        every dataset will necessarily have every possible of Bene_ID
-        and clm_id in it.
-    (5) unfortunately, though, full joins of more than two tables can also
-        introduce duplicates with respect to unique id values, even if unique
-        id values are not duplicated in the original input datasets 
-    */
-
-* After combining all data sets and adding several vars to define continious
-enrollement for data analysis we still have missing values, so we need to fix it;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw1;
-where bene_id is not missing and clm_id > 1 and county is not missing;
+    where bene_id is not missing 
+    and 
+    clm_id > 1 and county is not missing;
 run;
 
-* we use proc sort to indiscriminately remove   duplicates, after which column
-Bene_ID and Clm_ID is guaranteed to form   a composite key;
 proc sort
     nodupkey
     data=contenr2010_analytic_file_raw1
@@ -364,9 +333,5 @@ proc sort
     Bene_ID clm_id
     ;
 run;
-
-* check everything looks fine now;
-proc print data=contenr2010_analytic_file(obs=25); run;
-
 
 
