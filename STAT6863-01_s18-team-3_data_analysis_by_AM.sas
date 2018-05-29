@@ -190,15 +190,9 @@ proc sort
     ;
 run;
 
-proc sql;
-    select
-         min(OPTot_Pmt) as min
-        ,max(OPTot_Pmt) as max
-        ,mean(OPTot_Pmt) as mean
-        ,median(OPTot_Pmt) as median
-    from
-        COPD_OPTotal_Pmt
-    group by 
-        COPD_Status    
-;
-quit;
+proc report data= COPD_OPTotal_Pmt nowd headline headskip
+            ls=66 ps=18;	
+    column COPD_Status (Sum Min Max Mean Median),OPTot_Pmt;	
+    define OPTot_Pmt / format=dollar11.2 ;
+    title 'OP Claim Payment Statistics by COPD Status';
+run;
