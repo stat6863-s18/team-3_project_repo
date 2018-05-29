@@ -13,15 +13,13 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
-*
 
 title1 justify=left
-'Question: What proportions of patients have made zero or more than one inpatient
-claims by rheumatoid arthritis or osteoarthritis status?'
+'Question: What proportions of patients have made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status?'
+;
 
 title2 justify=left
-'Rationale: This should help identify trends in hospitalization for patients 
-with certain chronic conditions.'
+'Rationale: This should help identify trends in hospitalization for patients with certain chronic conditions.'
 ;
 
 footnote1 justify=left
@@ -29,9 +27,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'Depending on the magnitude of the imbalance in the number of claims submitted,
-parametric methods may not be appropriate for data analysis and a non-parametric
-method may need to be further explored.'
+'Depending on the magnitude of the imbalance in the number of claims submitted, parametric methods may not be appropriate for data analysis and a non-parametric method may need to be further explored.'
 ;
 
 *Note: This compares the variable "Chronic Condition: RA/OA" in 
@@ -56,12 +52,12 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=RAOA_IPClaim_raw
-        out=RAOA_IPClaim 
+    nodupkey
+    data=RAOA_IPClaim_raw
+    out=RAOA_IPClaim 
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
@@ -76,35 +72,31 @@ no 1 9694
 run;
 
 proc freq data=RAOA_2way order=data;
-tables RA_Status*Claim / chisq;
-weight Count;
+    tables RA_Status*Claim / chisq;
+    weight Count;
 run;
 
+title;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
-*
 
 title1 justify=left
-'Research Question: Of patients that have made inpatient claims, is there a 
-significant difference in claim amounts for patients with COPD versus patients 
-that do not have COPD?'
+'Research Question: Of patients that have made inpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
-'Rationale: This should help identify differences in hospitalization costs for 
-patients with/without certain chronic conditions.'
+'Rationale: This should help identify differences in hospitalization costs for patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a minimal difference in the
-distribution and magnitude of claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a minimal difference in the distribution and magnitude of claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
-'This apparent lack of difference could be explored in further detail using an
-graphical method.'
+'This apparent lack of difference could be explored in further detail using a graphical method.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
@@ -131,42 +123,41 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=COPD_IPTotal_Pmt_raw
-        out=COPD_IPTotal_Pmt
+    nodupkey
+    data=COPD_IPTotal_Pmt_raw
+    out=COPD_IPTotal_Pmt
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
 title 'Comparison of Claims by COPD Status';
+
 proc univariate data=COPD_IPTotal_Pmt;
-   var IPTot_Pmt;
-   class COPD_Status;
-   histogram IPTot_Pmt / kernel(color=red)
-                                cfill=ltgray;
-   label COPD_Status = 'COPD Status';
+    var IPTot_Pmt;
+    class COPD_Status;
+    histogram IPTot_Pmt / kernel(color=red) cfill=ltgray;
+    label COPD_Status = 'COPD Status';
 run;
+
+title;
+footote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 
 title1 justify=left
-'Research Question: Of patients that have made outpatient claims, is there a 
-significant difference in claim amounts for patients with COPD versus patients 
-that do not have COPD?'
+'Research Question: Of patients that have made outpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
-'Rationale: This should help identify differences in outpatient costs for 
-patients with/without certain chronic conditions.'
+'Rationale: This should help identify differences in outpatient costs for patients with/without certain chronic conditions.'
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a significant difference in the
-distribution and magnitude of outpatient claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a significant difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
@@ -196,24 +187,21 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=COPD_OPTotal_Pmt_raw 
-        out=COPD_OPTotal_Pmt 
+    nodupkey
+    data=COPD_OPTotal_Pmt_raw 
+    out=COPD_OPTotal_Pmt 
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
-proc sql;
-    select
-         min(OPTot_Pmt) as min
-        ,max(OPTot_Pmt) as max
-        ,mean(OPTot_Pmt) as mean
-        ,median(OPTot_Pmt) as median
-    from
-        COPD_OPTotal_Pmt
-    group by 
-        COPD_Status    
-;
-quit;
+proc report data= COPD_OPTotal_Pmt nowd headline headskip
+            ls=66 ps=18;	
+    column COPD_Status (Sum Min Max Mean Median),OPTot_Pmt;	
+    define OPTot_Pmt / format=dollar11.2 ;
+    title 'OP Claim Payment Statistics by COPD Status';
+run;
+
+title;
+footnote;
