@@ -76,6 +76,9 @@ proc freq data=RAOA_2way order=data;
     weight Count;
 run;
 
+title;
+footnote;
+
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
@@ -138,6 +141,9 @@ proc univariate data=COPD_IPTotal_Pmt;
     label COPD_Status = 'COPD Status';
 run;
 
+title;
+footote;
+
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
@@ -196,3 +202,6 @@ proc report data= COPD_OPTotal_Pmt nowd headline headskip
     define OPTot_Pmt / format=dollar11.2 ;
     title 'OP Claim Payment Statistics by COPD Status';
 run;
+
+title;
+footnote;
