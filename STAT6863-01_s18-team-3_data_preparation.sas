@@ -158,6 +158,62 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
 %mend;
 %loadDatasets
 
+
+* check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key
+after executing this query, we see that Ip2010claim_dups has no rows. 
+No mitigation needed for ID values;
+
+proc sql;
+    create table Ip2010claim_dups as
+        select
+             CLM_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Ip2010claim
+        group by
+             CLM_Id
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+
+* check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key
+  after executing this query, we see that Mbsf_AB_2010_dups has no rows. 
+  No mitigation needed for ID values;
+
+proc sql;
+    create table Mbsf_AB_2010_dups as
+        select
+             Bene_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Mbsf_AB_2010
+        group by
+             Bene_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+
+* check Op2010claim for bad unique id values, where the column Clm_ID is a unique key
+  after executing this query, we see that Op2010claim_dups has no rows. 
+  No mitigation needed for ID values;
+  
+proc sql;
+
+    create table Op2010claim_dups as
+        select
+             Clm_ID
+            ,count(*) as row_count_for_unique_id_value
+        from
+            Op2010claim
+        group by
+             CLM_ID
+        having
+            row_count_for_unique_id_value > 1
+    ;
+quit;
+
 * We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
