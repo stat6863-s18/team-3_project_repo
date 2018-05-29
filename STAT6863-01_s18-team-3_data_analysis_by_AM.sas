@@ -52,12 +52,12 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=RAOA_IPClaim_raw
-        out=RAOA_IPClaim 
+    nodupkey
+    data=RAOA_IPClaim_raw
+    out=RAOA_IPClaim 
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
@@ -72,10 +72,9 @@ no 1 9694
 run;
 
 proc freq data=RAOA_2way order=data;
-tables RA_Status*Claim / chisq;
-weight Count;
+    tables RA_Status*Claim / chisq;
+    weight Count;
 run;
-
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -121,22 +120,22 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=COPD_IPTotal_Pmt_raw
-        out=COPD_IPTotal_Pmt
+    nodupkey
+    data=COPD_IPTotal_Pmt_raw
+    out=COPD_IPTotal_Pmt
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
 title 'Comparison of Claims by COPD Status';
+
 proc univariate data=COPD_IPTotal_Pmt;
-   var IPTot_Pmt;
-   class COPD_Status;
-   histogram IPTot_Pmt / kernel(color=red)
-                                cfill=ltgray;
-   label COPD_Status = 'COPD Status';
+    var IPTot_Pmt;
+    class COPD_Status;
+    histogram IPTot_Pmt / kernel(color=red) cfill=ltgray;
+    label COPD_Status = 'COPD Status';
 run;
 
 *******************************************************************************;
@@ -182,12 +181,12 @@ proc sql;
 quit;
 
 proc sort
-        nodupkey
-        data=COPD_OPTotal_Pmt_raw 
-        out=COPD_OPTotal_Pmt 
+    nodupkey
+    data=COPD_OPTotal_Pmt_raw 
+    out=COPD_OPTotal_Pmt 
     ;
     by
-        Bene_ID
+    Bene_ID
     ;
 run;
 
