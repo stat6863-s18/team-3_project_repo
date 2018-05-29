@@ -13,10 +13,10 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
-*
 
 title1 justify=left
 'Question: What proportions of patients have made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status?'
+;
 
 title2 justify=left
 'Rationale: This should help identify trends in hospitalization for patients with certain chronic conditions.'
@@ -80,7 +80,6 @@ run;
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
-*
 
 title1 justify=left
 'Research Question: Of patients that have made inpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
