@@ -221,6 +221,9 @@ proc format;
     value SexF
         1='Male'
         2='Female';
+    value DiseaseF
+        1='Yes'
+        2='No';
     value RaceF
         1='White' 
         2='Black'
@@ -271,8 +274,8 @@ proc sql;
             end as contenrl_ab_2010
             ,d.county length=25 'County Name' as county
             ,d.state length=2 'State Name'
-            ,c.sp_ra_oa as RA_OA_Status
-            ,c.sp_copd as COPD_Status
+            ,c.sp_ra_oa as RA_OA_Status format=DiseaseF.
+            ,c.sp_copd as COPD_Status format=DiseaseF.
             ,a.pmt_amt as IP_Pmt_Amt
             ,a.clm_ID as IP_ClmID format=20.
                 
@@ -316,8 +319,8 @@ proc sql;
             end as contenrl_ab_2010
             ,d.county length=25 'County Name' as county
             ,d.state length=2 'State Name'
-            ,c.sp_ra_oa as RA_OA_Status
-            ,c.sp_copd as COPD_Status
+            ,c.sp_ra_oa as RA_OA_Status format=DiseaseF.
+            ,c.sp_copd as COPD_Status format=DiseaseF.
             ,b.pmt_amt as OP_Pmt_Amt
             ,b.clm_id as OP_ClmID format=20.
             
