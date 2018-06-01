@@ -254,7 +254,7 @@ in final analytic file named contenr2010_analytic_file using full join
 and union;
 
 proc sql;
-    create table contenr2010_analytic_file as
+    create table contenr2010_analytic_file_raw as
         select
             distinct a.bene_id 'Benefeciary Code'
             ,a.clm_id 'Benefeciary Claim' format= 20.
@@ -348,7 +348,7 @@ proc sql;
         ;
 quit;
 
-data contenr2010_analytic_file_raw1;
+data contenr2010_analytic_file;
 set contenr2010_analytic_file_raw;
     where bene_id is not missing 
     and 
