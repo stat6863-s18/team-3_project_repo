@@ -15,7 +15,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 
 title1 justify=left
-'Question: Is there a statisical difference in the proportion of patients that made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status? '
+'Question: Is there a statisical difference in the proportion of patients that made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status?'
 ;
 
 title2 justify=left
@@ -99,7 +99,7 @@ title2 justify=left
 ;
 
 title3 justify=left
-'Plot illustrating the similarity in the distribution of inpatient claim amounts by COPD Status."
+'Plot illustrating the similarity in the distribution of inpatient claim amounts by COPD Status.'
 ;
 
 footnote1 justify=left
@@ -150,7 +150,7 @@ proc sort
     ;
 run;
 
-proc univariate data=COPD_IPTotal_Pmt;
+proc univariate data=COPD_IPTotal_Pmt noprint;
     var IPTot_Pmt;
     class COPD_Status;
     histogram IPTot_Pmt / kernel(color=red) cfill=ltgray;
