@@ -72,9 +72,9 @@ data RAOA_2way;
 input RA_Status$ Claims$ Count;
 datalines;
 yes 0 5901
-yes 1 2621
+yes >1 2621
 no 0 37021
-no 1 9694
+no >1 9694
 ;
 run;
 
