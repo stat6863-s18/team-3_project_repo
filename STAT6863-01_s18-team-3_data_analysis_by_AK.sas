@@ -44,7 +44,15 @@ services are not included in our data set. We have already excluded the values
 of "contenrl_ab_2010" equal to missing from this analysis. In this dataset we
 have benefeciaries who are both enrolled in Medicare and HMOs services. Also,
 this data set includes information about benefeciaries being enrolled in 
-Medicare program but passed away in 2010;
+Medicare program but passed away in 2010
+
+Methodology: Use proc freq to display percentage of continiously enrolled alive 
+benefeciaries in Part A and Part B and Health Maintenance Organizations.
+
+Followup Steps: More carefully clean values in order to filter out any possible
+illegal values, and better handle missing data by validating extra variables
+with missing data.
+;
 
 proc freq data=contenr2010_analytic_file; 
     tables contenrl_ab_2010 bene_hmo_cvrage_tot_mons death_dt / missing; 
@@ -69,7 +77,16 @@ footnote;
 Limitation: We analysed information in the data set contenr2010_analytic_file 
 for only inpatient and outpatient beneficiaries who are continiously enrolled 
 in 2010 year. The other type of Medicare services are not included in our data
-set;
+set
+
+Methodology: Use two proc freq to display the proportion of benefeciaries by 
+sex and then by race.
+
+Followup Steps: More carefully clean values in order to filter out any possible
+illegal values, and better handle missing data by validating extra variables
+with missing data. Adding the other type of medical services to increase the 
+population of investigated benefeciaries.
+; 
 
 proc freq data=contenr2010_analytic_file; 
     tables sex / missing;
