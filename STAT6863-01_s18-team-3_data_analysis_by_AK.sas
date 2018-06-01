@@ -50,6 +50,8 @@ proc freq data=contenr2010_analytic_file;
     tables contenrl_ab_2010 contenrl_hmo_2010 death_2010 / missing; 
 run;
 
+title;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
