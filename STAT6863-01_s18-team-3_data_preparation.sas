@@ -348,4 +348,10 @@ proc sql;
         ;
 quit;
 
+data contenr2010_analytic_file_raw1;
+set contenr2010_analytic_file_raw;
+    where bene_id is not missing 
+    and 
+    clm_id > 1 and county is not missing;
+run;
 
