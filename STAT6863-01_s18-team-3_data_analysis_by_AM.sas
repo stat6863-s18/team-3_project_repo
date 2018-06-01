@@ -15,7 +15,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 
 title1 justify=left
-'Question: What proportions of patients have made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status?'
+'Question: Is there a statisical difference in the proportion of patients that made zero or more than one inpatient claims by rheumatoid arthritis or osteoarthritis status? '
 ;
 
 title2 justify=left
@@ -23,11 +23,11 @@ title2 justify=left
 ;
 
 footnote1 justify=left
-'There appears to be a large number of patients that have submitted zero claims.'
+'There is a statistically significant difference between the number of expected and observed claims, indicating that patients with RA or OA file more inpatient claims than their peers who do not.'
 ;
 
 footnote2 justify=left
-'Depending on the magnitude of the imbalance in the number of claims submitted, parametric methods may not be appropriate for data analysis and a non-parametric method may need to be further explored.'
+'The result of this test was highly significant, but there may be other factors driving this difference, such as age, overall general health, and/or other competing risks'
 ;
 
 *Note: This compares the variable "Chronic Condition: RA/OA" in 
@@ -36,6 +36,13 @@ Master_Inpatient_Claim_2010.csv.
 
 Limitations: This question assumes that each admission is logged individually
 as referenced by claim ID. This may not be acccurate.
+
+Methodology: Create a 2x2 table with COPD_Status versus number of inpatient claims
+and use proc freq to evaluate independence of those variables.
+
+Follow-up Steps: Further investigate by including other possible covariates and/or
+class variables in the analysis to determine if there are other contributing
+factors.
 ;
 
 proc sql;
@@ -65,14 +72,14 @@ data RAOA_2way;
 input RA_Status$ Claims$ Count;
 datalines;
 yes 0 5901
-yes 1 2621
+yes >1 2621
 no 0 37021
-no 1 9694
+no >1 9694
 ;
 run;
 
 proc freq data=RAOA_2way order=data;
-    tables RA_Status*Claim / chisq;
+    tables RA_Status*Claims / chisq;
     weight Count;
 run;
 
@@ -84,19 +91,23 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Research Question: Of patients that have made inpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
+'Research Question: Of patients that have made inpatient claims, is there a difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
 'Rationale: This should help identify differences in hospitalization costs for patients with/without certain chronic conditions.'
 ;
 
+title3 justify=left
+'Plot illustrating the similarity in the distribution of inpatient claim amounts by COPD Status."
+;
+
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a minimal difference in the distribution and magnitude of claim amounts based on COPD Status.'
+'In the plots above, we can see the similarity in the distributions. Both are right-skewed, mostly unimodal and peaking near $5000.'
 ;
 
 footnote2 justify=left
-'This apparent lack of difference could be explored in further detail using a graphical method.'
+'To further explore this area of interest, inferential methods (either parametric or non-parametric) could be employed to determine whether there is a statistically significant difference.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
@@ -104,6 +115,13 @@ Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in
 Master_Inpatient_Claim_2010.csv.
 
 Limitations: No limitations identified during exploratory steps.
+
+Methodology: Use proc univariate to further explore the apparent lack
+of difference in claim amounts for inpatient stays based on COPD status
+
+Follow-up Steps: A possible follow-up to this approach could use formal 
+inferential methods to compare mean and/or median values for each group 
+to provide evidence of no difference in claim amounts.
 ;
 
 proc sql;
@@ -132,8 +150,6 @@ proc sort
     ;
 run;
 
-title 'Comparison of Claims by COPD Status';
-
 proc univariate data=COPD_IPTotal_Pmt;
     var IPTot_Pmt;
     class COPD_Status;
@@ -142,7 +158,7 @@ proc univariate data=COPD_IPTotal_Pmt;
 run;
 
 title;
-footote;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -162,6 +178,7 @@ footnote1 justify=left
 
 footnote2 justify=left
 'This difference should be explored in further detail using an inferential method.'
+;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
@@ -186,6 +203,8 @@ proc sql;
 ;
 quit;
 
+*Remove duplicate Beneficiary IDs;
+
 proc sort
     nodupkey
     data=COPD_OPTotal_Pmt_raw 
@@ -196,11 +215,21 @@ proc sort
     ;
 run;
 
-proc report data= COPD_OPTotal_Pmt nowd headline headskip
-            ls=66 ps=18;	
-    column COPD_Status (Sum Min Max Mean Median),OPTot_Pmt;	
+*Sort by COPD_Status;
+
+proc sort
+    data=COPD_OPTotal_Pmt 
+    out=COPD_OPTotal_Pmt 
+    ;
+    by
+    COPD_Status
+    ;
+run;   
+
+proc report data= COPD_OPTotal_Pmt nowd headline headskip;	
+    column (Min Max Mean Median),OPTot_Pmt;	
     define OPTot_Pmt / format=dollar11.2 ;
-    title 'OP Claim Payment Statistics by COPD Status';
+    by COPD_Status;
 run;
 
 title;

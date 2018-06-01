@@ -214,22 +214,62 @@ proc sql;
     ;
 quit;
 
-* We combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
+* create formats to apply for sex, race, study_age, 
+bene_hmo_cvrage_tot_mons and death_dt variables;
+
+proc format; 
+    value SexF
+        1='Male'
+        2='Female';
+    value RaceF
+        1='White' 
+        2='Black'
+        3='Other'
+        4='Asian'
+        5='Hispanic'
+        6='North American Native';
+    value AgeF
+        10-64="<65"
+        65-74="65-74"
+        75-84="75 - 84"
+        85-94="85 - 94"
+        95-110=" > = 95";
+    value HmoF
+        12="hmo"
+        0-11="nohmo";
+    value deathF
+        . = 'Alive'
+        15000-20000 = 'Died';
+run;
+
+* Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
     create table contenr2010_analytic_file_raw as
         select
             a.bene_id 'Benefeciary Code'
-            ,a.clm_id 'Benefeciary Claim' format= 20. 
-            ,put(c.race,2.) 'Benefeciary Race Code' as Race
-            ,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
+            ,a.clm_id 'Benefeciary Claim' format= 20.
+            ,c.race 'Benefeciary Race' format=RaceF.
+            ,c.sex format=SexF.  
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
             ,c.bene_smi_cvrage_tot_mons 'Part B'
-            ,c.bene_hmo_cvrage_tot_mons 'HMO'
-            ,c.death_dt 'Date of Death'
-            ,d.county format=$25. length=25 'County Name'
+            ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
+            ,c.death_dt 'Date of Death' format=deathF.
+            ,
+            floor(
+            (
+            intck('month', c.bene_dob, '01jan2010'd) - 
+            (day('01jan2010'd) < day(c.bene_dob))
+            ) / 12) format=AgeF. as study_age
+            ,
+            case
+              when c.bene_hi_cvrage_tot_mons=12 
+              and c.bene_smi_cvrage_tot_mons=12 then "ab"
+              else "noab"
+            end as contenrl_ab_2010
+            ,d.county length=25 'County Name' as county
             ,d.state length=2 'State Name'
             ,c.sp_ra_oa as RA_OA_Status
             ,c.sp_copd as COPD_Status
@@ -252,17 +292,30 @@ proc sql;
     outer union corr
 
         select
+
             b.bene_id 'Benefeciary Code'
             ,b.clm_id 'Benefeciary Claim' format= 20.
-            ,put(c.race,2.) 'Benefeciary Race Code' as Race
-            ,put(c.sex,2.) 'Sex' as Sex format=$sex_cats_fmt.
+            ,c.race 'Benefeciary Race' format=RaceF.
+            ,c.sex format=SexF. 
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
             ,c.bene_smi_cvrage_tot_mons 'Part B'
-            ,c.bene_hmo_cvrage_tot_mons 'HMO'
-            ,c.death_dt 'Date of Death'
-            ,D.county format=$25. length=25 'County Name'
-            ,D.state length=2 'State Name'
+            ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
+            ,c.death_dt 'Date of Death' format=deathF.
+            ,
+            floor(
+            (
+            intck('month', c.bene_dob, '01jan2010'd) - 
+            (day('01jan2010'd) < day(c.bene_dob))
+            ) / 12) format=AgeF. as study_age
+            ,
+            case
+              when c.bene_hi_cvrage_tot_mons=12 
+              and c.bene_smi_cvrage_tot_mons=12 then "ab"
+              else "noab"
+            end as contenrl_ab_2010
+            ,d.county length=25 'County Name' as county
+            ,d.state length=2 'State Name'
             ,c.sp_ra_oa as RA_OA_Status
             ,c.sp_copd as COPD_Status
             ,b.pmt_amt as OP_Pmt_Amt
@@ -284,97 +337,9 @@ proc sql;
         order by bene_id, clm_id
         ;
 quit;
-
-*Since incorporating this query to our single SQL query above causing to produce 
-more complicated code, we buld separate SQL query to prepare continious enrollment
-benefeciaries in 2010 (Part A, Part B, without HMO benefeciaries, 
-who are still alive in 2010);
-
-proc sql;
-create table contenr2010_analytic_file_raw1 as
-       select
-           bene_id 
-           ,clm_id
-           ,Sex
-           ,Race
-           ,death_dt
-           ,state
-           ,county
-           ,COPD_Status
-           ,RA_OA_Status
-           ,bene_hi_cvrage_tot_mons
-           ,bene_smi_cvrage_tot_mons
-           ,bene_hmo_cvrage_tot_mons
-           ,bene_dob
-           ,OP_Pmt_Amt
-           ,OP_ClmID
-           ,IP_Pmt_Amt
-           ,IP_ClmID
-           , 
-           case
-              when sex=" 1" then "Male"
-              else "Female"
-           end as gender
-           ,
-           case
-              when race=" 1" then "White"
-              when race=" 2" then "Black"
-              when race=" 3" then "Other"
-              else "Hispanic"
-           end as ethnicity
-           ,
-           case 
-              when bene_hi_cvrage_tot_mons=12 
-              and bene_smi_cvrage_tot_mons=12 then "ab"
-              else "noab"
-           end as contenrl_ab_2010
-           ,
-           case
-              when bene_hmo_cvrage_tot_mons=12 then "hmo"
-              else "nohmo"
-           end as contenrl_hmo_2010
-           ,
-           case
-              when death_dt ne . then 1
-              else 0
-           end as death_2010
-        from contenr2010_analytic_file_raw;
-quit;
-
-* Note: To investigate the distribution of age of benefeciaries in the 2010
-we created the appropriate age categories. Since it seems that the comparison 
-operators with numerical variable is not working within Proc SQL Case statement
-we used SAS data step instead to calculate age and apply formats.;
-
-proc format; 
-    value age_cats_fmt
-          0=' < 65'
-          1='65 and 74' 
-          2='75 and 84'
-          3='85 and 94'
-          4=' > or = 95';
-run;
-
-data contenr2010_analytic_file_raw1;
-    set contenr2010_analytic_file_raw1;
-    format age_cats age_cats_fmt.;
-    study_age=floor(
-        (
-        intck('month', bene_dob, '01jan2010'd) - 
-        (day('01jan2010'd) < day(bene_dob))
-        ) / 12);
-    select;
-        when (study_age<65)      age_cats=0;
-        when (65<=study_age<=74) age_cats=1;
-        when (75<=study_age<=84) age_cats=2;
-        when (85<=study_age<=94) age_cats=3;
-        when (study_age>=95)     age_cats=4;
-    end;
-    label age_cats='Beneficiary age category at January 1, 2010';
-run;
  
 data contenr2010_analytic_file_raw1;
-set contenr2010_analytic_file_raw1;
+set contenr2010_analytic_file_raw;
     where bene_id is not missing 
     and 
     clm_id > 1 and county is not missing;
