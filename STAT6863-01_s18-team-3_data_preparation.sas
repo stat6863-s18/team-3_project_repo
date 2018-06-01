@@ -235,11 +235,11 @@ proc format;
         5='Hispanic'
         6='North American Native';
     value AgeF
-        10-64="<65"
-        65-74="65-74"
+        10-64="10 - 65"
+        65-74="65 - 74"
         75-84="75 - 84"
         85-94="85 - 94"
-        95-110=" > = 95";
+        95-110="95 -110";
     value HmoF
         12="hmo"
         0-11="nohmo";
@@ -247,6 +247,7 @@ proc format;
         . = 'Alive'
         15000-20000 = 'Died';
 run;
+
 
 * Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
@@ -257,7 +258,7 @@ proc sql;
             distinct a.bene_id 'Benefeciary Code'
             ,a.clm_id 'Benefeciary Claim' format= 20.
             ,c.race 'Benefeciary Race' format=RaceF.
-            ,c.sex format=SexF.  
+            ,c.Sex format=SexF.  
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
             ,c.bene_smi_cvrage_tot_mons 'Part B'
@@ -268,13 +269,14 @@ proc sql;
             (
             intck('month', c.bene_dob, '01jan2010'd) - 
             (day('01jan2010'd) < day(c.bene_dob))
-            ) / 12) format=AgeF. as study_age
+            ) / 12) format=AgeF. as Study_Age
             ,
             case
               when c.bene_hi_cvrage_tot_mons=12 
               and c.bene_smi_cvrage_tot_mons=12 then "ab"
               else "noab"
-            end as contenrl_ab_2010
+            end as Contenrl_ab_2010
+ 
             ,d.county length=25 'County Name' as county
             ,d.state length=2 'State Name'
             ,c.sp_ra_oa as RA_OA_Status format=DiseaseF.
@@ -298,7 +300,7 @@ proc sql;
     outer union corr
 
         select
-
+        
             distinct b.bene_id 'Benefeciary Code'
             ,b.clm_id 'Benefeciary Claim' format= 20.
             ,c.race 'Benefeciary Race' format=RaceF.
@@ -320,6 +322,7 @@ proc sql;
               and c.bene_smi_cvrage_tot_mons=12 then "ab"
               else "noab"
             end as contenrl_ab_2010
+
             ,d.county length=25 'County Name' as county
             ,d.state length=2 'State Name'
             ,c.sp_ra_oa as RA_OA_Status format=DiseaseF.
