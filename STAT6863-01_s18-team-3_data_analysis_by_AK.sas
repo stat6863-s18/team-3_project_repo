@@ -44,7 +44,7 @@ services are not included in our data set. We have already excluded the values
 of "contenrl_ab_2010" equal to missing from this analysis. In this dataset we
 have benefeciaries who are both enrolled in Medicare and HMOs services. Also,
 this data set includes information about benefeciaries being enrolled in 
-Medicare program but passed away in 2010
+Medicare program but passed away in 2010.
 
 Methodology: Use proc freq to display percentage of continiously enrolled alive 
 benefeciaries in Part A and Part B and Health Maintenance Organizations.
@@ -57,7 +57,10 @@ with missing data.
 proc freq data=contenr2010_analytic_file; 
     tables contenrl_ab_2010 bene_hmo_cvrage_tot_mons death_dt / missing; 
 run;
+
+* clear titles/footnotes;
 title;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -77,15 +80,16 @@ footnote;
 Limitation: We analysed information in the data set contenr2010_analytic_file 
 for only inpatient and outpatient beneficiaries who are continiously enrolled 
 in 2010 year. The other type of Medicare services are not included in our data
-set
+set.
 
-Methodology: Use two proc freq to display the proportion of benefeciaries by 
-sex and then by race.
+Methodology: Use two proc freq to display the ordered proportion of
+benefeciaries by sex and then by race.
 
 Followup Steps: More carefully clean values in order to filter out any possible
 illegal values, and better handle missing data by validating extra variables
 with missing data. Adding the other type of medical services to increase the 
-population of investigated benefeciaries.
+population of investigated benefeciaries. Use chi square test of independence
+to see the relationship between sex and race
 ; 
 
 proc freq data=contenr2010_analytic_file; 
@@ -109,6 +113,7 @@ proc freq data=contenr2010_analytic_file order=freq;
     tables race / missing;
 run;
 
+* clear titles/footnotes;
 title;
 footnote;
 
@@ -133,9 +138,17 @@ the column of the bene_id and claim_id from contenr2010_analytic_file.
 
 Limitation: We have information about inpatient and outpatient benefeciaries,
 who continiously enrolled in Medicare program in 2010. The other type of 
-Medicare services are excluded from the data set. Counties that do not have 
-information about benefeciaries and their claims under Medicare program are 
-excluded from data analysis;
+Medicare services are excluded from the data set.
+
+Methodology: Use proc freq to display percent of benefeciaries by study age,
+proc report to display their percent for each age categories by sex,
+sgplot to output a horizontal bar plot, illustrating the the percentage of 
+benefeciaries by sex to show the proportion of female and male in each
+age categories.
+
+Followup Steps: Analyse the proportion of male and female benefeciaries by
+race for each age categories.
+;
 
 title;
 
@@ -166,6 +179,8 @@ proc sort
     ;
 run;
 
+* display study_age, sex, number of benefeciaries and percent for each age
+categories by sex;
 proc report data=contenr2010_anal_file_by_Age;
     columns
         Study_Age
@@ -206,6 +221,21 @@ title1 justify=left
 
 title2 justify=left
 'Rationale: This gets information about composition of senior Americans by states and counties.'
+;
+
+* Note: It compares county and state column in contenr2010_analytic_file. 
+
+Limitation: Counties that do not have information about benefeciaries and their
+claims under Medicare program are excluded from data analysis.
+
+Methodology: Use proc freq to display sorted percentage of benefeciaries by
+state in descending order, proc sql to output the first top 5 counties with
+largest benefeciary population.
+
+Followup Steps: Analyse the frequency of benefeciaries grouped by state and 
+county to see states with counties with largest senior and disabled population
+for Medicare program and calculate the proportion of these benefeciaries from
+total population.
 ;
 
 footnote;
