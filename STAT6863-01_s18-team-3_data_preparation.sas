@@ -224,6 +224,9 @@ proc format;
     value DiseaseF
         1='Yes'
         2='No';
+    value ClaimF
+	    0 = '0'
+	    1-20 = '>1';
     value RaceF
         1='White' 
         2='Black'
@@ -249,9 +252,9 @@ run;
 in final analytic file named contenr2010_analytic_file using full join and union;
 
 proc sql;
-    create table contenr2010_analytic_file_raw as
+    create table contenr2010_analytic_file as
         select
-            a.bene_id 'Benefeciary Code'
+            distinct a.bene_id 'Benefeciary Code'
             ,a.clm_id 'Benefeciary Claim' format= 20.
             ,c.race 'Benefeciary Race' format=RaceF.
             ,c.sex format=SexF.  
@@ -296,7 +299,7 @@ proc sql;
 
         select
 
-            b.bene_id 'Benefeciary Code'
+            distinct b.bene_id 'Benefeciary Code'
             ,b.clm_id 'Benefeciary Claim' format= 20.
             ,c.race 'Benefeciary Race' format=RaceF.
             ,c.sex format=SexF. 
@@ -340,22 +343,5 @@ proc sql;
         order by bene_id, clm_id
         ;
 quit;
- 
-data contenr2010_analytic_file_raw1;
-set contenr2010_analytic_file_raw;
-    where bene_id is not missing 
-    and 
-    clm_id > 1 and county is not missing;
-run;
-
-proc sort
-    nodupkey
-    data=contenr2010_analytic_file_raw1
-    out=contenr2010_analytic_file
-    ;
-    by
-    Bene_ID clm_id
-    ;
-run;
 
 
