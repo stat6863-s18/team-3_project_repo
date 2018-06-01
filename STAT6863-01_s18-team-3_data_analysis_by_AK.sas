@@ -135,28 +135,21 @@ proc freq data=contenr2010_analytic_file; /*order=freq*/
 run;
 
 title1
-'Plot illustrating the proportion male and female benefeciaries by age categories under Medicare program'
+'Table shows the proportion male and female benefeciaries by age categories under Medicare program'
 ;
-
-footnote1
-'In the above plot, we can see that the proportion of female benefeciaries much higher in all age categories except those of less than 65 years old'
-;
-
-footnote2
-'This plot shows that women uses Medicare services more than men in the same age categories'
-; 
+footnote;
 
 * sort by study_age;
 proc sort
         data=contenr2010_analytic_file
-        out=contenr2010_analytic_file_by_Age
+        out=contenr2010_anal_file_by_Age
     ;
     by
         Study_Age
     ;
 run;
 
-proc report data=contenr2010_anal_file_by_State;
+proc report data=contenr2010_anal_file_by_Age;
     columns
         Study_Age
         Sex
@@ -170,6 +163,17 @@ proc report data=contenr2010_anal_file_by_State;
     rbreak after /summarize;
 run;
 
+title1
+'Plot illustrating the proportion male and female benefeciaries by age categories under Medicare program'
+;
+
+footnote1
+'In the above plot, we can see that the proportion of female benefeciaries much higher in all age categories except those of less than 65 years old'
+;
+
+footnote2
+'This plot shows that women uses Medicare services more than men in the same age categories'
+; 
 
 proc sgplot data=contenr2010_analytic_file;
 hbar study_age / group=sex;
