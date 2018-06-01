@@ -132,8 +132,6 @@ proc sort
     ;
 run;
 
-title 'Comparison of Claims by COPD Status';
-
 proc univariate data=COPD_IPTotal_Pmt;
     var IPTot_Pmt;
     class COPD_Status;
@@ -142,7 +140,7 @@ proc univariate data=COPD_IPTotal_Pmt;
 run;
 
 title;
-footote;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -162,6 +160,7 @@ footnote1 justify=left
 
 footnote2 justify=left
 'This difference should be explored in further detail using an inferential method.'
+;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
@@ -196,11 +195,9 @@ proc sort
     ;
 run;
 
-proc report data= COPD_OPTotal_Pmt nowd headline headskip
-            ls=66 ps=18;	
-    column COPD_Status (Sum Min Max Mean Median),OPTot_Pmt;	
+proc report data= COPD_OPTotal_Pmt nowd headline headskip;	
+    column (Min Max Mean Median),OPTot_Pmt;	
     define OPTot_Pmt / format=dollar11.2 ;
-    title 'OP Claim Payment Statistics by COPD Status';
 run;
 
 title;
