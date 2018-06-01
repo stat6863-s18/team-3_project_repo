@@ -46,10 +46,10 @@ factors.
 ;
 
 proc sql;
-    create table RAOA_IPClaim_raw AS
+    create table RAOA_IPClaim AS
         select
-            Bene_ID
-	   ,COUNT(IP_ClmID) AS IP_Num_Clm
+            distinct Bene_ID
+	   ,COUNT(IP_ClmID) AS IP_Claims format = IPClaimF.
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
@@ -58,29 +58,8 @@ proc sql;
 ;	    
 quit;
 
-proc sort
-    nodupkey
-    data=RAOA_IPClaim_raw
-    out=RAOA_IPClaim 
-    ;
-    by
-    Bene_ID
-    ;
-run;
-
-data RAOA_2way;
-input RA_Status$ Claims$ Count;
-datalines;
-yes 0 5901
-yes >1 2621
-no 0 37021
-no >1 9694
-;
-run;
-
-proc freq data=RAOA_2way order=data;
-    tables RA_Status*Claims / chisq;
-    weight Count;
+proc freq data= RAOA_IPClaim order=freq;
+    tables RA_OA_Status*IP_Claims / chisq;
 run;
 
 title;
@@ -125,9 +104,9 @@ to provide evidence of no difference in claim amounts.
 ;
 
 proc sql;
-    create table COPD_IPTotal_Pmt_raw AS
+    create table COPD_IPTotal_Pmt AS
         select
-            Bene_ID
+            distinct Bene_ID
 	   ,COUNT(IP_ClmID) AS IP_Num_Clm
 	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
 	   ,COPD_Status
@@ -139,16 +118,6 @@ proc sql;
 	    SUM(IP_PMT_AMT) >0
 ;
 quit;
-
-proc sort
-    nodupkey
-    data=COPD_IPTotal_Pmt_raw
-    out=COPD_IPTotal_Pmt
-    ;
-    by
-    Bene_ID
-    ;
-run;
 
 proc univariate data=COPD_IPTotal_Pmt noprint;
     var IPTot_Pmt;
@@ -190,7 +159,7 @@ Limitations: No limitations identified during exploratory steps.
 proc sql;
     create table COPD_OPTotal_Pmt_raw AS
         select
-            Bene_ID
+            distinct Bene_ID
 	   ,COUNT(OP_ClmID) AS OP_Num_Clm
 	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
 	   ,COPD_Status
@@ -203,22 +172,10 @@ proc sql;
 ;
 quit;
 
-*Remove duplicate Beneficiary IDs;
-
-proc sort
-    nodupkey
-    data=COPD_OPTotal_Pmt_raw 
-    out=COPD_OPTotal_Pmt 
-    ;
-    by
-    Bene_ID
-    ;
-run;
-
 *Sort by COPD_Status;
 
 proc sort
-    data=COPD_OPTotal_Pmt 
+    data=COPD_OPTotal_Pmt_raw 
     out=COPD_OPTotal_Pmt 
     ;
     by
