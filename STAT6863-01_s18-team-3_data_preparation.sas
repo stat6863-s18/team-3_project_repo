@@ -159,9 +159,9 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
 %loadDatasets
 
 
-* check Ip2010claim for bad unique id values, where the column CLM_ID is a unique key
-after executing this query, we see that Ip2010claim_dups has no rows. 
-No mitigation needed for ID values;
+* check Ip2010claim for bad unique id values, where the column CLM_ID is a 
+unique key after executing this query, we see that Ip2010claim_dups has no 
+rows. No mitigation needed for ID values;
 
 proc sql;
     create table Ip2010claim_dups as
@@ -177,9 +177,9 @@ proc sql;
     ;
 quit;
 
-* check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a unique key
-  after executing this query, we see that Mbsf_AB_2010_dups has no rows. 
-  No mitigation needed for ID values;
+* check Mbsf_AB_2010 for bad unique id values, where the column Bene_ID is a
+unique key after executing this query, we see that Mbsf_AB_2010_dups has no 
+rows. No mitigation needed for ID values;
 
 proc sql;
     create table Mbsf_AB_2010_dups as
@@ -195,9 +195,9 @@ proc sql;
     ;
 quit;
 
-* check Op2010claim for bad unique id values, where the column Clm_ID is a unique key
-  after executing this query, we see that Op2010claim_dups has no rows. 
-  No mitigation needed for ID values;
+* check Op2010claim for bad unique id values, where the column Clm_ID is a 
+unique key after executing this query, we see that Op2010claim_dups has no 
+rows. No mitigation needed for ID values;
   
 proc sql;
 
@@ -214,8 +214,8 @@ proc sql;
     ;
 quit;
 
-* create formats to apply for sex, race, study_age, 
-bene_hmo_cvrage_tot_mons and death_dt variables;
+* create formats to apply for sex, race, study_age, bene_hmo_cvrage_tot_mons 
+and death_dt variables;
 
 proc format; 
     value SexF
@@ -250,7 +250,8 @@ run;
 
 
 * Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
-in final analytic file named contenr2010_analytic_file using full join and union;
+in final analytic file named contenr2010_analytic_file using full join 
+and union;
 
 proc sql;
     create table contenr2010_analytic_file as
