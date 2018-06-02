@@ -255,7 +255,7 @@ proc sql;
         select
             a.bene_id 'Benefeciary Code'
             ,a.clm_id 'Benefeciary Claim' format= 20.
-            ,c.race 'Benefeciary Race' format=RaceF.
+            ,c.Race 'Benefeciary Race' format=RaceF.
             ,c.Sex format=SexF.  
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
@@ -263,11 +263,15 @@ proc sql;
             ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
             ,c.death_dt 'Date of Death' format=deathF.
             ,
-            floor(
-            (
-            intck('month', c.bene_dob, '01jan2010'd) - 
-            (day('01jan2010'd) < day(c.bene_dob))
-            ) / 12) format=AgeF. as Study_Age
+            case 
+			 when bene_dob is not missing then
+             floor(
+             (
+             intck('month', c.bene_dob, '01jan2010'd) - 
+             (day('01jan2010'd) < day(c.bene_dob))
+             ) / 12)
+             else 0
+            end as Study_Age format=AgeF.
             ,
             case
               when c.bene_hi_cvrage_tot_mons=12 
@@ -300,19 +304,23 @@ proc sql;
         select
             b.bene_id 'Benefeciary Code'
             ,b.clm_id 'Benefeciary Claim' format= 20.
-            ,c.race 'Benefeciary Race' format=RaceF.
-            ,c.sex format=SexF. 
+            ,c.Race 'Benefeciary Race' format=RaceF.
+            ,c.Sex format=SexF. 
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
             ,c.bene_smi_cvrage_tot_mons 'Part B'
             ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
             ,c.death_dt 'Date of Death' format=deathF.
             ,
-            floor(
-            (
-            intck('month', c.bene_dob, '01jan2010'd) - 
-            (day('01jan2010'd) < day(c.bene_dob))
-            ) / 12) format=AgeF. as study_age
+			case 
+			 when bene_dob is not missing then
+             floor(
+             (
+             intck('month', c.bene_dob, '01jan2010'd) - 
+             (day('01jan2010'd) < day(c.bene_dob))
+             ) / 12)
+             else 0
+            end as Study_Age format=AgeF. 
             ,
             case
               when c.bene_hi_cvrage_tot_mons=12 
@@ -345,7 +353,7 @@ proc sql;
 quit;
 
 *Removing missing values after full join and union and
-sorted to eliminate duplicates;
+sorting data set to eliminate duplicates;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw;
