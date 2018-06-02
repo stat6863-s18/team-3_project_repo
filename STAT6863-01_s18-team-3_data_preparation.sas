@@ -115,6 +115,38 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
 ;
 %let inputDataset4Type = CSV;
 
+* create formats to apply for sex, race, study_age, 
+bene_hmo_cvrage_tot_mons and death_dt variables;
+
+proc format; 
+    value SexF
+        1='Male'
+        2='Female';
+    value DiseaseF
+        1='Yes'
+        2='No';
+    value RaceF
+        1='White' 
+        2='Black'
+        3='Other'
+        4='Asian'
+        5='Hispanic'
+        6='North American Native';
+    value AgeF
+        10-64="10 - 65"
+        65-74="65 - 74"
+        75-84="75 - 84"
+        85-94="85 - 94"
+        95-110="95 -110";
+    value HmoF
+        12="hmo"
+        0-11="nohmo";
+    value deathF
+        . = 'Alive'
+        15000-20000 = 'Died';
+run;
+
+
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
     %put &=dsn;
@@ -214,37 +246,6 @@ proc sql;
     ;
 quit;
 
-* create formats to apply for sex, race, study_age, 
-bene_hmo_cvrage_tot_mons and death_dt variables;
-
-proc format; 
-    value SexF
-        1='Male'
-        2='Female';
-    value DiseaseF
-        1='Yes'
-        2='No';
-    value RaceF
-        1='White' 
-        2='Black'
-        3='Other'
-        4='Asian'
-        5='Hispanic'
-        6='North American Native';
-    value AgeF
-        10-64="10 - 65"
-        65-74="65 - 74"
-        75-84="75 - 84"
-        85-94="85 - 94"
-        95-110="95 -110";
-    value HmoF
-        12="hmo"
-        0-11="nohmo";
-    value deathF
-        . = 'Alive'
-        15000-20000 = 'Died';
-run;
-
 
 * Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join and union;
@@ -342,6 +343,9 @@ proc sql;
         order by bene_id, clm_id
         ;
 quit;
+
+*Removing missing values after full join and union and
+sorted to eliminate duplicates;
  
 data contenr2010_analytic_file_raw1;
 set contenr2010_analytic_file_raw;
