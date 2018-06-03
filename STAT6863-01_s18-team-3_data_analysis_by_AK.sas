@@ -103,11 +103,11 @@ run;
 title;
 footnote;
 
-footnote2 justify=left
+footnote1 justify=left
 'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic'
 ;
 
-footnote3 justify=left
+footnote2 justify=left
 'The largest proportion of White benefeciaries can be explained that the minor Black, Other and Hispanic ethnicities might not be eligible for Medicare program'
 ; 
 
