@@ -1,4 +1,3 @@
-
 *******************************************************************************;
 **************** 80-character banner for column width reference ***************;
 * (set window width to banner width to calibrate line length to 80 characters *;
@@ -33,13 +32,10 @@ footnote2 justify=left
 *Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
 Master_Inpatient_Claim_2010.csv.
-
 Limitations: This question assumes that each admission is logged individually
 as referenced by claim ID. This may not be acccurate.
-
 Methodology: Create a 2x2 table with COPD_Status versus number of inpatient claims
 and use proc freq to evaluate independence of those variables.
-
 Follow-up Steps: Further investigate by including other possible covariates and/or
 class variables in the analysis to determine if there are other contributing
 factors.
@@ -49,7 +45,7 @@ proc sql;
     create table RAOA_IPClaim AS
         select
             distinct Bene_ID
-	   ,COUNT(IP_ClmID) AS IP_Claims format = IPClaimF.
+	   ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
@@ -77,7 +73,7 @@ title2 justify=left
 'Rationale: This should help identify differences in hospitalization costs for patients with/without certain chronic conditions.'
 ;
 
-title3 justify=left
+title3 justify=center
 'Plot illustrating the similarity in the distribution of inpatient claim amounts by COPD Status.'
 ;
 
@@ -86,18 +82,15 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'To further explore this area of interest, inferential methods (either parametric or non-parametric) could be employed to determine whether there is a statistically significant difference.'
+'To further explore this area of interest, inferential methods (parametric or non-parametric) could be employed to determine whether there is a statistically significant difference.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Inpatient_Claim_2010.csv.
-
 Limitations: No limitations identified during exploratory steps.
-
 Methodology: Use proc univariate to further explore the apparent lack
 of difference in claim amounts for inpatient stays based on COPD status
-
 Follow-up Steps: A possible follow-up to this approach could use formal 
 inferential methods to compare mean and/or median values for each group 
 to provide evidence of no difference in claim amounts.
@@ -134,7 +127,7 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Research Question: Of patients that have made outpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
+'Research Question: For patients that have made outpatient claims, is there a difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
@@ -142,7 +135,7 @@ title2 justify=left
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a significant difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
@@ -152,7 +145,6 @@ footnote2 justify=left
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Outpatient_Claim_1_2010.csv.
-
 Limitations: No limitations identified during exploratory steps.
 ;
 

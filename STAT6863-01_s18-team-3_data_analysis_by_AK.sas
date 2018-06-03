@@ -9,7 +9,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 
 
 * load external file that will generate final analytic file;
-%include '.\STAT6863-02_s18-team-0_project2_data_preparation';
+%include '.\STAT6863-01_s18-team-3_data_preparation.sas';
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
@@ -73,7 +73,7 @@ title1 justify=left
 title2 justify=left
 'Rationale: This should help to identify benefeciaries of Medicare services by Sex and by Race in 2010 to explore the composition of our population.'
 ; 
-footnote;
+*footnote;
 
 *Note: This compares "Sex", "Race" columns from contenr2010_analytic_file. 
 
@@ -92,20 +92,22 @@ population of investigated benefeciaries. Use chi square test of independence
 to see the relationship between sex and race
 ; 
 
-proc freq data=contenr2010_analytic_file; 
-    tables sex / missing;
-run;
-title;
-
 footnote1 justify=left
 'From total benefeciaries population 43% are men and 57% are women. Women utilize Medicare services 1.33 times more than men.'
 ; 
 
-footnote2 justify=left
-'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4% and 2% are Hispanic'
+proc freq data=contenr2010_analytic_file; 
+    tables sex / missing;
+run;
+
+title;
+footnote;
+
+footnote1 justify=left
+'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic'
 ;
 
-footnote3 justify=left
+footnote2 justify=left
 'The largest proportion of White benefeciaries can be explained that the minor Black, Other and Hispanic ethnicities might not be eligible for Medicare program'
 ; 
 
@@ -150,24 +152,25 @@ Followup Steps: Analyse the proportion of male and female benefeciaries by
 race for each age categories.
 ;
 
-title;
-
 footnote1 justify=left
-'This analysis shows that the top age group category of benenefeciaries in Medicare program are from age 65 to 74 years old. The percentage of this age category out of total population is 33%'
+'This data analysis shows that the top age category of benenefeciaries in Medicare program are from age 65 to 74 years old. The percentage of this age category out of total population is 35%'
 ;
 
 footnote2 justify=left
-'Also, this analysis helps us to reveal disabled benefeciaries under age of 65, that being eligible to enroll in Medicare program in 2010.'
+'Also, this data analysis helps us to reveal disabled benefeciaries under age of 65, that being eligible to enroll in Medicare program in 2010.'
 ; 
 
 proc freq data=contenr2010_analytic_file; /*order=freq*/
     table study_age / list missing;
 run;
 
-title1
-'Table shows the proportion male and female benefeciaries by age categories under Medicare program'
-;
 footnote;
+
+footnote1 justify=left
+'This data analysis shows that the proportion of women in each age categories is larger than the proportion of men'
+;
+
+title;
 
 * sort by study_age;
 proc sort
@@ -182,6 +185,7 @@ run;
 * display study_age, sex, number of benefeciaries and percent for each age
 categories by sex;
 proc report data=contenr2010_anal_file_by_Age;
+title' The Proportion of Men and Women by Age';
     columns
         Study_Age
         Sex
@@ -191,7 +195,7 @@ proc report data=contenr2010_anal_file_by_Age;
     define Study_Age / group;
     define Sex / group;
     define N / "N of Benefeciaries";
-    define pctn / 'Percent of Grand Total' f=percent9.3;
+    define pctn / 'Percent of Total' f=percent9.3;
     rbreak after /summarize;
 run;
 
@@ -208,15 +212,19 @@ footnote2
 ; 
 
 proc sgplot data=contenr2010_analytic_file;
-hbar study_age / group=sex;
+   hbar study_age / group=sex;
 run;
+
+* clear titles/footnotes;
+title;
+footnote;
 
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
 
 title1 justify=left
-'Question 4: What is the top five states and counties of benefeciaries population in 2010?'
+'Question 4: What is the the proportion of benefeciaries by states and counties in 2010?'
 ;
 
 title2 justify=left
@@ -238,7 +246,13 @@ for Medicare program and calculate the proportion of these benefeciaries from
 total population.
 ;
 
-footnote;
+footnote1 justify=left
+'The top five US states of benefeciary population in 2010 are California, Florida, Texas, New York and Pensylvania.'   
+;
+
+footnote2 justify=left
+'These top five states are covered 33% of total benefeciaries population. Three out of five states (CA, TX, NY) are the three largest states in the US'
+;
 
 proc freq data=contenr2010_analytic_file order=freq; 
     tables state /missing nocum;
@@ -247,18 +261,14 @@ run;
 title;
 
 footnote1 justify=left
-'The top five US states of benefeciaries population in 2010 are California, Florida, Texas, New York and Pensylvania. The top five counties are Los Angeles, Cook, Jefferson, Orange and Montgomery'  
+'The top five US counties are Los Angeles, Cook, Jefferson, Orange and Montgomery'
 ;
 
 footnote2 justify=left
-'These top five states are covered 33% of total benefeciaries population. Three out of five states (CA, TX, NY) are the three largest states in the US'
-;
-
-footnote3 justify=left
 'This data analysis shows that these top five counties represented the largest senior and disabled benefeciaries population in the US. The proportion of these population are covered 8% of total benefeciaries population'
 ; 
 
-proc sql(outobs=5);
+proc sql outobs=5;
     * print frequency of each Counties ;
     select
          County
@@ -267,7 +277,10 @@ proc sql(outobs=5);
         contenr2010_analytic_file
     group by
         County
-	order by Number_of_Benefeciaries desc
+    order by Number_of_Benefeciaries desc
     ;
 quit;
 
+* clear titles/footnotes;
+title;
+footnote;

@@ -115,6 +115,40 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
 ;
 %let inputDataset4Type = CSV;
 
+* create formats to apply for sex, race, study_age, 
+bene_hmo_cvrage_tot_mons and death_dt variables;
+
+proc format; 
+    value SexF
+        1='Male'
+        2='Female';
+    value DiseaseF
+        1='Yes'
+        2='No';
+    value ClaimF
+        0='0'
+	1-20='>1';
+    value RaceF
+        1='White' 
+        2='Black'
+        3='Other'
+        4='Asian'
+        5='Hispanic'
+        6='North American Native';
+    value AgeF
+        10-64="10 - 65"
+        65-74="65 - 74"
+        75-84="75 - 84"
+        85-94="85 - 94"
+        95-110="95 -110";
+    value HmoF
+        12="hmo"
+        0-11="nohmo";
+    value deathF
+        . = 'Alive'
+        15000-20000 = 'Died';
+run;
+
 * load raw datasets over the wire, if they doesn't already exist;
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
     %put &=dsn;
@@ -157,7 +191,6 @@ https://raw.githubusercontent.com/stat6863/team-3_project_repo/master/data/MSABE
     %end;
 %mend;
 %loadDatasets
-
 
 * check Ip2010claim for bad unique id values, where the column CLM_ID is a 
 unique key after executing this query, we see that Ip2010claim_dups has no 
@@ -214,41 +247,6 @@ proc sql;
     ;
 quit;
 
-* create formats to apply for sex, race, study_age, bene_hmo_cvrage_tot_mons 
-and death_dt variables;
-
-proc format; 
-    value SexF
-        1='Male'
-        2='Female';
-    value DiseaseF
-        1='Yes'
-        2='No';
-    value ClaimF
-	    0 = '0'
-	    1-20 = '>1';
-    value RaceF
-        1='White' 
-        2='Black'
-        3='Other'
-        4='Asian'
-        5='Hispanic'
-        6='North American Native';
-    value AgeF
-        10-64="10 - 65"
-        65-74="65 - 74"
-        75-84="75 - 84"
-        85-94="85 - 94"
-        95-110="95 -110";
-    value HmoF
-        12="hmo"
-        0-11="nohmo";
-    value deathF
-        . = 'Alive'
-        15000-20000 = 'Died';
-run;
-
-
 * Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join 
 and union;
@@ -258,7 +256,7 @@ proc sql;
         select
             distinct a.bene_id 'Benefeciary Code'
             ,a.clm_id 'Benefeciary Claim' format= 20.
-            ,c.race 'Benefeciary Race' format=RaceF.
+            ,c.Race 'Benefeciary Race' format=RaceF.
             ,c.Sex format=SexF.  
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
@@ -266,14 +264,18 @@ proc sql;
             ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
             ,c.death_dt 'Date of Death' format=deathF.
             ,
-            floor(
-            (
-            intck('month', c.bene_dob, '01jan2010'd) - 
-            (day('01jan2010'd) < day(c.bene_dob))
-            ) / 12) format=AgeF. as Study_Age
+            case 
+		when bene_dob is not missing then
+             floor(
+             (
+             intck('month', c.bene_dob, '01jan2010'd) - 
+             (day('01jan2010'd) < day(c.bene_dob))
+             ) / 12)
+             else 0
+            end as Study_Age format=AgeF.
             ,
             case
-              when c.bene_hi_cvrage_tot_mons=12 
+                when c.bene_hi_cvrage_tot_mons=12 
               and c.bene_smi_cvrage_tot_mons=12 then "ab"
               else "noab"
             end as Contenrl_ab_2010
@@ -301,25 +303,28 @@ proc sql;
     outer union corr
 
         select
-        
             distinct b.bene_id 'Benefeciary Code'
             ,b.clm_id 'Benefeciary Claim' format= 20.
-            ,c.race 'Benefeciary Race' format=RaceF.
-            ,c.sex format=SexF. 
+            ,c.Race 'Benefeciary Race' format=RaceF.
+            ,c.Sex format=SexF. 
             ,c.bene_dob 'Date of Birth' 
             ,c.bene_hi_cvrage_tot_mons 'Part A'
             ,c.bene_smi_cvrage_tot_mons 'Part B'
             ,c.bene_hmo_cvrage_tot_mons 'HMO' format=Hmof.
             ,c.death_dt 'Date of Death' format=deathF.
             ,
+	    case 
+	        when bene_dob is not missing then
             floor(
             (
             intck('month', c.bene_dob, '01jan2010'd) - 
             (day('01jan2010'd) < day(c.bene_dob))
-            ) / 12) format=AgeF. as study_age
+            ) / 12)
+            else 0
+            end as Study_Age format=AgeF. 
             ,
             case
-              when c.bene_hi_cvrage_tot_mons=12 
+                when c.bene_hi_cvrage_tot_mons=12 
               and c.bene_smi_cvrage_tot_mons=12 then "ab"
               else "noab"
             end as contenrl_ab_2010
@@ -348,10 +353,11 @@ proc sql;
         ;
 quit;
 
+*Removing missing values after full join and union;
+ 
 data contenr2010_analytic_file;
 set contenr2010_analytic_file_raw;
     where bene_id is not missing 
     and 
     clm_id > 1 and county is not missing;
 run;
-
