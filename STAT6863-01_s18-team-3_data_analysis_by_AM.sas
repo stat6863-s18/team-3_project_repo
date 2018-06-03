@@ -49,7 +49,7 @@ proc sql;
     create table RAOA_IPClaim AS
         select
             distinct Bene_ID
-	   ,COUNT(IP_ClmID) AS IP_Claims format = IPClaimF.
+	   ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
 	   ,RA_OA_Status
         from
             contenr2010_analytic_file
@@ -77,7 +77,7 @@ title2 justify=left
 'Rationale: This should help identify differences in hospitalization costs for patients with/without certain chronic conditions.'
 ;
 
-title3 justify=left
+title3 justify=center
 'Plot illustrating the similarity in the distribution of inpatient claim amounts by COPD Status.'
 ;
 
@@ -86,7 +86,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'To further explore this area of interest, inferential methods (either parametric or non-parametric) could be employed to determine whether there is a statistically significant difference.'
+'To further explore this area of interest, inferential methods (parametric or non-parametric) could be employed to determine whether there is a statistically significant difference.'
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
@@ -134,7 +134,7 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Research Question: Of patients that have made outpatient claims, is there a significant difference in claim amounts for patients with COPD versus patients that do not have COPD?'
+'Research Question: Of patients that have made outpatient claims, is there a difference in claim amounts for patients with COPD versus patients that do not have COPD?'
 ;
 
 title2 justify=left
@@ -142,7 +142,7 @@ title2 justify=left
 ;
 
 footnote1 justify=left
-'In the exploratory analysis, there appears to be a significant difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
+'In the exploratory analysis, there appears to be a difference in the distribution and magnitude of outpatient claim amounts based on COPD Status.'
 ;
 
 footnote2 justify=left
