@@ -225,8 +225,8 @@ proc format;
         1='Yes'
         2='No';
     value ClaimF
-	    0 = '0'
-	    1-20 = '>1';
+	0 = '0'
+	1-20 = '>1';
     value RaceF
         1='White' 
         2='Black'
@@ -247,7 +247,6 @@ proc format;
         . = 'Alive'
         15000-20000 = 'Died';
 run;
-
 
 * Combine ip2010claim, op2010claim, mbsf_ab_2010 and msabea_ssa data sets
 in final analytic file named contenr2010_analytic_file using full join 
