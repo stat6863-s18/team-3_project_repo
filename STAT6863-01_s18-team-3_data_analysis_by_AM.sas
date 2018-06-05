@@ -48,8 +48,8 @@ proc sql;
     create table RAOA_IPClaim AS
         select
             distinct Bene_ID
-	         ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
-	         ,RA_OA_Status
+	   ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
+	   ,RA_OA_Status
         from
             contenr2010_analytic_file
         group by 
@@ -106,15 +106,15 @@ proc sql;
     create table COPD_IPTotal_Pmt AS
         select
             distinct Bene_ID
-	         ,COUNT(IP_ClmID) AS IP_Num_Clm
-	         ,SUM(IP_PMT_AMT) AS IPTot_Pmt
-	         ,COPD_Status
+	   ,COUNT(IP_ClmID) AS IP_Num_Clm
+	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
+	   ,COPD_Status
         from
             contenr2010_analytic_file
         group by 
             BENE_ID
-	      having 
-	          SUM(IP_PMT_AMT) >0
+	having 
+	    SUM(IP_PMT_AMT) >0
 ;
 quit;
 
@@ -166,15 +166,15 @@ proc sql;
     create table COPD_OPTotal_Pmt_raw AS
         select
             distinct Bene_ID
-	         ,COUNT(OP_ClmID) AS OP_Num_Clm
-	         ,SUM(OP_PMT_AMT) AS OPTot_Pmt
-	         ,COPD_Status
+	   ,COUNT(OP_ClmID) AS OP_Num_Clm
+	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
+	   ,COPD_Status
         from
             contenr2010_analytic_file
         group by 
             BENE_ID, COPD_Status      
-	      having
-	          SUM(OP_PMT_AMT) >0
+	having
+	    SUM(OP_PMT_AMT) >0
 ;
 quit;
 
