@@ -347,6 +347,8 @@ proc sql;
         ;
 quit;
 
+*Remove blanks after full join and outer union;
+
 data contenr2010_analytic_file;
 set contenr2010_analytic_file_raw;
     where bene_id is not missing 
