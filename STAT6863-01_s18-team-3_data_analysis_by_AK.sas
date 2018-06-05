@@ -307,3 +307,7 @@ Followup Steps: Perform a chi-square goodness of fit test that allow us to test
 whether the observed proportions for race differ from hypothesized proportions
 of this categorical variable.
 ;
+
+* clear titles/footnotes;
+title;
+footnote;
