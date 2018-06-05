@@ -163,7 +163,7 @@ to provide evidence of a significant difference in claim amounts.
 ;
 
 proc sql;
-    create table COPD_OPTotal_Pmt_raw AS
+    create table COPD_OPTotal_Pmt AS
         select
             distinct Bene_ID
 	   ,COUNT(OP_ClmID) AS OP_Num_Clm
