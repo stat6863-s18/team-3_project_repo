@@ -127,7 +127,7 @@ proc format;
         2='No';
     value ClaimF
         0='0'
-	1-20='>1';
+	      1-20='>1';
     value RaceF
         1='White' 
         2='Black'
@@ -353,9 +353,9 @@ proc sql;
         ;
 quit;
 
-*Removing missing values after full join and union and
-sorting data set to eliminate duplicates;
- 
+
+*Removing missing values after full join and union;
+
 data contenr2010_analytic_file;
 set contenr2010_analytic_file_raw;
     where bene_id is not missing 
