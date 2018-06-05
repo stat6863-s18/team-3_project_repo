@@ -124,7 +124,7 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Question 3: What is the top age category of benefeciaries who was enrolled in Medicare program in 2010?'
+'Question 3: What is the top age category of benefeciaries who were enrolled in Medicare program in 2010?'
 ;
 
 title2 justify=left
@@ -280,7 +280,7 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Question 4: Is the race and sex are independent of each other'
+'Question 5: Is the race and sex are independent of each other'
 ;
 
 title2 justify=left
