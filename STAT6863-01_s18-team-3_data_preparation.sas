@@ -353,7 +353,6 @@ proc sql;
         ;
 quit;
 
-
 *Removing missing values after full join and union;
 
 data contenr2010_analytic_file;
