@@ -284,12 +284,16 @@ title1 justify=left
 ;
 
 title2 justify=left
-'Rationale: This tests hypothesis about relationship between sex and race'
+'Rationale: This test check hypothesis about relationship between sex and race'
 ;
 
+footnote1 justify=left
+'These results indicate that there is statistically very significant relationship between the benefeciary race and sex (chi-square with 3 degree of freedom = 24.45, p < 0.0001).'
+;
 
-
-
+proc freq data = contenr2010_analytic_file;
+  tables sex*race / chisq;
+run;
 
 * Note: It compares sex and race columns in contenr2010_analytic_file. 
 
