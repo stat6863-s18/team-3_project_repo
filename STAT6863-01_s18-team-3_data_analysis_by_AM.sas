@@ -48,8 +48,8 @@ proc sql;
     create table RAOA_IPClaim AS
         select
             distinct Bene_ID
-	   ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
-	   ,RA_OA_Status
+	         ,COUNT(IP_ClmID) AS IP_Claims format = ClaimF.
+	         ,RA_OA_Status
         from
             contenr2010_analytic_file
         group by 
@@ -106,15 +106,15 @@ proc sql;
     create table COPD_IPTotal_Pmt AS
         select
             distinct Bene_ID
-	   ,COUNT(IP_ClmID) AS IP_Num_Clm
-	   ,SUM(IP_PMT_AMT) AS IPTot_Pmt
-	   ,COPD_Status
+	         ,COUNT(IP_ClmID) AS IP_Num_Clm
+	         ,SUM(IP_PMT_AMT) AS IPTot_Pmt
+	         ,COPD_Status
         from
             contenr2010_analytic_file
         group by 
             BENE_ID
-	having 
-	    SUM(IP_PMT_AMT) >0
+	      having 
+	          SUM(IP_PMT_AMT) >0
 ;
 quit;
 
@@ -149,12 +149,13 @@ footnote2 justify=left
 ;
 
 *Note: This compares the variable "Chronic Condition: COPD" in 
-Master_Beneficiary_Summary_2010.csv to "C
+Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
+Master_Outpatient_Claim_1_2010.csv.
 
 Limitations: No limitations identified during exploratory steps.
 
 Methodology: Use proc report to explore differences in claim amounts
-for inpatient stays based on COPD status.
+for inpatient stays based on COPD status
 
 Follow-up Steps: A possible follow-up to this approach could use formal 
 inferential methods to compare mean and/or median values for each group 
@@ -165,15 +166,15 @@ proc sql;
     create table COPD_OPTotal_Pmt_raw AS
         select
             distinct Bene_ID
-	   ,COUNT(OP_ClmID) AS OP_Num_Clm
-	   ,SUM(OP_PMT_AMT) AS OPTot_Pmt
-	   ,COPD_Status
+	         ,COUNT(OP_ClmID) AS OP_Num_Clm
+	         ,SUM(OP_PMT_AMT) AS OPTot_Pmt
+	         ,COPD_Status
         from
             contenr2010_analytic_file
         group by 
-            BENE_ID, COPD_Status
-	having
-	    SUM(OP_PMT_AMT) >0
+            BENE_ID, COPD_Status      
+	      having
+	          SUM(OP_PMT_AMT) >0
 ;
 quit;
 
