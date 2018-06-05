@@ -172,20 +172,10 @@ footnote1 justify=left
 
 title;
 
-* sort by study_age;
-proc sort
-        data=contenr2010_analytic_file
-        out=contenr2010_anal_file_by_Age
-    ;
-    by
-        Study_Age
-    ;
-run;
-
 * display study_age, sex, number of benefeciaries and percent for each age
 categories by sex;
-proc report data=contenr2010_anal_file_by_Age;
 title' The Proportion of Men and Women by Age';
+proc report data=contenr2010_anal_file_by_Age;
     columns
         Study_Age
         Sex
@@ -284,3 +274,32 @@ quit;
 * clear titles/footnotes;
 title;
 footnote;
+
+*******************************************************************************;
+* Research Question Analysis Starting Point;
+*******************************************************************************;
+
+title1 justify=left
+'Question 4: Is the race and sex are independent of each other'
+;
+
+title2 justify=left
+'Rationale: This tests hypothesis about relationship between sex and race'
+;
+
+
+
+
+
+* Note: It compares sex and race columns in contenr2010_analytic_file. 
+
+Limitation: the expected value for each cell in contingency table is five or
+higher. Sex and race variables are not correlated with each other.
+
+Methodology: Use proc freq with chisq option to calculate chi square statistics
+and p value to conduct chi square test of independence of sex and race
+
+Followup Steps: Perform a chi-square goodness of fit test that allow us to test
+whether the observed proportions for race differ from hypothesized proportions
+of this categorical variable.
+;
