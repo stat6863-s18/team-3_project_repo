@@ -171,22 +171,11 @@ proc sql;
         from
             contenr2010_analytic_file
         group by 
-            BENE_ID COPD_Status
+            BENE_ID, COPD_Status
 	having
 	    SUM(OP_PMT_AMT) >0
 ;
 quit;
-
-*Sort by COPD_Status;
-
-proc sort
-    data=COPD_OPTotal_Pmt_raw 
-    out=COPD_OPTotal_Pmt 
-    ;
-    by
-    COPD_Status
-    ;
-run;   
 
 proc report data= COPD_OPTotal_Pmt nowd headline headskip;	
     column (Min Max Mean Median),OPTot_Pmt;	
