@@ -32,10 +32,13 @@ footnote2 justify=left
 *Note: This compares the variable "Chronic Condition: RA/OA" in 
 Master_Beneficiary_Summary_2010.csv to "Clm_ID" in 
 Master_Inpatient_Claim_2010.csv.
+
 Limitations: This question assumes that each admission is logged individually
 as referenced by claim ID. This may not be acccurate.
+
 Methodology: Create a 2x2 table with COPD_Status versus number of inpatient claims
 and use proc freq to evaluate independence of those variables.
+
 Follow-up Steps: Further investigate by including other possible covariates and/or
 class variables in the analysis to determine if there are other contributing
 factors.
@@ -88,9 +91,12 @@ footnote2 justify=left
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Inpatient_Claim_2010.csv.
+
 Limitations: No limitations identified during exploratory steps.
+
 Methodology: Use proc univariate to further explore the apparent lack
-of difference in claim amounts for inpatient stays based on COPD status
+of difference in claim amounts for inpatient stays based on COPD status.
+
 Follow-up Steps: A possible follow-up to this approach could use formal 
 inferential methods to compare mean and/or median values for each group 
 to provide evidence of no difference in claim amounts.
@@ -145,11 +151,19 @@ footnote2 justify=left
 *Note: This compares the variable "Chronic Condition: COPD" in 
 Master_Beneficiary_Summary_2010.csv to "Claim Payment Amount" in 
 Master_Outpatient_Claim_1_2010.csv.
+
 Limitations: No limitations identified during exploratory steps.
+
+Methodology: Use proc report to explore differences in claim amounts
+for inpatient stays based on COPD status.
+
+Follow-up Steps: A possible follow-up to this approach could use formal 
+inferential methods to compare mean and/or median values for each group 
+to provide evidence of a significant difference in claim amounts.
 ;
 
 proc sql;
-    create table COPD_OPTotal_Pmt_raw AS
+    create table COPD_OPTotal_Pmt AS
         select
             distinct Bene_ID
 	   ,COUNT(OP_ClmID) AS OP_Num_Clm
@@ -158,22 +172,11 @@ proc sql;
         from
             contenr2010_analytic_file
         group by 
-            BENE_ID
+            BENE_ID, COPD_Status      
 	having
 	    SUM(OP_PMT_AMT) >0
 ;
 quit;
-
-*Sort by COPD_Status;
-
-proc sort
-    data=COPD_OPTotal_Pmt_raw 
-    out=COPD_OPTotal_Pmt 
-    ;
-    by
-    COPD_Status
-    ;
-run;   
 
 proc report data= COPD_OPTotal_Pmt nowd headline headskip;	
     column (Min Max Mean Median),OPTot_Pmt;	
