@@ -172,7 +172,7 @@ proc sql;
         from
             contenr2010_analytic_file
         group by 
-            BENE_ID, COPD_Status      
+            COPD_Status, BENE_ID    
 	having
 	    SUM(OP_PMT_AMT) >0
 ;
