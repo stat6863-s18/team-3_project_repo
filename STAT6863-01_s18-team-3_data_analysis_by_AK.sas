@@ -288,7 +288,7 @@ title2 justify=left
 ;
 
 footnote1 justify=left
-'These results indicate that there is statistically very significant relationship between the benefeciary race and sex (chi-square with 3 degree of freedom = 24.45, p < 0.0001).'
+'These results indicate that there is statistically very significant relationship between the benefeciary race and sex (chi-square with 3 degrees of freedom = 27.45, p < 0.0001).'
 ;
 
 proc freq data = contenr2010_analytic_file;
