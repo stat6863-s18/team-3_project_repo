@@ -73,7 +73,7 @@ title1 justify=left
 title2 justify=left
 'Rationale: This should help to identify benefeciaries of Medicare services by Sex and by Race in 2010 to explore the composition of our population.'
 ; 
-*footnote;
+footnote;
 
 *Note: This compares "Sex", "Race" columns from contenr2010_analytic_file. 
 
@@ -100,6 +100,7 @@ proc freq data=contenr2010_analytic_file;
     tables sex / missing;
 run;
 
+* clear titles/footnotes;
 title;
 footnote;
 
@@ -164,12 +165,14 @@ proc freq data=contenr2010_analytic_file; /*order=freq*/
     table study_age / list missing;
 run;
 
+* clear footnotes;
 footnote;
 
 footnote1 justify=left
 'This data analysis shows that the proportion of women in each age categories is larger than the proportion of men'
 ;
 
+* clear titles;
 title;
 
 * display study_age, sex, number of benefeciaries and percent for each age
@@ -248,6 +251,7 @@ proc freq data=contenr2010_analytic_file order=freq;
     tables state /missing nocum;
 run;
 
+* clear titles;
 title;
 
 footnote1 justify=left
