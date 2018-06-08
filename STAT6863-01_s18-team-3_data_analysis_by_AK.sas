@@ -73,6 +73,8 @@ title1 justify=left
 title2 justify=left
 'Rationale: This should help to identify benefeciaries of Medicare services by Sex and by Race in 2010 to explore the composition of our population.'
 ; 
+
+* clear footnotes;
 footnote;
 
 *Note: This compares "Sex", "Race" columns from contenr2010_analytic_file. 
