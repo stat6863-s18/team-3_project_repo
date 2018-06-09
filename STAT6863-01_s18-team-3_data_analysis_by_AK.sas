@@ -32,7 +32,7 @@ footnote2 justify=left
 ; 
 
 footnote3 justify=left
-'Only 0.94% of benefeciaries from total benefeciaries population who use Medicare program are passed away in 2010.'
+'Only 0.94% of benefeciaries from total benefeciary population who use Medicare program are passed away in 2010.'
 ; 
 
 *Note: It compares Columns "contenrl_ab_2010" (Part A and B) and "contenrl_hmo" 
@@ -95,7 +95,7 @@ to see the relationship between sex and race
 ; 
 
 footnote1 justify=left
-'From total benefeciaries population 43% are men and 57% are women. Women utilize Medicare services 1.33 times more than men.'
+'From total benefeciary population 43% are men and 57% are women. Women utilize Medicare services 1.33 times more than men.'
 ; 
 
 proc freq data=contenr2010_analytic_file; 
@@ -107,7 +107,7 @@ title;
 footnote;
 
 footnote1 justify=left
-'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic.'
+'The benefeciary population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic.'
 ;
 
 footnote2 justify=left
@@ -246,7 +246,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'These top five states are covered 33% of total benefeciaries population. Three out of five states (CA, TX, NY) are the three largest states in the US.'
+'These top five states are covered 33% of total benefeciary population. Three out of five states (CA, TX, NY) are the three largest states in the US.'
 ;
 
 proc freq data=contenr2010_analytic_file order=freq; 
@@ -261,7 +261,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'This data analysis shows that these top five counties represented the largest senior and disabled benefeciaries population in the US. The proportion of these population are covered 8% of total benefeciaries population.'
+'This data analysis shows that these top five counties represented the largest senior and disabled benefeciary population in the US. The proportion of these population are covered 8% of total benefeciary population.'
 ; 
 
 proc sql outobs=5;
