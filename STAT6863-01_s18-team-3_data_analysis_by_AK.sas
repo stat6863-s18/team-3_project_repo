@@ -16,7 +16,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 
 title1 justify=left
-'Question 1: What was the proportion of alived inpatient and outpatient benefeciaries and HMOs benefeciaries continiously enrolled in Medicare program in 2010?'
+'Question 1: What was the proportion of alive inpatient and outpatient benefeciaries and HMOs benefeciaries continiously enrolled in Medicare program in 2010?'
 ;
 
 title2 justify=left
