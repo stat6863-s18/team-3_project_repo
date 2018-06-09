@@ -24,11 +24,11 @@ title2 justify=left
 ;
 
 footnote1 justify=left
-'Out of total benefeciaries population 96% of benefeciaries are enrolled in inpatient and outpatient Medicare services. Since the other type of medical services are excluded from data analysis, we can see the high proportion of inpatient and outpatient benefeciaries'  
+'Out of total benefeciary population 96% of them are enrolled in inpatient and outpatient services. Since the other type of medical services are excluded from data analysis, we can see the high proportion of inpatient and outpatient benefeciaries.'  
 ;
 
 footnote2 justify=left
-'Only 30% of benefeciaries from total population also uses the other type of medical services provided by Health Medical Organizations (HMOs)'
+'Only 30% of benefeciaries from total population also uses the other type of medical services provided by Health Medical Organizations (HMOs).'
 ; 
 
 footnote3 justify=left
@@ -107,11 +107,11 @@ title;
 footnote;
 
 footnote1 justify=left
-'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic'
+'The benefeciaries population who are continiously enrolled in 2010 are the following: White are 84%, Black are 10%, Other are 4%, and 2% are Hispanic.'
 ;
 
 footnote2 justify=left
-'The largest proportion of White benefeciaries can be explained that the minor Black, Other and Hispanic ethnicities might not be eligible for Medicare program'
+'The largest proportion of White benefeciaries can be explained that the minor Black, Other and Hispanic ethnicities might not be eligible for Medicare program.'
 ; 
 
 proc freq data=contenr2010_analytic_file order=freq; 
@@ -156,14 +156,14 @@ race for each age categories.
 ;
 
 footnote1 justify=left
-'This data analysis shows that the top age category of benenefeciaries in Medicare program are from age 65 to 74 years old. The percentage of this age category out of total population is 35%'
+'This data analysis shows that the top age category of benefeciaries in Medicare program are from age 65 to 74 years old. The percentage of this age category out of total population is 35%.'
 ;
 
 footnote2 justify=left
 'Also, this data analysis helps us to reveal disabled benefeciaries under age of 65, that being eligible to enroll in Medicare program in 2010.'
 ; 
 
-proc freq data=contenr2010_analytic_file; /*order=freq*/
+proc freq data=contenr2010_analytic_file order=freq;
     table study_age / list missing;
 run;
 
@@ -171,7 +171,7 @@ run;
 footnote;
 
 footnote1 justify=left
-'This data analysis shows that the proportion of women in each age categories is larger than the proportion of men'
+'This data analysis shows that the proportion of women in each age categories is larger than the proportion of men.'
 ;
 
 * clear titles;
@@ -180,7 +180,7 @@ title;
 * display study_age, sex, number of benefeciaries and percent for each age
 categories by sex;
 title' The Proportion of Men and Women by Age';
-proc report data=contenr2010_anal_file_by_Age;
+proc report data=contenr2010_analytic_file;
     columns
         Study_Age
         Sex
@@ -190,20 +190,20 @@ proc report data=contenr2010_anal_file_by_Age;
     define Study_Age / group;
     define Sex / group;
     define N / "N of Benefeciaries";
-    define pctn / 'Percent of Total' f=percent9.3;
+    define pctn / 'Percent of Total' f=percent12.3;
     rbreak after /summarize;
 run;
 
 title1
-'Plot illustrating the proportion male and female benefeciaries by age categories under Medicare program'
+'Plot illustrating the proportion male and female benefeciaries by age categories under Medicare program.'
 ;
 
 footnote1
-'In the above plot, we can see that the proportion of female benefeciaries much higher in all age categories except those of less than 65 years old'
+'In the above plot, we can see that the proportion of female benefeciaries much higher in all age categories except those of less than 65 years old.'
 ;
 
 footnote2
-'This plot shows that women uses Medicare services more than men in the same age categories'
+'This plot shows that women uses Medicare services more than men in the same age categories.'
 ; 
 
 proc sgplot data=contenr2010_analytic_file;
@@ -246,7 +246,7 @@ footnote1 justify=left
 ;
 
 footnote2 justify=left
-'These top five states are covered 33% of total benefeciaries population. Three out of five states (CA, TX, NY) are the three largest states in the US'
+'These top five states are covered 33% of total benefeciaries population. Three out of five states (CA, TX, NY) are the three largest states in the US.'
 ;
 
 proc freq data=contenr2010_analytic_file order=freq; 
@@ -257,11 +257,11 @@ run;
 title;
 
 footnote1 justify=left
-'The top five US counties are Los Angeles, Cook, Jefferson, Orange and Montgomery'
+'The top five US counties are Los Angeles, Cook, Jefferson, Orange and Montgomery.'
 ;
 
 footnote2 justify=left
-'This data analysis shows that these top five counties represented the largest senior and disabled benefeciaries population in the US. The proportion of these population are covered 8% of total benefeciaries population'
+'This data analysis shows that these top five counties represented the largest senior and disabled benefeciaries population in the US. The proportion of these population are covered 8% of total benefeciaries population.'
 ; 
 
 proc sql outobs=5;
@@ -286,11 +286,11 @@ footnote;
 *******************************************************************************;
 
 title1 justify=left
-'Question 5: Is the race and sex are independent of each other'
+'Question 5: Is the race and sex are independent of each other?'
 ;
 
 title2 justify=left
-'Rationale: This test check hypothesis about relationship between sex and race'
+'Rationale: This test check hypothesis about relationship between sex and race.'
 ;
 
 footnote1 justify=left
