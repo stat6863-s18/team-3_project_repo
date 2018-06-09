@@ -20,7 +20,7 @@ title1 justify=left
 ;
 
 title2 justify=left
-'Rationale: It should identify type of medical services under Medicare program in 2010'
+'Rationale: It should identify type of medical services under Medicare program in 2010.'
 ;
 
 footnote1 justify=left
